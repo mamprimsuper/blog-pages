@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Verificador de Saldo Bônus - Blend Broker</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --blend-blue: #05c3bd;
+        }
+        .bg-blend-blue {
+            background-color: var(--blend-blue);
+        }
+        .text-blend-blue {
+            color: var(--blend-blue);
+        }
+        .border-blend-blue {
+            border-color: var(--blend-blue);
+        }
+        .hover\:bg-blend-blue-dark:hover {
+            background-color: #04a9a4;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .animate-pulse {
+            animation: pulse 1.5s infinite;
+        }
+        
+        /* Custom responsive styles */
+        @media (max-width: 360px) {
+            .container-custom {
+                padding: 0.5rem !important;
+            }
+            .text-custom-sm {
+                font-size: 0.875rem !important;
+            }
+            .text-custom-base {
+                font-size: 1rem !important;
+            }
+        }
+        
+        /* Prevent content overflow */
+        body {
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+        }
+        
+        /* Fix for mobile input zoom */
+        input[type="email"] {
+            font-size: 16px !important;
+        }
+        
+        /* Custom container for better mobile fit */
+        .mobile-container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding: 0.75rem;
+        }
+        
+        @media (min-width: 640px) {
+            .mobile-container {
+                max-width: 90%;
+                margin: 0 auto;
+                padding: 1.5rem;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .mobile-container {
+                max-width: 80%;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .mobile-container {
+                max-width: 600px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-black min-h-screen w-full">
+    <div class="mobile-container bg-gray-900 rounded-lg shadow-xl mx-auto">
+        <!-- Logo -->
+        <div class="flex justify-center mb-4 sm:mb-6">
+            <img src="https://s3-new.flowhosted.com/imagens/logo.webp" alt="Blend Broker Logo" class="h-10 sm:h-12 md:h-16 object-contain">
+        </div>
+
+        <!-- Tela Inicial -->
+        <div id="initial-screen" class="px-2 sm:px-4">
+            <div class="space-y-3 sm:space-y-4">
+                <div class="bg-gray-800 p-3 sm:p-4 md:p-6 rounded-lg">
+                    <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-center mb-2 sm:mb-3 text-white">
+                        Você foi pré-selecionado para receber saldo bônus!
+                    </h1>
+                    <p class="text-gray-300 text-center text-sm sm:text-base">
+                        A Blend Broker está distribuindo saldo bônus para clientes selecionados.
+                        Verifique agora se sua conta foi contemplada!
+                    </p>
+                </div>
+
+                <div class="bg-gray-800 p-3 sm:p-4 md:p-6 rounded-lg">
+                    <div class="flex items-center gap-2 mb-2 sm:mb-3">
+                        <svg class="h-4 w-4 sm:h-5 sm:w-5 text-blend-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="font-bold text-white text-sm sm:text-base">Benefícios Exclusivos:</span>
+                    </div>
+                    <ul class="space-y-2 text-gray-300 ml-5 sm:ml-6 list-disc text-sm sm:text-base">
+                        <li>Saldo bônus de R$ 50,00</li>
+                        <li>Ativação instantânea após depósito</li>
+                        <li>Aproveite para operar ainda hoje</li>
+                    </ul>
+                </div>
+
+                <form id="check-form" class="space-y-3 sm:space-y-4">
+                    <div>
+                        <label for="email" class="block text-xs sm:text-sm font-medium text-gray-300 mb-1">
+                            Digite seu e-mail para verificar sua elegibilidade:
+                        </label>
+                        <input
+                            type="email"
+                            id="email"
+                            required
+                            class="w-full px-3 py-2 sm:py-3 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blend-blue focus:border-transparent"
+                            placeholder="Seu melhor e-mail"
+                        >
+                    </div>
+                    <button
+                        type="submit"
+                        class="w-full bg-blend-blue hover:bg-blend-blue-dark text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition duration-300 text-sm sm:text-base"
+                    >
+                        Verificar Elegibilidade
+                        <svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tela de Verificação -->
+        <div id="checking-screen" class="hidden space-y-3 sm:space-y-4 py-4 sm:py-6 px-2 sm:px-4">
+            <div class="text-center">
+                <h2 class="text-base sm:text-lg font-bold mb-3 sm:mb-4 text-white">Verificando elegibilidade...</h2>
+                <div class="w-full bg-gray-800 rounded-full h-2 mb-3 sm:mb-4">
+                    <div id="progress-bar" class="bg-blend-blue h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <div id="step1" class="hidden flex items-center gap-2 text-gray-300 justify-center text-xs sm:text-sm">
+                    <svg class="h-3 w-3 sm:h-4 sm:w-4 text-blend-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Verificando base de dados...</span>
+                </div>
+                <div id="step2" class="hidden flex items-center gap-2 text-gray-300 justify-center text-xs sm:text-sm">
+                    <svg class="h-3 w-3 sm:h-4 sm:w-4 text-blend-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Analisando perfil...</span>
+                </div>
+                <div id="step3" class="hidden flex items-center gap-2 text-gray-300 justify-center text-xs sm:text-sm">
+                    <svg class="h-3 w-3 sm:h-4 sm:w-4 text-blend-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Preparando resultado...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tela de Resultado -->
+        <div id="result-screen" class="hidden space-y-3 sm:space-y-4 py-4 sm:py-6 px-2 sm:px-4">
+            <div class="text-center">
+                <div class="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-blend-blue bg-opacity-20 mb-3 sm:mb-4">
+                    <svg class="h-6 w-6 sm:h-8 sm:w-8 text-blend-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-white">Parabéns!</h2>
+                <p class="text-base sm:text-lg text-gray-300 mb-4 sm:mb-6">
+                    Você foi selecionado para receber R$ 50,00 em saldo bônus!
+                </p>
+            </div>
+
+            <div class="bg-gray-800 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6">
+                <div class="flex items-center gap-2 mb-2 sm:mb-3">
+                    <svg class="h-4 w-4 sm:h-5 sm:w-5 text-blend-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="font-semibold text-white text-sm sm:text-base">Como ativar seu bônus:</span>
+                </div>
+                <ul class="space-y-2 text-gray-300 text-sm sm:text-base ml-5 sm:ml-6 list-disc">
+                    <li>Faça um depósito inicial de R$ 20,00</li>
+                    <li>Use o cupom: <span class="text-blend-blue font-semibold">BONUS50</span></li>
+                    <li>Receba R$ 50,00 em saldo bônus</li>
+                </ul>
+            </div>
+
+            <a
+                href="https://blendbroker.com/pt/signIn"
+                class="block w-full bg-blend-blue hover:bg-blend-blue-dark text-white font-bold py-3 px-4 rounded-lg text-center animate-pulse transition duration-300 text-sm sm:text-base"
+            >
+                ATIVAR MEU BÔNUS AGORA
+            </a>
+
+            <p class="text-xs text-gray-500 text-center mt-2 sm:mt-3">
+                *Oferta por tempo limitado, sujeita a termos e condições
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('check-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            document.getElementById('initial-screen').classList.add('hidden');
+            document.getElementById('checking-screen').classList.remove('hidden');
+            
+            let progress = 0;
+            const progressBar = document.getElementById('progress-bar');
+            
+            const interval = setInterval(() => {
+                progress += 1;
+                progressBar.style.width = `${progress}%`;
+                
+                if (progress >= 30) {
+                    document.getElementById('step1').classList.remove('hidden');
+                }
+                if (progress >= 60) {
+                    document.getElementById('step2').classList.remove('hidden');
+                }
+                if (progress >= 90) {
+                    document.getElementById('step3').classList.remove('hidden');
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        document.getElementById('checking-screen').classList.add('hidden');
+                        document.getElementById('result-screen').classList.remove('hidden');
+                    }, 500);
+                }
+            }, 30);
+        });
+    </script>
+</body>
+</html>

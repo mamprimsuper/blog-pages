@@ -110,49 +110,41 @@
 
         .analysis-box {
             background: white;
-            border: 2px solid #C4170C;
-            border-radius: 8px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: none;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         .analysis-header {
-            text-align: center;
-            margin-bottom: 25px;
-            position: relative;
+            text-align: left;
+            margin-bottom: 16px;
         }
 
         .analysis-header h3 {
-            color: #C4170C;
-            font-size: 24px;
-            font-weight: bold;
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
             margin: 0;
-            padding: 0 0 15px;
-        }
-
-        .header-underline {
-            width: 60px;
-            height: 3px;
-            background: #C4170C;
-            margin: 0 auto;
+            padding: 0;
         }
 
         .analysis-content {
-            text-align: center;
+            text-align: left;
         }
 
         .main-text {
-            font-size: 24px;
+            font-size: 16px;
             color: #333;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             line-height: 1.4;
-            font-weight: bold;
+            font-weight: 500;
         }
 
         .sub-text {
-            font-size: 18px;
+            font-size: 14px;
             color: #666;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             line-height: 1.4;
         }
 
@@ -160,24 +152,20 @@
             background: #C4170C;
             color: white;
             border: none;
-            border-radius: 50px;
-            padding: 20px 40px;
-            font-size: 18px;
-            font-weight: bold;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            margin: 20px 0;
+            transition: all 0.2s ease;
+            margin: 12px 0;
             width: 100%;
-            max-width: 500px;
+            box-shadow: 0 2px 4px rgba(196, 23, 12, 0.2);
         }
 
-        .pulse-button {
-            animation: pulse-red 2s infinite;
-        }
-
-        .glow-button {
-            animation: glow 1.5s ease-in-out infinite alternate;
+        .analysis-button:hover {
+            background: #a01209;
+            transform: translateY(-1px);
         }
 
         @keyframes pulse-red {
@@ -402,14 +390,13 @@
                 <div class="ad-container">
                     <div class="analysis-box">
                         <div class="analysis-header">
-                            <h3>ANÁLISE GRATUITA DE SAÚDE</h3>
-                            <div class="header-underline"></div>
+                            <h3>Avaliação Personalizada</h3>
                         </div>
                         <div class="analysis-content">
-                            <p class="main-text">Você também pode recuperar sua disposição como Antonio Fagundes!</p>
-                            <p class="sub-text">Responda a um breve questionário e descubra seu potencial de melhoria com o Vital 360.</p>
-                            <button onclick="window.location.href='https://google.com'" class="analysis-button pulse-button">
-                                FAZER MINHA ANÁLISE GRATUITA
+                            <p class="main-text">Descubra como melhorar sua disposição</p>
+                            <p class="sub-text">Responda algumas perguntas rápidas e receba sua análise gratuita.</p>
+                            <button onclick="window.location.href='https://google.com'" class="analysis-button">
+                                Avaliar agora
                             </button>
                             <div class="benefits">
                                 <div class="benefit-item">

@@ -7,219 +7,329 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
 </head>
-<body class="bg-gray-50 min-h-screen py-8">
-    <div id="quiz-container" class="max-w-2xl mx-auto p-4">
+<body class="bg-gray-50 min-h-screen">
+    <div id="quiz-container" class="max-w-md mx-auto p-4 py-6">
         <!-- Tela Inicial -->
-        <div id="intro-screen" class="bg-white rounded-lg shadow-lg p-8">
-            <h1 class="text-2xl font-bold text-red-600 text-center mb-6">
-                ATENÇÃO: Se você está insatisfeito com sua disposição e vitalidade, esta pode ser a mensagem mais importante que você lerá hoje!
+        <div id="intro-screen" class="bg-white rounded-lg shadow-lg p-6">
+            <h1 class="text-xl md:text-2xl font-bold text-red-600 text-center mb-4">
+                Responda 5 perguntas rápidas e descubra como melhorar sua libido!
             </h1>
-            <div class="bg-blue-50 p-6 rounded-lg mb-6">
-                <p class="text-lg mb-4">Milhares de homens estão descobrindo um segredo revolucionário para:</p>
-                <ul class="space-y-3">
+            <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                <p class="text-lg mb-3">Este teste rápido vai revelar:</p>
+                <ul class="space-y-2">
                     <li class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 flex-shrink-0 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
-                        <span>Recuperar a energia e disposição da juventude</span>
+                        <span>Como aumentar seu desejo naturalmente</span>
                     </li>
                     <li class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 flex-shrink-0 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
-                        <span>Melhorar significativamente o desempenho íntimo</span>
+                        <span>Segredo para melhorar seu desempenho</span>
                     </li>
                     <li class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 flex-shrink-0 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
-                        <span>Aumentar a confiança e autoestima</span>
+                        <span>Uma solução especial ao final</span>
                     </li>
                 </ul>
             </div>
             <div class="border-2 border-red-500 p-4 rounded-lg">
-                <div class="flex items-center justify-center gap-2 mb-4">
+                <div class="flex items-center justify-center gap-2 mb-3">
                     <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                     </svg>
-                    <h3 class="text-xl font-bold text-red-500">OFERTA ESPECIAL!</h3>
+                    <h3 class="text-lg font-bold text-red-500">TESTE RÁPIDO!</h3>
                 </div>
-                <p class="text-center font-semibold">
-                    Responda 5 perguntas rápidas e destrave até 70% de DESCONTO!
+                <p class="text-center font-semibold text-sm md:text-base">
+                    Em apenas 2 minutos você descobrirá a solução!
                 </p>
             </div>
-            <button onclick="startQuiz()" class="w-full mt-6 bg-green-600 hover:bg-green-700 text-white py-4 rounded-lg text-lg font-bold">
-                RESPONDER AGORA E GARANTIR MEU DESCONTO
+            <button id="start-quiz" class="w-full mt-4 bg-green-600 hover:bg-green-700 text-white py-4 rounded-lg text-lg font-bold animate-pulse">
+                COMEÇAR TESTE AGORA
             </button>
         </div>
 
-        <!-- Tela de Perguntas (inicialmente oculta) -->
-        <div id="question-screen" class="hidden bg-white rounded-lg shadow-lg p-8">
+        <!-- Tela de Perguntas -->
+        <div id="question-screen" class="hidden bg-white rounded-lg shadow-lg p-6">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold">Descubra seu desconto exclusivo</h2>
+                <h2 class="text-lg font-bold">Quiz Rápido</h2>
                 <span class="text-sm text-gray-500">Pergunta <span id="current-question">1</span> de 5</span>
             </div>
             <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
-                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 20%"></div>
+                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: 20%"></div>
             </div>
-            <h3 id="question-text" class="text-xl font-semibold mb-6"></h3>
+            <h3 id="question-text" class="text-lg font-semibold mb-4"></h3>
             <div id="options-container" class="space-y-3"></div>
         </div>
 
-        <!-- Tela de Análise (inicialmente oculta) -->
-        <div id="analyzing-screen" class="hidden bg-white rounded-lg shadow-lg p-8 text-center">
-            <h2 class="text-2xl font-bold mb-4">Analisando suas respostas...</h2>
-            <div class="w-full bg-gray-200 rounded-full h-2.5">
-                <div class="bg-blue-600 h-2.5 rounded-full animate-[loading_3s_ease-in-out]" style="width: 100%"></div>
+        <!-- Tela de Análise -->
+        <div id="analyzing-screen" class="hidden bg-white rounded-lg shadow-lg p-6 text-center">
+            <h2 class="text-xl font-bold mb-4">Analisando suas respostas...</h2>
+            <div class="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div class="loading-bar absolute top-0 left-0 h-full w-full bg-blue-600"></div>
+            </div>
+            <div class="mt-4 space-y-2">
+                <p class="analyzing-text opacity-0">Verificando seu perfil...</p>
+                <p class="analyzing-text opacity-0">Analisando resultados...</p>
+                <p class="analyzing-text opacity-0">Preparando sua solução...</p>
             </div>
         </div>
 
-        <!-- Tela de Resultado (inicialmente oculta) -->
-        <div id="result-screen" class="hidden bg-white rounded-lg shadow-lg p-8">
-            <h2 class="text-2xl font-bold text-green-600 text-center mb-6">
-                PARABÉNS! Você foi aprovado para receber até 70% de DESCONTO no Vital 360!
-            </h2>
-            <div class="bg-green-50 p-6 rounded-lg mb-6">
-                <p class="text-lg text-center mb-6">
-                    Com base nas suas respostas, você é o candidato IDEAL para experimentar o poder do Vital 360!
+        <!-- Tela de Resultado -->
+        <div id="result-screen" class="hidden bg-white rounded-lg shadow-lg p-6">
+            <div class="bg-green-600 text-white p-4 rounded-lg mb-6">
+                <h2 class="text-xl font-bold text-center">
+                    PARABÉNS! Preparamos algo especial para você!
+                </h2>
+            </div>
+
+            <div class="mb-6">
+                <img src="https://s3-new.flowhosted.com/imagens/potes.png" alt="Vital 360 Product" class="w-full rounded-lg mb-4">
+                <h3 class="text-xl font-bold text-center text-red-600 mb-4">VITAL 360</h3>
+                <p class="text-center mb-4">
+                    A solução natural que já transformou a vida de mais de 100 mil homens!
                 </p>
+            </div>
+
+            <div class="bg-blue-50 p-4 rounded-lg mb-6">
+                <h4 class="font-bold text-lg mb-3">Benefícios Comprovados:</h4>
+                <ul class="space-y-2">
+                    <li class="flex items-center gap-2">
+                        <svg class="w-5 h-5 flex-shrink-0 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>Aumento da libido em até 82% dos casos</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <svg class="w-5 h-5 flex-shrink-0 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>Mais disposição e energia em 30 dias</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <svg class="w-5 h-5 flex-shrink-0 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>97% de satisfação entre usuários</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                <h4 class="font-bold text-lg mb-3 text-center">O que dizem nossos clientes:</h4>
                 <div class="space-y-4">
-                    <div class="flex items-center gap-3">
-                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span>Aumento comprovado da libido e disposição em até 30 dias</span>
+                    <div class="bg-white p-3 rounded shadow">
+                        <div class="flex items-center mb-2">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2">
+                                <span class="font-bold text-blue-600">RC</span>
+                            </div>
+                            <div>
+                                <p class="font-bold">Roberto C.</p>
+                                <div class="flex text-yellow-400">★★★★★</div>
+                            </div>
+                        </div>
+                        <p class="text-sm">"Comecei a usar o Vital 360 há 2 meses e os resultados são impressionantes. Minha energia voltou e minha esposa notou a diferença!"</p>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span>Fórmula natural e segura, sem efeitos colaterais</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span>97% de satisfação entre nossos clientes</span>
+                    <div class="bg-white p-3 rounded shadow">
+                        <div class="flex items-center mb-2">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2">
+                                <span class="font-bold text-blue-600">MS</span>
+                            </div>
+                            <div>
+                                <p class="font-bold">Marcos S.</p>
+                                <div class="flex text-yellow-400">★★★★★</div>
+                            </div>
+                        </div>
+                        <p class="text-sm">"Produto incrível! Em apenas 3 semanas já senti uma diferença significativa na disposição. Recomendo!"</p>
                     </div>
                 </div>
             </div>
+
             <div class="mb-6">
-                <h3 class="text-lg font-bold text-center mb-4">Sua Evolução Esperada com Vital 360</h3>
                 <canvas id="progressChart" class="w-full"></canvas>
                 <div class="mt-4 space-y-2 text-sm">
-                    <p><strong>Semana 1-2:</strong> Aumento inicial de energia e disposição</p>
-                    <p><strong>Semana 3-4:</strong> Melhoria significativa na libido e vitalidade</p>
-                    <p><strong>Semana 5-6:</strong> Resultados completos e transformação</p>
+                    <p><strong>Semana 1-2:</strong> Aumento inicial de energia</p>
+                    <p><strong>Semana 3-4:</strong> Melhoria na libido</p>
+                    <p><strong>Semana 5-6:</strong> Resultados completos</p>
                 </div>
             </div>
-            <button onclick="window.location.href='https://emailserverside.com/elementor-2026/'" class="w-full bg-red-600 hover:bg-red-700 text-white py-4 rounded-lg text-lg font-bold">
-                QUERO APROVEITAR MEU DESCONTO EXCLUSIVO AGORA!
+
+            <div class="text-center mb-6">
+                <div class="text-2xl font-bold text-red-600 mb-2">CLIQUE ABAIXO PARA DESCOBRIR SUA SURPRESA ESPECIAL!</div>
+                <div class="text-sm text-gray-600">* Disponível por tempo limitado</div>
+            </div>
+
+            <button onclick="window.location.href='https://emailserverside.com/elementor-2026/'" class="w-full bg-red-600 hover:bg-red-700 text-white py-4 rounded-lg text-lg font-bold pulse-button">
+                QUERO DESCOBRIR MINHA SURPRESA AGORA!
             </button>
         </div>
     </div>
 
-    <script>
-        const questions = [
-            {
-                question: "Qual é a sua faixa etária?",
-                options: ["Menos de 30 anos", "30-35 anos", "35-45 anos", "45-60 anos", "Acima de 60 anos"]
-            },
-            {
-                question: "Qual é sua principal preocupação?",
-                options: ["Baixa libido/desejo sexual", "Cansaço e falta de energia", "Dificuldade de concentração", "Insatisfação com desempenho"]
-            },
-            {
-                question: "Com que frequência você sente falta de disposição para intimidade?",
-                options: ["Quase sempre", "Frequentemente", "Às vezes", "Raramente"]
-            },
-            {
-                question: "Como está sua energia durante o dia?",
-                options: ["Sempre cansado", "Energia irregular", "Energia moderada", "Energia normal"]
-            },
-            {
-                question: "Há quanto tempo você percebe esses sintomas?",
-                options: ["Mais de 1 ano", "6 meses a 1 ano", "3 a 6 meses", "Menos de 3 meses"]
-            }
-        ];
-
-        let currentQuestion = 0;
-
-        function startQuiz() {
-            document.getElementById('intro-screen').classList.add('hidden');
-            document.getElementById('question-screen').classList.remove('hidden');
-            showQuestion();
-        }
-
-        function showQuestion() {
-            const question = questions[currentQuestion];
-            document.getElementById('question-text').textContent = question.question;
-            document.getElementById('current-question').textContent = currentQuestion + 1;
-            document.getElementById('progress-bar').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
-
-            const optionsContainer = document.getElementById('options-container');
-            optionsContainer.innerHTML = '';
-            
-            question.options.forEach(option => {
-                const button = document.createElement('button');
-                button.className = 'w-full text-left p-4 rounded-lg border border-gray-300 hover:bg-gray-50';
-                button.textContent = option;
-                button.onclick = () => handleAnswer(option);
-                optionsContainer.appendChild(button);
-            });
-        }
-
-        function handleAnswer(answer) {
-            currentQuestion++;
-            
-            if (currentQuestion < questions.length) {
-                showQuestion();
-            } else {
-                showAnalyzing();
-            }
-        }
-
-        function showAnalyzing() {
-            document.getElementById('question-screen').classList.add('hidden');
-            document.getElementById('analyzing-screen').classList.remove('hidden');
-            
-            setTimeout(showResult, 3000);
-        }
-
-        function showResult() {
-            document.getElementById('analyzing-screen').classList.add('hidden');
-            document.getElementById('result-screen').classList.remove('hidden');
-            
-            // Criar gráfico de progresso
-            const ctx = document.getElementById('progressChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4', 'Semana 5', 'Semana 6'],
-                    datasets: [{
-                        label: 'Progresso Esperado (%)',
-                        data: [20, 40, 65, 85, 95, 100],
-                        borderColor: 'rgb(34, 197, 94)',
-                        tension: 0.1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100
-                        }
-                    }
-                }
-            });
-        }
-    </script>
     <style>
+        .loading-bar {
+            animation: loading 3s linear infinite;
+            background: linear-gradient(90deg, transparent, #3B82F6, transparent);
+            background-size: 200% 100%;
+        }
+
         @keyframes loading {
-            0% { width: 0% }
-            100% { width: 100% }
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .pulse-button {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 640px) {
+            .text-xl {
+                font-size: 1.1rem;
+            }
+            .text-lg {
+                font-size: 1rem;
+            }
+            .p-6 {
+                padding: 1.25rem;
+            }
+        }
+
+        .analyzing-text {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .analyzing-text.show {
+            opacity: 1;
         }
     </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const questions = [
+                {
+                    question: "Qual é a sua faixa etária?",
+                    options: ["Menos de 30 anos", "30-35 anos", "35-45 anos", "45-60 anos", "Acima de 60 anos"]
+                },
+                {
+                    question: "Qual é sua principal preocupação?",
+                    options: ["Baixa libido/desejo sexual", "Cansaço e falta de energia", "Dificuldade de concentração", "Insatisfação com desempenho"]
+                },
+                {
+                    question: "Com que frequência você sente falta de disposição para intimidade?",
+                    options: ["Quase sempre", "Frequentemente", "Às vezes", "Raramente"]
+                },
+                {
+                    question: "Como está sua energia durante o dia?",
+                    options: ["Sempre cansado", "Energia irregular", "Energia moderada", "Energia normal"]
+                },
+                {
+                    question: "Há quanto tempo você percebe esses sintomas?",
+                    options: ["Mais de 1 ano", "6 meses a 1 ano", "3 a 6 meses", "Menos de 3 meses"]
+                }
+            ];
+
+            let currentQuestion = 0;
+
+            // Elementos DOM
+            const startButton = document.getElementById('start-quiz');
+            const introScreen = document.getElementById('intro-screen');
+            const questionScreen = document.getElementById('question-screen');
+            const analyzingScreen = document.getElementById('analyzing-screen');
+            const resultScreen = document.getElementById('result-screen');
+
+            // Event Listeners
+            if (startButton) {
+                startButton.addEventListener('click', startQuiz);
+            }
+
+                        function startQuiz() {
+                introScreen.classList.add('hidden');
+                questionScreen.classList.remove('hidden');
+                showQuestion();
+            }
+
+            function showQuestion() {
+                const question = questions[currentQuestion];
+                document.getElementById('question-text').textContent = question.question;
+                document.getElementById('current-question').textContent = currentQuestion + 1;
+                document.getElementById('progress-bar').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+
+                const optionsContainer = document.getElementById('options-container');
+                optionsContainer.innerHTML = '';
+                
+                question.options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.className = 'w-full text-left p-4 rounded-lg border border-gray-300 hover:bg-gray-50';
+                    button.textContent = option;
+                    button.onclick = () => handleAnswer(option);
+                    optionsContainer.appendChild(button);
+                });
+            }
+
+            function handleAnswer(answer) {
+                currentQuestion++;
+                
+                if (currentQuestion < questions.length) {
+                    showQuestion();
+                } else {
+                    showAnalyzing();
+                }
+            }
+
+            function showAnalyzing() {
+                questionScreen.classList.add('hidden');
+                analyzingScreen.classList.remove('hidden');
+                
+                // Animação dos textos de análise
+                const texts = document.querySelectorAll('.analyzing-text');
+                texts.forEach((text, index) => {
+                    setTimeout(() => {
+                        text.classList.add('show');
+                    }, index * 1000);
+                });
+                
+                setTimeout(showResult, 3000);
+            }
+
+            function showResult() {
+                analyzingScreen.classList.add('hidden');
+                resultScreen.classList.remove('hidden');
+                
+                // Criar gráfico de progresso
+                const ctx = document.getElementById('progressChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4', 'Semana 5', 'Semana 6'],
+                        datasets: [{
+                            label: 'Progresso Esperado (%)',
+                            data: [20, 40, 65, 85, 95, 100],
+                            borderColor: 'rgb(34, 197, 94)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

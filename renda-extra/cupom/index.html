@@ -41,6 +41,17 @@
                 max-height: 40px;
             }
         }
+
+        .fade-enter {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .fade-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 300ms, transform 300ms;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-50">
@@ -52,7 +63,7 @@
                 <p class="text-gray-600 mt-2">Faça seu cadastro para começar</p>
             </div>
             
-            <form id="authForm" class="space-y-4">
+            <form id="authForm" class="space-y-4" onsubmit="handleLogin(event)">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Email</label>
                     <input type="email" id="userEmail" required class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
@@ -72,6 +83,7 @@
 
     <!-- Tela Principal -->
     <div id="mainScreen" class="hidden min-h-screen py-4 px-4">
+        <!-- [O resto do HTML permanece igual ao anterior] -->
         <div class="max-w-md mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
             <!-- Header -->
             <div class="p-4 bg-gradient-to-r from-yellow-400 to-yellow-500">
@@ -103,7 +115,7 @@
                 </div>
 
                 <!-- Code Input -->
-                <form id="codeForm" class="p-4 space-y-4 bg-gray-50">
+                <form id="codeForm" class="p-4 space-y-4 bg-gray-50" onsubmit="handleCodeSubmit(event)">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
                             Digite o código do cupom:
@@ -132,6 +144,7 @@
             <div id="withdrawSection" class="hidden p-4 bg-gray-50">
                 <button
                     id="withdrawButton"
+                    onclick="showPixModal()"
                     class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition duration-300 shadow-md"
                 >
                     Sacar via PIX
@@ -143,64 +156,15 @@
         </div>
     </div>
 
+    <!-- [Os modais permanecem iguais ao anterior] -->
     <!-- Modal PIX -->
     <div id="pixModal" class="hidden fixed inset-0 flex items-center justify-center z-50 modal p-4">
-        <div class="bg-white rounded-xl shadow-xl p-6 max-w-md w-full mx-4">
-            <h3 class="text-xl font-bold text-gray-900 mb-4">Saque via PIX</h3>
-            
-            <form id="pixForm" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Tipo de Chave PIX</label>
-                    <select id="pixType" class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg">
-                        <option value="cpf">CPF</option>
-                        <option value="email">E-mail</option>
-                        <option value="telefone">Telefone</option>
-                    </select>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Chave PIX</label>
-                    <input type="text" id="pixKey" required class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg">
-                </div>
-                
-                <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg">
-                    Confirmar Saque
-                </button>
-                
-                <button type="button" id="cancelPix" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg">
-                    Cancelar
-                </button>
-            </form>
-        </div>
+        <!-- [Conteúdo do modal permanece igual] -->
     </div>
 
     <!-- Modal Promoção -->
     <div id="promoModal" class="hidden fixed inset-0 flex items-center justify-center z-50 modal p-4">
-        <div class="bg-white rounded-xl shadow-xl p-6 max-w-md w-full mx-4">
-            <div class="text-center">
-                <div class="w-16 h-16 mx-auto bg-yellow-100 rounded-full flex items-center justify-center mb-4">
-                    <svg class="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Ops! E-mail não encontrado</h3>
-                <p class="text-gray-600 mb-6">
-                    Não encontramos seu cadastro para pagamento, mas temos uma oferta especial para você!
-                </p>
-                <p class="text-lg font-bold text-green-600 mb-6">
-                    Ganhe 50% de desconto no seu primeiro depósito!
-                </p>
-                
-                <a href="#" class="block w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3 px-4 rounded-lg mb-3">
-                    Aproveitar Desconto
-                </a>
-                
-                <button id="closePromoModal" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg">
-                    Fechar
-                </button>
-            </div>
-        </div>
+        <!-- [Conteúdo do modal permanece igual] -->
     </div>
 
     <script>
@@ -218,8 +182,19 @@
         const baseAmount = 121.14;
         let userEmail = '';
 
-        // Auth handling
-        document.getElementById('codeInput').value;
+        // Função para lidar com o login
+        function handleLogin(event) {
+            event.preventDefault();
+            userEmail = document.getElementById('userEmail').value;
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('mainScreen').classList.remove('hidden');
+            document.getElementById('mainScreen').classList.add('fade-enter', 'fade-enter-active');
+        }
+
+        // Função para lidar com o código
+        function handleCodeSubmit(event) {
+            event.preventDefault();
+            const code = document.getElementById('codeInput').value;
 
             if (code === products[currentProductIndex].code) {
                 animateBalance(baseAmount);
@@ -235,35 +210,7 @@
                     input.classList.remove('animate-bounce');
                 }, 1000);
             }
-        });
-
-        // PIX Modal handlers
-        document.getElementById('withdrawButton').addEventListener('click', function() {
-            document.getElementById('pixModal').classList.remove('hidden');
-        });
-
-        document.getElementById('cancelPix').addEventListener('click', function() {
-            document.getElementById('pixModal').classList.add('hidden');
-        });
-
-        document.getElementById('pixForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            document.getElementById('pixModal').classList.add('hidden');
-            document.getElementById('promoModal').classList.remove('hidden');
-        });
-
-        document.getElementById('closePromoModal').addEventListener('click', function() {
-            document.getElementById('promoModal').classList.add('hidden');
-        });
-
-        // Inicializar com o primeiro produto
-        document.getElementById('productImage').src = products[0].image;
-        document.getElementById('barcodeNumber').textContent = products[0].code;getElementById('authForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            userEmail = document.getElementById('userEmail').value;
-            document.getElementById('authScreen').classList.add('hidden');
-            document.getElementById('mainScreen').classList.remove('hidden');
-        });
+        }
 
         function updateBalance(newBalance) {
             const balanceElement = document.getElementById('balance');
@@ -320,6 +267,34 @@
             requestAnimationFrame(animate);
         }
 
-        document.getElementById('codeForm').addEventListener('submit', function(e) {
+        function showPixModal() {
+            document.getElementById('pixModal').classList.remove('hidden');
+        }
+
+        function hidePixModal() {
+            document.getElementById('pixModal').classList.add('hidden');
+        }
+
+        function showPromoModal() {
+            document.getElementById('pixModal').classList.add('hidden');
+            document.getElementById('promoModal').classList.remove('hidden');
+        }
+
+        function hidePromoModal() {
+            document.getElementById('promoModal').classList.add('hidden');
+        }
+
+        // Event Listeners
+        document.getElementById('cancelPix').addEventListener('click', hidePixModal);
+        document.getElementById('pixForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const code = document.
+            showPromoModal();
+        });
+        document.getElementById('closePromoModal').addEventListener('click', hidePromoModal);
+
+        // Inicializar com o primeiro produto
+        document.getElementById('productImage').src = products[0].image;
+        document.getElementById('barcodeNumber').textContent = products[0].code;
+    </script>
+</body>
+</html>

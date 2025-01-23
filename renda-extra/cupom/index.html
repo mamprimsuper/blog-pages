@@ -17,23 +17,38 @@
         }
         
         .glass-effect {
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
         }
 
         .modal {
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(5px);
+        }
+
+        body {
+            background: #f8f9fa;
+        }
+
+        .logo-container img {
+            max-height: 50px;
+            width: auto;
+        }
+
+        @media (max-width: 640px) {
+            .logo-container img {
+                max-height: 40px;
+            }
         }
     </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-yellow-100 via-yellow-200 to-yellow-300">
+<body class="min-h-screen bg-gray-50">
     <!-- Tela de Login/Cadastro -->
     <div id="authScreen" class="min-h-screen flex items-center justify-center p-4">
-        <div class="max-w-md w-full bg-white rounded-xl shadow-xl p-6 space-y-6">
-            <div class="text-center">
-                <h2 class="text-2xl font-bold text-gray-900">Cupom da Vez</h2>
+        <div class="max-w-md w-full bg-white rounded-xl shadow-lg p-6 space-y-6">
+            <div class="text-center logo-container">
+                <img src="https://s3-new.flowhosted.com/imagens/logocupom.png" alt="Cupom da Vez" class="mx-auto mb-6">
                 <p class="text-gray-600 mt-2">Faça seu cadastro para começar</p>
             </div>
             
@@ -56,37 +71,39 @@
     </div>
 
     <!-- Tela Principal -->
-    <div id="mainScreen" class="hidden min-h-screen py-8 px-4">
-        <div class="max-w-md mx-auto bg-white rounded-xl shadow-xl overflow-hidden">
+    <div id="mainScreen" class="hidden min-h-screen py-4 px-4">
+        <div class="max-w-md mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
             <!-- Header -->
-            <div class="p-6 bg-gradient-to-r from-yellow-400 to-yellow-500">
+            <div class="p-4 bg-gradient-to-r from-yellow-400 to-yellow-500">
                 <div class="flex justify-between items-center">
-                    <h1 class="text-2xl font-bold text-white">Cupom da Vez</h1>
-                    <div class="glass-effect px-6 py-3 rounded-lg">
+                    <div class="logo-container">
+                        <img src="https://s3-new.flowhosted.com/imagens/logocupom.png" alt="Cupom da Vez" class="h-8">
+                    </div>
+                    <div class="glass-effect px-4 py-2 rounded-lg">
                         <p class="text-sm text-gray-800">SALDO</p>
-                        <p id="balance" class="text-2xl font-bold text-gray-900">R$ 0,00</p>
-                        <p id="attemptsLeft" class="text-sm text-gray-600 mt-1">5 tentativas restantes</p>
+                        <p id="balance" class="text-xl font-bold text-gray-900">R$ 0,00</p>
+                        <p id="attemptsLeft" class="text-xs text-gray-600 mt-1">5 tentativas restantes</p>
                     </div>
                 </div>
             </div>
 
             <!-- Product Section -->
             <div id="productSection">
-                <div class="relative p-6 space-y-4">
+                <div class="relative p-4 space-y-4">
                     <img 
                         id="productImage"
-                        src="https://s3-new.flowhosted.com/imagens/imagemnova.png"
+                        src="https://s3-new.flowhosted.com/imagens/cupom1.jpg"
                         alt="Produto"
-                        class="w-full h-64 object-cover rounded-lg shadow-md"
+                        class="w-full h-auto object-cover rounded-lg shadow-md"
                     />
-                    <div class="text-center p-4 bg-gray-100 rounded-lg">
-                        <p class="text-sm text-gray-600 mb-2">Código do Produto</p>
-                        <p id="barcodeNumber" class="mt-2 font-mono text-gray-800">79891578</p>
+                    <div class="text-center p-3 bg-gray-100 rounded-lg">
+                        <p class="text-sm text-gray-600 mb-1">Código do Produto</p>
+                        <p id="barcodeNumber" class="font-mono text-gray-800 text-lg">42712113</p>
                     </div>
                 </div>
 
                 <!-- Code Input -->
-                <form id="codeForm" class="p-6 space-y-4 bg-gray-50">
+                <form id="codeForm" class="p-4 space-y-4 bg-gray-50">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
                             Digite o código do cupom:
@@ -111,8 +128,8 @@
                 </form>
             </div>
 
-            <!-- Botão Sacar (inicialmente escondido) -->
-            <div id="withdrawSection" class="hidden p-6 bg-gray-50">
+            <!-- Botão Sacar -->
+            <div id="withdrawSection" class="hidden p-4 bg-gray-50">
                 <button
                     id="withdrawButton"
                     class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition duration-300 shadow-md"
@@ -127,7 +144,7 @@
     </div>
 
     <!-- Modal PIX -->
-    <div id="pixModal" class="hidden fixed inset-0 flex items-center justify-center z-50 modal">
+    <div id="pixModal" class="hidden fixed inset-0 flex items-center justify-center z-50 modal p-4">
         <div class="bg-white rounded-xl shadow-xl p-6 max-w-md w-full mx-4">
             <h3 class="text-xl font-bold text-gray-900 mb-4">Saque via PIX</h3>
             
@@ -158,7 +175,7 @@
     </div>
 
     <!-- Modal Promoção -->
-    <div id="promoModal" class="hidden fixed inset-0 flex items-center justify-center z-50 modal">
+    <div id="promoModal" class="hidden fixed inset-0 flex items-center justify-center z-50 modal p-4">
         <div class="bg-white rounded-xl shadow-xl p-6 max-w-md w-full mx-4">
             <div class="text-center">
                 <div class="w-16 h-16 mx-auto bg-yellow-100 rounded-full flex items-center justify-center mb-4">
@@ -175,7 +192,7 @@
                     Ganhe 50% de desconto no seu primeiro depósito!
                 </p>
                 
-                <a href="https://exemplo.com/cadastro" class="block w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3 px-4 rounded-lg mb-3">
+                <a href="#" class="block w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3 px-4 rounded-lg mb-3">
                     Aproveitar Desconto
                 </a>
                 
@@ -187,13 +204,61 @@
     </div>
 
     <script>
+        const products = [
+            { image: 'https://s3-new.flowhosted.com/imagens/cupom1.jpg', code: '42712113' },
+            { image: 'https://s3-new.flowhosted.com/imagens/cupom2.jpg', code: '55349848' },
+            { image: 'https://s3-new.flowhosted.com/imagens/cupom3.jpg', code: '55938874' },
+            { image: 'https://s3-new.flowhosted.com/imagens/cupom4.jpg', code: '86899761' },
+            { image: 'https://s3-new.flowhosted.com/imagens/cupom5.jpg', code: '32459664' }
+        ];
+
         let currentBalance = 0;
         let attemptsLeft = 5;
+        let currentProductIndex = 0;
         const baseAmount = 121.14;
         let userEmail = '';
 
         // Auth handling
-        document.getElementById('authForm').addEventListener('submit', function(e) {
+        document.getElementById('codeInput').value;
+
+            if (code === products[currentProductIndex].code) {
+                animateBalance(baseAmount);
+                document.getElementById('codeInput').value = '';
+                updateAttempts();
+                if (attemptsLeft > 0) {
+                    showNextProduct();
+                }
+            } else {
+                const input = document.getElementById('codeInput');
+                input.classList.add('animate-bounce');
+                setTimeout(() => {
+                    input.classList.remove('animate-bounce');
+                }, 1000);
+            }
+        });
+
+        // PIX Modal handlers
+        document.getElementById('withdrawButton').addEventListener('click', function() {
+            document.getElementById('pixModal').classList.remove('hidden');
+        });
+
+        document.getElementById('cancelPix').addEventListener('click', function() {
+            document.getElementById('pixModal').classList.add('hidden');
+        });
+
+        document.getElementById('pixForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            document.getElementById('pixModal').classList.add('hidden');
+            document.getElementById('promoModal').classList.remove('hidden');
+        });
+
+        document.getElementById('closePromoModal').addEventListener('click', function() {
+            document.getElementById('promoModal').classList.add('hidden');
+        });
+
+        // Inicializar com o primeiro produto
+        document.getElementById('productImage').src = products[0].image;
+        document.getElementById('barcodeNumber').textContent = products[0].code;getElementById('authForm').addEventListener('submit', function(e) {
             e.preventDefault();
             userEmail = document.getElementById('userEmail').value;
             document.getElementById('authScreen').classList.add('hidden');
@@ -207,6 +272,20 @@
             setTimeout(() => {
                 balanceElement.classList.remove('balance-animation');
             }, 800);
+        }
+
+        function showNextProduct() {
+            currentProductIndex = (currentProductIndex + 1) % products.length;
+            const productImage = document.getElementById('productImage');
+            const barcodeNumber = document.getElementById('barcodeNumber');
+            
+            productImage.src = products[currentProductIndex].image;
+            barcodeNumber.textContent = products[currentProductIndex].code;
+            
+            productImage.style.opacity = '0';
+            setTimeout(() => {
+                productImage.style.opacity = '1';
+            }, 150);
         }
 
         function updateAttempts() {
@@ -243,39 +322,4 @@
 
         document.getElementById('codeForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const code = document.getElementById('codeInput').value;
-
-            if (code === "79891578") {
-                animateBalance(baseAmount);
-                document.getElementById('codeInput').value = '';
-                updateAttempts();
-            } else {
-                const input = document.getElementById('codeInput');
-                input.classList.add('animate-bounce');
-                setTimeout(() => {
-                    input.classList.remove('animate-bounce');
-                }, 1000);
-            }
-        });
-
-        // PIX Modal handlers
-        document.getElementById('withdrawButton').addEventListener('click', function() {
-            document.getElementById('pixModal').classList.remove('hidden');
-        });
-
-        document.getElementById('cancelPix').addEventListener('click', function() {
-            document.getElementById('pixModal').classList.add('hidden');
-        });
-
-        document.getElementById('pixForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            document.getElementById('pixModal').classList.add('hidden');
-            document.getElementById('promoModal').classList.remove('hidden');
-        });
-
-        document.getElementById('closePromoModal').addEventListener('click', function() {
-            document.getElementById('promoModal').classList.add('hidden');
-        });
-    </script>
-</body>
-</html>
+            const code = document.

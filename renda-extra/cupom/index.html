@@ -12,32 +12,19 @@
             100% { transform: scale(1); background-color: rgba(246, 200, 0, 0.1); }
         }
         
-        @keyframes slideUp {
-            0% { transform: translateY(20px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-        
         .balance-animation {
             animation: balancePulse 0.8s ease-in-out;
         }
         
-        .slide-up {
-            animation: slideUp 0.5s ease-out;
-        }
-        
-        .balance-increase {
-            position: absolute;
-            color: #22c55e;
-            font-weight: bold;
-            right: 10px;
-            animation: slideUp 1s ease-out forwards;
-            opacity: 0;
-        }
-
         .glass-effect {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
+        }
+
+        .modal {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
         }
     </style>
 </head>
@@ -53,7 +40,7 @@
             <form id="authForm" class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" required class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                    <input type="email" id="userEmail" required class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
                 </div>
                 
                 <div>
@@ -75,104 +62,143 @@
             <div class="p-6 bg-gradient-to-r from-yellow-400 to-yellow-500">
                 <div class="flex justify-between items-center">
                     <h1 class="text-2xl font-bold text-white">Cupom da Vez</h1>
-                    <div class="glass-effect px-6 py-3 rounded-lg relative">
+                    <div class="glass-effect px-6 py-3 rounded-lg">
                         <p class="text-sm text-gray-800">SALDO</p>
                         <p id="balance" class="text-2xl font-bold text-gray-900">R$ 0,00</p>
-                        <div id="balanceIncrease" class="balance-increase"></div>
+                        <p id="attemptsLeft" class="text-sm text-gray-600 mt-1">5 tentativas restantes</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Product Image and Barcode -->
-            <div class="relative p-6 space-y-4">
-                <img 
-                    id="productImage"
-                    src="https://s3-new.flowhosted.com/imagens/imagemnova.png"
-                    alt="Produto"
-                    class="w-full h-64 object-cover rounded-lg shadow-md"
-                />
-                <div class="text-center p-4 bg-gray-100 rounded-lg">
-                    <p class="text-sm text-gray-600 mb-2">Código do Produto</p>
+            <!-- Product Section -->
+            <div id="productSection">
+                <div class="relative p-6 space-y-4">
                     <img 
-                        id="barcodeImage"
-                        src="/api/placeholder/200/50"
-                        alt="Código de Barras"
-                        class="mx-auto"
+                        id="productImage"
+                        src="https://s3-new.flowhosted.com/imagens/imagemnova.png"
+                        alt="Produto"
+                        class="w-full h-64 object-cover rounded-lg shadow-md"
                     />
-                    <p id="barcodeNumber" class="mt-2 font-mono text-gray-800">79891578</p>
+                    <div class="text-center p-4 bg-gray-100 rounded-lg">
+                        <p class="text-sm text-gray-600 mb-2">Código do Produto</p>
+                        <p id="barcodeNumber" class="mt-2 font-mono text-gray-800">79891578</p>
+                    </div>
                 </div>
+
+                <!-- Code Input -->
+                <form id="codeForm" class="p-6 space-y-4 bg-gray-50">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Digite o código do cupom:
+                        </label>
+                        <input
+                            type="text"
+                            id="codeInput"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent shadow-sm"
+                            placeholder="Digite o código do produto"
+                        />
+                    </div>
+                    
+                    <button
+                        type="submit"
+                        class="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition duration-300 shadow-md"
+                    >
+                        Validar Código
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </button>
+                </form>
             </div>
 
-            <!-- Code Input -->
-            <form id="codeForm" class="p-6 space-y-4 bg-gray-50">
+            <!-- Botão Sacar (inicialmente escondido) -->
+            <div id="withdrawSection" class="hidden p-6 bg-gray-50">
+                <button
+                    id="withdrawButton"
+                    class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition duration-300 shadow-md"
+                >
+                    Sacar via PIX
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal PIX -->
+    <div id="pixModal" class="hidden fixed inset-0 flex items-center justify-center z-50 modal">
+        <div class="bg-white rounded-xl shadow-xl p-6 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Saque via PIX</h3>
+            
+            <form id="pixForm" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Digite o código do cupom:
-                    </label>
-                    <input
-                        type="text"
-                        id="codeInput"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent shadow-sm"
-                        placeholder="Digite o código do produto"
-                    />
+                    <label class="block text-sm font-medium text-gray-700">Tipo de Chave PIX</label>
+                    <select id="pixType" class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg">
+                        <option value="cpf">CPF</option>
+                        <option value="email">E-mail</option>
+                        <option value="telefone">Telefone</option>
+                    </select>
                 </div>
                 
-                <button
-                    type="submit"
-                    class="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition duration-300 shadow-md"
-                >
-                    Validar Código
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                    </svg>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Chave PIX</label>
+                    <input type="text" id="pixKey" required class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg">
+                </div>
+                
+                <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg">
+                    Confirmar Saque
+                </button>
+                
+                <button type="button" id="cancelPix" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg">
+                    Cancelar
                 </button>
             </form>
         </div>
     </div>
 
-    <script>
-        const products = [
-            {
-                name: "Produto 1",
-                image: "https://s3-new.flowhosted.com/imagens/imagemnova.png",
-                code: "79891578"
-            },
-            {
-                name: "Produto 2",
-                image: "https://s3-new.flowhosted.com/imagens/imagemnova.png",
-                code: "12345678"
-            }
-        ];
+    <!-- Modal Promoção -->
+    <div id="promoModal" class="hidden fixed inset-0 flex items-center justify-center z-50 modal">
+        <div class="bg-white rounded-xl shadow-xl p-6 max-w-md w-full mx-4">
+            <div class="text-center">
+                <div class="w-16 h-16 mx-auto bg-yellow-100 rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Ops! E-mail não encontrado</h3>
+                <p class="text-gray-600 mb-6">
+                    Não encontramos seu cadastro para pagamento, mas temos uma oferta especial para você!
+                </p>
+                <p class="text-lg font-bold text-green-600 mb-6">
+                    Ganhe 50% de desconto no seu primeiro depósito!
+                </p>
+                
+                <a href="https://exemplo.com/cadastro" class="block w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3 px-4 rounded-lg mb-3">
+                    Aproveitar Desconto
+                </a>
+                
+                <button id="closePromoModal" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
 
+    <script>
         let currentBalance = 0;
-        let currentProductIndex = 0;
-        let successfulAttempts = 0;
+        let attemptsLeft = 5;
         const baseAmount = 121.14;
+        let userEmail = '';
 
         // Auth handling
         document.getElementById('authForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            userEmail = document.getElementById('userEmail').value;
             document.getElementById('authScreen').classList.add('hidden');
             document.getElementById('mainScreen').classList.remove('hidden');
-            document.getElementById('mainScreen').classList.add('slide-up');
         });
-
-        function showBalanceIncrease(amount) {
-            const element = document.getElementById('balanceIncrease');
-            element.textContent = `+R$ ${amount.toFixed(2)}`;
-            element.style.opacity = '0';
-            element.style.transform = 'translateY(20px)';
-            
-            // Reset animation
-            void element.offsetWidth;
-            
-            element.style.opacity = '1';
-            element.style.transform = 'translateY(-20px)';
-            
-            setTimeout(() => {
-                element.style.opacity = '0';
-            }, 1000);
-        }
 
         function updateBalance(newBalance) {
             const balanceElement = document.getElementById('balance');
@@ -183,6 +209,16 @@
             }, 800);
         }
 
+        function updateAttempts() {
+            attemptsLeft--;
+            document.getElementById('attemptsLeft').textContent = `${attemptsLeft} tentativas restantes`;
+            
+            if (attemptsLeft === 0) {
+                document.getElementById('productSection').classList.add('hidden');
+                document.getElementById('withdrawSection').classList.remove('hidden');
+            }
+        }
+
         function animateBalance(finalAmount) {
             const startBalance = currentBalance;
             const endBalance = startBalance + finalAmount;
@@ -191,8 +227,6 @@
             const frames = duration / (1000 / fps);
             const increment = (endBalance - startBalance) / frames;
             let currentFrame = 0;
-
-            showBalanceIncrease(finalAmount);
 
             function animate() {
                 currentFrame++;
@@ -207,33 +241,15 @@
             requestAnimationFrame(animate);
         }
 
-        function showNextProduct() {
-            currentProductIndex = (currentProductIndex + 1) % products.length;
-            const productImage = document.getElementById('productImage');
-            const barcodeNumber = document.getElementById('barcodeNumber');
-            
-            productImage.src = products[currentProductIndex].image;
-            barcodeNumber.textContent = products[currentProductIndex].code;
-            
-            // Animate transition
-            productImage.style.opacity = '0';
-            setTimeout(() => {
-                productImage.style.opacity = '1';
-            }, 150);
-        }
-
         document.getElementById('codeForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const code = document.getElementById('codeInput').value;
 
-            if (code === products[currentProductIndex].code) {
-                successfulAttempts++;
-                const multiplier = successfulAttempts > 5 ? 1.5 : 1;
-                animateBalance(baseAmount * multiplier);
-                showNextProduct();
+            if (code === "79891578") {
+                animateBalance(baseAmount);
                 document.getElementById('codeInput').value = '';
+                updateAttempts();
             } else {
-                // Shake animation for invalid code
                 const input = document.getElementById('codeInput');
                 input.classList.add('animate-bounce');
                 setTimeout(() => {
@@ -242,9 +258,24 @@
             }
         });
 
-        // Initialize with first product
-        document.getElementById('productImage').src = products[0].image;
-        document.getElementById('barcodeNumber').textContent = products[0].code;
+        // PIX Modal handlers
+        document.getElementById('withdrawButton').addEventListener('click', function() {
+            document.getElementById('pixModal').classList.remove('hidden');
+        });
+
+        document.getElementById('cancelPix').addEventListener('click', function() {
+            document.getElementById('pixModal').classList.add('hidden');
+        });
+
+        document.getElementById('pixForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            document.getElementById('pixModal').classList.add('hidden');
+            document.getElementById('promoModal').classList.remove('hidden');
+        });
+
+        document.getElementById('closePromoModal').addEventListener('click', function() {
+            document.getElementById('promoModal').classList.add('hidden');
+        });
     </script>
 </body>
 </html>

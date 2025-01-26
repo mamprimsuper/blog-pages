@@ -168,19 +168,37 @@
         }
     </style>
     <script>
-        window.addEventListener('beforeunload', function (e) {
-            // Cancel the event
-            e.preventDefault();
-            // Chrome requires returnValue to be set
-            e.returnValue = '';
-            
-            // Redirect to the target URL
-            window.location.href = 'https://google.com';
+        let hasUserInteracted = false;
+        let exitAttempts = 0;
+        const maxExitAttempts = 1;
+
+        // Track if user has interacted with the page
+        document.addEventListener('click', function() {
+            hasUserInteracted = true;
         });
 
-        // Also handle back button
+        window.addEventListener('beforeunload', function (e) {
+            if (hasUserInteracted && exitAttempts < maxExitAttempts) {
+                e.preventDefault();
+                e.returnValue = '';
+                exitAttempts++;
+                
+                // Open in new tab to ensure it's not blocked
+                window.open('https://google.com', '_blank');
+                
+                // Fallback for browsers that block new windows
+                setTimeout(function() {
+                    window.location.href = 'https://google.com';
+                }, 1);
+            }
+        });
+
+        // Handle back button
         window.onpopstate = function(event) {
-            window.location.href = 'https://google.com';
+            if (hasUserInteracted && exitAttempts < maxExitAttempts) {
+                exitAttempts++;
+                window.location.href = 'https://google.com';
+            }
         };
     </script>
 </head>

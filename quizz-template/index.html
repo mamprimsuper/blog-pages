@@ -830,6 +830,202 @@
                 });
             });
         }
+        class TrackingSystem {
+    constructor() {
+        this.initializeTracking();
+        this.bindEvents();
+    }
+
+    initializeTracking() {
+        // Save initial tracking data
+        this.saveTrackingData();
+        
+        // Initialize session data
+        this.sessionData = {
+            sessionStart: new Date().toISOString(),
+            userInteractions: [],
+            completedSteps: new Set()
+        };
+    }
+
+    getURLParams() {
+        const searchParams = new URLSearchParams(window.location.search);
+        const params = {
+            src: searchParams.get('src') || 'direct',
+            utm_source: searchParams.get('utm_source'),
+            utm_medium: searchParams.get('utm_medium'),
+            utm_campaign: searchParams.get('utm_campaign'),
+            utm_content: searchParams.get('utm_content'),
+            utm_term: searchParams.get('utm_term')
+        };
+
+        // Clean undefined values
+        Object.keys(params).forEach(key => {
+            if (!params[key]) delete params[key];
+        });
+
+        return params;
+    }
+
+    saveTrackingData() {
+        const params = this.getURLParams();
+        if (Object.keys(params).length > 0) {
+            const trackingData = {
+                ...params,
+                first_visit: new Date().toISOString(),
+                referrer: document.referrer || 'direct',
+                landing_page: window.location.href
+            };
+            
+            try {
+                localStorage.setItem('quiz_tracking_data', JSON.stringify(trackingData));
+            } catch (e) {
+                console.warn('Failed to save tracking data to localStorage:', e);
+            }
+        }
+    }
+
+    getTrackingData() {
+        try {
+            const data = localStorage.getItem('quiz_tracking_data');
+            return data ? JSON.parse(data) : null;
+        } catch (e) {
+            console.warn('Failed to retrieve tracking data:', e);
+            return null;
+        }
+    }
+
+    trackEvent(eventName, additionalData = {}) {
+        const trackingData = this.getTrackingData() || this.getURLParams();
+        const eventData = {
+            event_name: eventName,
+            timestamp: new Date().toISOString(),
+            page_url: window.location.href,
+            ...trackingData,
+            ...additionalData
+        };
+
+        // Store in session data
+        this.sessionData.userInteractions.push(eventData);
+
+        // Send to Google Analytics
+        this.sendToGA(eventName, eventData);
+
+        // Send to Facebook Pixel
+        this.sendToFBPixel(eventName, eventData);
+
+        // Log event for debugging
+        if (window.location.hostname === 'localhost') {
+            console.log('Event tracked:', eventData);
+        }
+
+        return eventData;
+    }
+
+    sendToGA(eventName, eventData) {
+        if (typeof gtag === 'function') {
+            try {
+                gtag('event', eventName, {
+                    ...eventData,
+                    event_category: 'Quiz',
+                    non_interaction: false
+                });
+            } catch (e) {
+                console.warn('Failed to send event to Google Analytics:', e);
+            }
+        }
+    }
+
+    sendToFBPixel(eventName, eventData) {
+        if (typeof fbq === 'function') {
+            try {
+                fbq('track', eventName, eventData);
+            } catch (e) {
+                console.warn('Failed to send event to Facebook Pixel:', e);
+            }
+        }
+    }
+
+    trackQuizProgress(questionNumber, questionType, answer = null) {
+        const eventData = {
+            question_number: questionNumber,
+            question_type: questionType,
+            step: `${questionNumber}/${questions.length}`
+        };
+
+        if (answer) {
+            eventData.answer = answer;
+        }
+
+        this.trackEvent('quiz_progress', eventData);
+        this.sessionData.completedSteps.add(questionNumber);
+    }
+
+    trackPurchaseIntent(packageType, price) {
+        this.trackEvent('purchase_intent', {
+            package_type: packageType,
+            price: price,
+            currency: 'USD'
+        });
+    }
+
+    bindEvents() {
+        // Track option selections
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.option-card')) {
+                const optionCard = e.target.closest('.option-card');
+                const optionText = optionCard.querySelector('.option-text')?.textContent;
+                
+                this.trackEvent('option_selected', {
+                    question_number: currentQuestion + 1,
+                    selected_option: optionText
+                });
+            }
+        });
+
+        // Track button clicks
+        document.addEventListener('click', (e) => {
+            // Next button clicks
+            if (e.target.matches('.next-btn')) {
+                this.trackEvent('next_button_clicked', {
+                    question_number: currentQuestion + 1,
+                    progress: `${currentQuestion + 1}/${questions.length}`
+                });
+            }
+
+            // Order button clicks
+            if (e.target.matches('a[href*="checkout"]')) {
+                const packageSection = e.target.closest('[class*="Package"]');
+                if (packageSection) {
+                    const packageType = packageSection.querySelector('h3')?.textContent || 'unknown';
+                    const priceElement = packageSection.querySelector('.text-2xl')?.textContent;
+                    const price = priceElement ? parseFloat(priceElement.replace('$', '')) : 0;
+
+                    this.trackPurchaseIntent(packageType, price);
+                }
+            }
+        });
+    }
+}
+
+// Initialize tracking system
+const trackingSystem = new TrackingSystem();
+
+// Modify existing quiz functions to include tracking
+const originalLoadQuestion = window.loadQuestion;
+window.loadQuestion = function() {
+    originalLoadQuestion();
+    const currentQ = questions[currentQuestion];
+    trackingSystem.trackQuizProgress(currentQuestion + 1, currentQ.type);
+};
+
+const originalSelectOption = window.selectOption;
+window.selectOption = function(selectedCard) {
+    originalSelectOption(selectedCard);
+    const optionText = selectedCard.querySelector('.option-text')?.textContent;
+    trackingSystem.trackQuizProgress(currentQuestion + 1, questions[currentQuestion].type, optionText);
+};
+
 
         // Handle window resize
         function handleResize() {

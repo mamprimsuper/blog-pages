@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Men's Health Quiz</title>
+
+    <script>
+        window.cartpanda = window.cartpanda || {
+            shop: 'flowhosted',
+            platform: 'custom',
+            queue: []
+        };
+    </script>
+    <script async src="https://cdn.cartpanda.com/tracking.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <style>
         * {
@@ -390,6 +399,7 @@
             <!-- Content will be dynamically inserted here -->
         </div>
     </div>
+    
 
     <script>
         const questions = [
@@ -851,6 +861,13 @@
         // Event listeners for window resize
         window.addEventListener('resize', handleResize);
         window.addEventListener('orientationchange', handleResize);
+
+
+
+
+
+
+        
 // FlowHosted Quiz Tracking System
 class TrackingSystem {
     constructor() {

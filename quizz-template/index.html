@@ -851,10 +851,11 @@
         // Event listeners for window resize
         window.addEventListener('resize', handleResize);
         window.addEventListener('orientationchange', handleResize);
-
-       // Enhanced Tracking System with Cartpanda Integration
+// FlowHosted Quiz Tracking System
 class TrackingSystem {
     constructor() {
+        this.domain = 'news.flowhosted.com';
+        this.cartpandaDomain = 'sip.mycartpanda.com';
         this.initializeTracking();
         this.bindEvents();
         this.initializeCartpanda();
@@ -864,21 +865,48 @@ class TrackingSystem {
         this.saveTrackingData();
         this.sessionData = {
             sessionStart: new Date().toISOString(),
-            userInteractions: [],
-            completedSteps: new Set()
+            source: this.getSource(),
+            userInteractions: []
+        };
+    }
+
+    getSource() {
+        return {
+            domain: this.domain,
+            path: window.location.pathname,
+            full_url: window.location.href,
+            referrer: document.referrer
         };
     }
 
     initializeCartpanda() {
-        // Inicializa o objeto global do Cartpanda se não existir
-        window.cartpanda = window.cartpanda || {};
-        window.cartpanda.queue = window.cartpanda.queue || [];
+        // Inicializar Cartpanda com configuração específica para FlowHosted
+        window.cartpanda = {
+            shop: 'flowhosted',
+            platform: 'custom',
+            queue: []
+        };
 
-        // Função auxiliar para enviar eventos ao Cartpanda
-        window.cartpanda.push = function(event) {
-            window.cartpanda.queue.push(event);
-            this.processCartpandaQueue();
-        }.bind(this);
+        // Função de tracking do Cartpanda
+        window.cartpanda.track = function(event, data) {
+            const trackingData = {
+                ...data,
+                source: this.domain,
+                path: window.location.pathname
+            };
+
+            fetch('https://sip.mycartpanda.com/track', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    event,
+                    data: trackingData,
+                    timestamp: new Date().toISOString()
+                })
+            }).catch(error => console.warn('Cartpanda tracking error:', error));
+        };
 
         this.loadCartpandaScript();
     }
@@ -890,56 +918,41 @@ class TrackingSystem {
         document.head.appendChild(script);
     }
 
-    processCartpandaQueue() {
-        if (window.cartpanda.queue && window.cartpanda.queue.length > 0) {
-            window.cartpanda.queue.forEach(event => {
-                if (typeof window.cartpanda.track === 'function') {
-                    window.cartpanda.track(event.name, event.data);
-                }
-            });
-            window.cartpanda.queue = [];
-        }
-    }
-
     getURLParams() {
         const searchParams = new URLSearchParams(window.location.search);
-        const params = {
-            src: searchParams.get('src') || 'direct',
+        return {
+            src: searchParams.get('src') || 'flowhosted',
             utm_source: searchParams.get('utm_source'),
             utm_medium: searchParams.get('utm_medium'),
             utm_campaign: searchParams.get('utm_campaign'),
             utm_content: searchParams.get('utm_content'),
-            utm_term: searchParams.get('utm_term')
+            quiz_variant: 'men_health'
         };
-
-        Object.keys(params).forEach(key => {
-            if (!params[key]) delete params[key];
-        });
-
-        return params;
     }
 
     saveTrackingData() {
         const params = this.getURLParams();
-        if (Object.keys(params).length > 0) {
-            const trackingData = {
-                ...params,
-                first_visit: new Date().toISOString(),
-                referrer: document.referrer || 'direct',
-                landing_page: window.location.href
-            };
+        const trackingData = {
+            ...params,
+            domain: this.domain,
+            first_visit: new Date().toISOString(),
+            session_id: this.generateSessionId()
+        };
             
-            try {
-                localStorage.setItem('quiz_tracking_data', JSON.stringify(trackingData));
-            } catch (e) {
-                console.warn('Failed to save tracking data:', e);
-            }
+        try {
+            localStorage.setItem('flowhosted_tracking', JSON.stringify(trackingData));
+        } catch (e) {
+            console.warn('Failed to save tracking data:', e);
         }
+    }
+
+    generateSessionId() {
+        return 'fh_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
 
     getTrackingData() {
         try {
-            const data = localStorage.getItem('quiz_tracking_data');
+            const data = localStorage.getItem('flowhosted_tracking');
             return data ? JSON.parse(data) : null;
         } catch (e) {
             console.warn('Failed to retrieve tracking data:', e);
@@ -948,89 +961,64 @@ class TrackingSystem {
     }
 
     trackToCartpanda(eventName, eventData) {
-        try {
-            window.cartpanda.push({
+        const cartpandaData = {
+            ...eventData,
+            domain: this.domain,
+            quiz_id: 'men_health',
+            session_id: this.sessionData.sessionId
+        };
+
+        if (window.cartpanda && typeof window.cartpanda.track === 'function') {
+            window.cartpanda.track(eventName, cartpandaData);
+        } else {
+            window.cartpanda.queue.push({
                 name: eventName,
-                data: {
-                    ...eventData,
-                    timestamp: new Date().toISOString(),
-                    url: window.location.href
-                }
+                data: cartpandaData
             });
-        } catch (e) {
-            console.warn('Failed to track to Cartpanda:', e);
         }
     }
 
     trackEvent(eventName, additionalData = {}) {
-        const trackingData = this.getTrackingData() || this.getURLParams();
-        const eventData = {
-            event_name: eventName,
+        const trackingData = {
+            event: eventName,
             timestamp: new Date().toISOString(),
-            page_url: window.location.href,
-            ...trackingData,
+            domain: this.domain,
+            page: window.location.pathname,
+            ...this.getURLParams(),
             ...additionalData
         };
 
-        this.sessionData.userInteractions.push(eventData);
-        
-        // Track to multiple platforms
-        this.sendToGA(eventName, eventData);
-        this.sendToFBPixel(eventName, eventData);
-        this.trackToCartpanda(eventName, eventData);
+        this.sessionData.userInteractions.push(trackingData);
+        this.trackToCartpanda(eventName, trackingData);
 
-        if (window.location.hostname === 'localhost') {
-            console.log('Event tracked:', eventData);
+        // Debug mode
+        if (window.location.hostname.includes('localhost') || window.location.search.includes('debug=true')) {
+            console.log('Event tracked:', trackingData);
         }
 
-        return eventData;
-    }
-
-    sendToGA(eventName, eventData) {
-        if (typeof gtag === 'function') {
-            try {
-                gtag('event', eventName, {
-                    ...eventData,
-                    event_category: 'Quiz',
-                    non_interaction: false
-                });
-            } catch (e) {
-                console.warn('Failed to send event to Google Analytics:', e);
-            }
-        }
-    }
-
-    sendToFBPixel(eventName, eventData) {
-        if (typeof fbq === 'function') {
-            try {
-                fbq('track', eventName, eventData);
-            } catch (e) {
-                console.warn('Failed to send event to Facebook Pixel:', e);
-            }
-        }
+        return trackingData;
     }
 
     trackQuizProgress(questionNumber, questionType, answer = null) {
         const eventData = {
+            quiz_id: 'men_health',
             question_number: questionNumber,
             question_type: questionType,
-            step: `${questionNumber}/${questions.length}`
+            step: `${questionNumber}/${questions.length}`,
+            answer: answer
         };
 
-        if (answer) {
-            eventData.answer = answer;
-        }
-
         this.trackEvent('quiz_progress', eventData);
-        this.sessionData.completedSteps.add(questionNumber);
     }
 
     trackPurchaseIntent(packageType, price, productId) {
         const eventData = {
+            product_id: productId,
             package_type: packageType,
             price: price,
             currency: 'USD',
-            product_id: productId
+            quiz_id: 'men_health',
+            checkout_url: `https://${this.cartpandaDomain}/checkout/${productId}`
         };
 
         this.trackEvent('purchase_intent', eventData);
@@ -1043,35 +1031,33 @@ class TrackingSystem {
     }
 
     getProductIdFromUrl(url) {
+        // Extrair ID do produto da URL do Cartpanda
         const match = url.match(/checkout\/(\d+)/);
         return match ? match[1] : null;
     }
 
     bindEvents() {
-        // Rastrear seleções de opções
+        // Rastrear seleções do quiz
         document.addEventListener('click', (e) => {
             if (e.target.closest('.option-card')) {
                 const optionCard = e.target.closest('.option-card');
                 const optionText = optionCard.querySelector('.option-text')?.textContent;
                 
-                this.trackEvent('option_selected', {
+                this.trackEvent('quiz_option_selected', {
                     question_number: currentQuestion + 1,
                     selected_option: optionText
                 });
             }
-        });
 
-        // Rastrear cliques em botões
-        document.addEventListener('click', (e) => {
-            // Cliques no botão Next
+            // Rastrear cliques no botão Next
             if (e.target.matches('.next-btn')) {
-                this.trackEvent('next_button_clicked', {
-                    question_number: currentQuestion + 1,
-                    progress: `${currentQuestion + 1}/${questions.length}`
+                this.trackEvent('quiz_next', {
+                    current_step: currentQuestion + 1,
+                    total_steps: questions.length
                 });
             }
 
-            // Cliques nos botões de checkout
+            // Rastrear cliques no checkout
             if (e.target.matches('a[href*="checkout"]')) {
                 const checkoutLink = e.target;
                 const packageSection = checkoutLink.closest('[class*="Package"]');
@@ -1082,7 +1068,6 @@ class TrackingSystem {
                     const price = priceElement ? parseFloat(priceElement.replace('$', '')) : 0;
                     const productId = this.getProductIdFromUrl(checkoutLink.href);
 
-                    // Rastrear no Cartpanda e outros sistemas
                     this.trackPurchaseIntent(packageType, price, productId);
                 }
             }
@@ -1093,7 +1078,7 @@ class TrackingSystem {
 // Inicializar o sistema de tracking
 const trackingSystem = new TrackingSystem();
 
-// Modificar funções existentes do quiz para incluir tracking
+// Modificar funções existentes do quiz
 const originalLoadQuestion = window.loadQuestion;
 window.loadQuestion = function() {
     originalLoadQuestion();
@@ -1107,6 +1092,7 @@ window.selectOption = function(selectedCard) {
     const optionText = selectedCard.querySelector('.option-text')?.textContent;
     trackingSystem.trackQuizProgress(currentQuestion + 1, questions[currentQuestion].type, optionText);
 };
+       
     
     </script>
     

@@ -1,1462 +1,964 @@
-const { onCall, onRequest } = require("firebase-functions/v2/https");
-const admin = require('firebase-admin');
-const cors = require('cors')({ origin: true });
-const crypto = require('crypto');
-const functions = require('firebase-functions');
-const { getFirestore, FieldValue } = require('firebase-admin/firestore');
-const { initializeApp } = require('firebase-admin/app');
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Men's Health Quiz</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Montserrat', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
+        body {
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            background: linear-gradient(135deg, #1a3c6d 0%, #2b5876 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+            color: #333;
+            touch-action: manipulation;
+        }
 
-if (!admin.apps.length) {
-  initializeApp();
-}
+        html {
+            height: -webkit-fill-available;
+        }
 
-const corsConfig = {
-  origin: ['http://localhost:5173', 'https://flowgenie.com.br', 'https://dados.ilovedeploy.host'],
-  methods: ['POST', 'OPTIONS'],
-  credentials: true
-};
+        .quiz-container {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            overflow-x: hidden;
+            position: relative;
+        }
 
+        .progress-container {
+            margin-bottom: 20px;
+            padding: 0 4px;
+        }
 
+        .progress-bar {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
 
-const allowedOrigins = [
-  'http://localhost:5173',
-  'https://flowgenie.com.br',
-  'https://app.flowgenie.com.br',
-  'https://dados.ilovedeploy.host'
-];
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #2b5876 0%, #4e4376 100%);
+            border-radius: 8px;
+            transition: width 0.3s ease;
+        }
 
-const commonConfig = {
-  region: 'us-central1',
-  maxInstances: 10,
-  timeoutSeconds: 60,
-  minInstances: 0,
-  cors: {
-    origin: [
-      'http://localhost:5173',
-      'https://flowgenie.com.br',
-      'https://app.flowgenie.com.br',
-      'https://dados.ilovedeploy.host'
-    ],
-    methods: ['POST', 'GET', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-    credentials: true,
-    maxAge: 3600
-  },
-  memory: '256MiB'
-};
+        .question-container {
+            text-align: center;
+            padding: 0 8px;
+        }
 
-function calculateEngagementScore(userData, eventType) {
-  const baseScore = userData?.engagementScore || 0;
-  const scores = {
-    send: 0,
-    open: 1,
-    click: 3
-  };
-  return baseScore + (scores[eventType] || 0);
-}
+        .question {
+            font-size: 1.25rem;
+            color: #1a3c6d;
+            margin-bottom: 16px;
+            line-height: 1.3;
+            font-weight: 700;
+        }
 
-function getInitialScore(eventType) {
-  const scores = {
-    send: 0,
-    open: 1,
-    click: 3
-  };
-  return scores[eventType] || 0;
-}
+        .subtitle {
+            color: #666;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            padding: 0 8px;
+        }
 
-async function initializeTracking(userId) {
-  const userRef = admin.firestore().collection('users').doc(userId);
-  const trackingRef = userRef.collection('tracking').doc('stats');
-  
-  await trackingRef.set({
-    totalEmails: 0,
-    totalOpens: 0,
-    uniqueOpens: 0,
-    totalClicks: 0,
-    uniqueClicks: 0,
-    lastUpdate: admin.firestore.FieldValue.serverTimestamp(),
-    createdAt: admin.firestore.FieldValue.serverTimestamp()
-  });
-}
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 0 4px;
+        }
 
+        .option-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 72px;
+            user-select: none;
+        }
 
+        .option-card:active {
+            transform: scale(0.98);
+        }
 
-// Função para processar postback do Payt e criar usuário
-exports.paytPostback = onRequest({
-  ...commonConfig,
-  cors: {
-    origin: true,
-    methods: ['POST', 'OPTIONS', 'GET'],
-    allowedHeaders: ['Content-Type'],
-    credentials: true
-  }
-}, async (req, res) => {
-  try {
-    // Adicionar logs para debug
-    console.log('Request recebido:', {
-      method: req.method,
-      headers: req.headers,
-      body: req.body
-    });
+        .option-card.selected {
+            background: #2b5876;
+            border-color: #2b5876;
+            color: white;
+        }
 
-    // Permitir requisições OPTIONS para pre-flight
-    if (req.method === 'OPTIONS') {
-      res.status(204).send('');
-      return;
-    }
+        .option-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
 
-    if (req.method !== 'POST') {
-      return res.status(405).json({ error: 'Method Not Allowed' });
-    }
+        .option-icon {
+            font-size: 1.8rem;
+            min-width: 40px;
+        }
 
-    // Verificar se o corpo da requisição existe
-    if (!req.body) {
-      return res.status(400).json({ error: 'Payload inválido' });
-    }
+        .option-text {
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: left;
+            flex: 1;
+        }
 
-    const {
-      status,
-      customer,
-      reference_id
-    } = req.body;
+        .next-btn {
+            background: linear-gradient(90deg, #2b5876 0%, #4e4376 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin: 16px auto;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
 
-    // Validar dados obrigatórios
-    if (!status || !customer || !reference_id) {
-      return res.status(400).json({ 
-        error: 'Dados obrigatórios faltando',
-        required: ['status', 'customer', 'reference_id']
-      });
-    }
+        .next-btn:active {
+            transform: scale(0.98);
+        }
 
-    if (status !== 'approved') {
-      console.log(`Pagamento não aprovado. Status: ${status}`);
-      return res.status(200).json({ received: true, status: 'not_approved' });
-    }
+        .success-story {
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin: 16px 4px;
+        }
 
-    // Validar dados do customer
-    if (!customer.email || !customer.name || !customer.phone) {
-      return res.status(400).json({
-        error: 'Dados do cliente incompletos',
-        required: ['email', 'name', 'phone']
-      });
-    }
+        .success-icon {
+            font-size: 2rem;
+            color: #2b5876;
+            margin-bottom: 12px;
+            text-align: center;
+        }
 
-    // Gerar senha aleatória
-    const password = generatePassword();
+        .success-text {
+            font-size: 1rem;
+            color: #333;
+            line-height: 1.4;
+            margin-bottom: 16px;
+        }
 
-    try {
-      // Criar usuário no Authentication
-      const userRecord = await admin.auth().createUser({
-        email: customer.email,
-        password: password,
-        displayName: customer.name,
-        phoneNumber: customer.phone
-      });
+        .success-image {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 12px;
+            margin: 16px auto;
+            display: block;
+        }
 
-      // Gerar pixel ID único
-      const pixelId = crypto.randomBytes(16).toString('hex');
-      
-      // Criar batch para operações
-      const batch = admin.firestore().batch();
-      
-      // Documento principal do usuário
-      const userRef = admin.firestore().collection('users').doc(userRecord.uid);
-      batch.set(userRef, {
-        email: customer.email,
-        fullName: customer.name,
-        phoneNumber: customer.phone,
-        smtpUsername: '',
-        smtpPassword: '',
-        smtpHost: 'mta.flowgenie.com.br',
-        smtpPort: '2525',
-        referenceId: reference_id,
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
-      });
+        /* News Section Styles */
+        .news-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
 
-      // Configurar pixel
-      const pixelConfigRef = userRef.collection('pixel').doc('config');
-      batch.set(pixelConfigRef, {
-        pixelId: pixelId,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        status: 'active'
-      });
+        .news-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+            flex-direction: column;
+            gap: 15px;
+        }
 
-      // Configurar tracking inicial
-      const trackingStatsRef = userRef.collection('tracking').doc('stats');
-      batch.set(trackingStatsRef, {
-        totalEmails: 0,
-        totalOpens: 0,
-        uniqueOpens: 0,
-        totalClicks: 0,
-        uniqueClicks: 0,
-        lastUpdate: admin.firestore.FieldValue.serverTimestamp()
-      });
+        .news-logo {
+            margin-bottom: 10px;
+        }
 
-      // Executar todas as operações
-      await batch.commit();
+        .news-logo-img {
+            height: 30px;
+            object-fit: contain;
+        }
 
-      // Criar documento na coleção mail para disparo do email
-      await admin.firestore().collection('mail').add({
-        to: customer.email,
-        message: {
-          subject: "Bem-vindo ao Flow Genie - Suas Credenciais de Acesso",
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <img src="https://firebasestorage.googleapis.com/v0/b/apps-95324.appspot.com/o/logos_apps%2FCaptura_de_tela_2024-12-18_150124-removebg-preview.png?alt=media&token=30283dcb-e784-44a9-8b83-984ed6be2d5b" alt="Flow Genie Logo" style="max-width: 200px; margin: 20px 0;">
-              <h1 style="color: #333;">Bem-vindo ao Flow Genie!</h1>
-              <p>Seu cadastro foi realizado com sucesso. Abaixo estão suas credenciais de acesso:</p>
-              <div style="background: #f5f5f5; padding: 20px; border-radius: 5px; margin: 20px 0;">
-                <p><strong>Email:</strong> ${customer.email}</p>
-                <p><strong>Senha:</strong> ${password}</p>
-              </div>
-              <p>Por segurança, recomendamos que você altere sua senha no primeiro acesso.</p>
-              <p>Para acessar a plataforma, clique no botão abaixo:</p>
-              <a href="https://flowgenie.com.br/login" style="display: inline-block; background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 20px 0;">Acessar Flow Genie</a>
-              <p>Se precisar de ajuda, entre em contato conosco respondendo este email.</p>
+        .news-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .news-source {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a3c6d;
+        }
+
+        .news-date {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .news-headline {
+            font-size: 2rem;
+            line-height: 1.3;
+            color: #1a3c6d;
+            margin-bottom: 25px;
+            font-weight: 700;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .key-points {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 30px auto;
+            max-width: 700px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .key-points h3 {
+            color: #1a3c6d;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.3rem;
+        }
+
+        .key-points ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .key-points li {
+            margin-bottom: 12px;
+            padding-left: 30px;
+            position: relative;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .key-points li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #2ecc71;
+            font-weight: bold;
+        }
+
+        .expert-quote {
+            border-left: 4px solid #2b5876;
+            padding: 25px;
+            background: #f8f9fa;
+            margin: 40px auto;
+            max-width: 700px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .expert-quote p {
+            font-size: 1.1rem;
+            color: #333;
+            font-style: italic;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .expert-quote cite {
+            color: #666;
+            font-style: normal;
+            font-size: 0.9rem;
+            display: block;
+            text-align: right;
+        }
+
+        /* Landing Page Styles */
+        .landing-page {
+            background: #fff;
+        }
+
+        /* Responsive Styles */
+        @media (min-width: 768px) {
+            .quiz-container {
+                padding: 32px;
+            }
+
+            .question {
+                font-size: 1.6rem;
+            }
+
+            .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .options-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .option-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 24px;
+            }
+
+            .option-image {
+                width: 80px;
+                height: 80px;
+            }
+
+            .option-text {
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .quiz-container {
+                padding: 12px;
+            }
+
+            .question {
+                font-size: 1.2rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .option-card {
+                padding: 12px;
+            }
+
+            .next-btn {
+                font-size: 1rem;
+                padding: 14px;
+            }
+        }
+
+        @media (hover: hover) {
+            .option-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            }
+
+            .next-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(43,88,118,0.2);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
             </div>
-          `
-        }
-      });
+        </div>
+        <div class="question-container" id="questionContainer">
+            <!-- Content will be dynamically inserted here -->
+        </div>
+    </div>
 
-      // Log de sucesso
-      console.log('Usuário criado com sucesso:', {
-        userId: userRecord.uid,
-        email: customer.email
-      });
+    <script>
+        const questions = [
+            {
+                type: 'age',
+                question: "What is your age range?",
+                subtitle: "To offer you the best personalized solution",
+                options: [
+                    { text: "30-40 years", image: "https://www.cnnbrasil.com.br/wp-content/uploads/sites/12/2023/06/india.webp?w=495" },
+                    { text: "41-50 years", image: "https://img.freepik.com/fotos-premium/homem-de-terno-e-gravata-posando-para-uma-foto-ia-geradora_97167-19520.jpg" },
+                    { text: "51-60 years", image: "https://img.freepik.com/fotos-premium/homem-velho-feliz-observando-residencia-ia-gerativa_94628-7061.jpg?w=360" },
+                    { text: "60+ years", image: "https://d1muf25xaso8hp.cloudfront.net/https://img.criativodahora.com.br/2025/01/criativo-67808e3d1342aimg-2025-01-1067808e3d1342e.jpg?w=380&h=&auto=compress&dpr=1&fit=max" }
+                ],
+                needsButton: false
+            },
+            {
+                type: 'success',
+                question: "Did you know?",
+                subtitle: "More than 14,000 men in your age group have already recovered their libido naturally and quickly! And they've returned to having a more active sex life than in their youth",
+                content: "Understand why our solution was able to help all these men, without causing any side effects and being more effective than any existing method.",
+                image: "https://img.freepik.com/fotos-premium/um-homem-feliz-e-alegre-irradiando-energia-positiva-ia-generativa_888418-14329.jpg",
+                needsButton: true
+            },
+            {
+                type: 'treatment',
+                question: "What treatment are you currently using?",
+                subtitle: "Help us better understand your situation",
+                options: [
+                    { text: "Medications", icon: "💊" },
+                    { text: "Supplements", icon: "🌿" },
+                    { text: "No treatment", icon: "❌" },
+                    { text: "Physical Activity", icon: "🏃‍♂️" }
+                ],
+                needsButton: false
+            },
+            {
+                type: 'frequency',
+                question: "How often do you have relations with your partner?",
+                subtitle: "Your answer is confidential and helps us personalize your solution",
+                options: [
+                    { text: "Rarely or never", icon: "😔" },
+                    { text: "1-2 times per month", icon: "😐" },
+                    { text: "1-2 times per week", icon: "🙂" },
+                    { text: "3+ times per week", icon: "😄" }
+                ],
+                needsButton: false
+            },
+            {
+                type: 'success',
+                question: "We've analyzed your answers and it's time to solve this problem once and for all!",
+                subtitle: "Click the button below and discover how thousands of men just like you regained their stamina and confidence in bed in less than 2 weeks",
+                buttonText: "I want to discover the solution!",
+                content: "Get back to having an overwhelming libido and lasting hours in bed with your partner!",
+                image: "https://imagex1.sx.cdn.live/images/pinporn/2019/12/03/22268284.gif?width=300",
+                needsButton: true
+            },
+            {
+                type: 'news',
+                content: `<main class="news-container">
+                    <div class="news-header">
+                        <div class="news-logo">
+                            <img class="news-logo-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Men%27s_Health.svg/1024px-Men%27s_Health.svg.png" alt="Logo"></div>
+                        <div class="news-meta">
+                            <span class="news-source">Health & Wellness</span>
+                            <span class="news-date">Published on January 28, 2024 • Updated 2 days ago</span>
+                        </div>
+                    </div>
+                    
+                    <h1 class="news-headline">Revolutionary Discovery: Brazilian Scientists Develop Natural Solution for Male Potency</h1>
+                    
+                    <div class="news-share">
+                        <span class="share-count">12.4k shares</span>
+                    </div>
 
-      return res.status(200).json({
-        received: true,
-        status: 'success',
-        userId: userRecord.uid,
-        pixelId: pixelId
-      });
+                    <div class="key-points">
+                        <h3>Key Points:</h3>
+                        <ul>
+                            <li>Natural formula developed after 5 years of research</li>
+                            <li>92% efficacy proven in clinical studies</li>
+                            <li>Zero reported side effects</li>
+                            <li>Has already helped more than 14,000 men in US</li>
+                        </ul>
+                    </div>
 
-    } catch (error) {
-      console.error('Erro ao criar usuário:', error);
-      return res.status(400).json({ 
-        received: true, 
-        status: 'error', 
-        message: error.message 
-      });
-    }
-  } catch (error) {
-    console.error('Erro ao processar postback:', error);
-    return res.status(500).json({ 
-      received: true, 
-      status: 'error', 
-      message: error.message 
-    });
-  }
-});
+                    <blockquote class="expert-quote">
+                        <p>"This discovery represents a significant advancement in men's health. For the first time, we have a solution that treats the root cause of the problem, not just the symptoms."</p>
+                        <cite>- Dr. Paul Mendes, Men's Health Specialist</cite>
+                    </blockquote>
+                </main>`,
+                needsButton: true,
+                buttonText: "I want to recover my stamina now!"
+            },
+            {
+                type: 'landing',
+                content: `
+                <!-- Landing Page Container -->
+<div class="landing-page bg-gray-50">
+    <!-- Sticky Offer Banner -->
+    <div class="fixed top-0 left-0 right-0 z-50 bg-red-600 text-white py-3 text-center shadow-lg">
+        <p class="text-sm md:text-base animate-pulse font-medium px-4">
+            🔥 Special Offer: Save 30% + Free Shipping Today Only!
+        </p>
+    </div>
 
-// Função para gerar senha aleatória
-const generatePassword = () => {
-  const length = 12;
-  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
-  let password = "";
-  for (let i = 0, n = charset.length; i < length; ++i) {
-    password += charset.charAt(Math.floor(Math.random() * n));
-  }
-  return password;
-};
+    <!-- Header Section with padding-top to account for fixed banner -->
+    <header class="bg-gradient-to-r from-blue-900 to-blue-800 text-white pt-20 pb-12 px-4 md:pt-24 md:pb-16">
+        <div class="container mx-auto max-w-4xl text-center">
+            <h1 class="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
+                Breakthrough Natural Solution for Men's Health
+            </h1>
+            <p class="text-lg md:text-xl opacity-90">
+                Clinically Proven | Doctor Recommended | 100% Natural
+            </p>
+        </div>
+    </header>
 
-// Função original de tracking (renomeada)
-exports.setupUserTracking = onCall({
-  ...commonConfig
-}, async (context) => {
-  try {
-    const userId = context.auth?.uid;
-    if (!userId) throw new Error('Usuário não autenticado');
+    <main class="container mx-auto px-4 py-8 md:py-12 max-w-6xl">
+        <!-- Hero Section -->
+        <section class="bg-white rounded-2xl shadow-xl overflow-hidden mb-12">
+            <div class="grid md:grid-cols-2 gap-6 md:gap-8 p-6 md:p-8">
+                <!-- Product Image -->
+                <div class="flex items-center justify-center">
+                    <img 
+                        src="https://erec-boost.com/BKR-ES-DESC/assets/6.png" 
+                        alt="Product Image" 
+                        class="rounded-lg shadow-lg w-full max-w-md transform transition-transform hover:scale-105"
+                        loading="lazy"
+                    >
+                </div>
 
-    const pixelId = crypto.randomBytes(16).toString('hex');
-    const batch = admin.firestore().batch();
-    const userRef = admin.firestore().collection('users').doc(userId);
+                <!-- Benefits & CTA -->
+                <div class="space-y-6">
+                    <!-- Benefits Card -->
+                    <div class="bg-green-50 p-6 rounded-xl shadow-sm">
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">
+                            Clinically Proven Benefits
+                        </h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-center text-green-800">
+                                <svg class="w-5 h-5 md:w-6 md:h-6 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="text-sm md:text-base">Enhanced Performance (92% Success Rate)</span>
+                            </li>
+                            <li class="flex items-center text-green-800">
+                                <svg class="w-5 h-5 md:w-6 md:h-6 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="text-sm md:text-base">Improved Confidence (88% Reported)</span>
+                            </li>
+                            <li class="flex items-center text-green-800">
+                                <svg class="w-5 h-5 md:w-6 md:h-6 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="text-sm md:text-base">100% Natural Formula</span>
+                            </li>
+                        </ul>
+                    </div>
 
-    // Configurar pixel
-    const pixelConfigRef = userRef.collection('pixel').doc('config');
-    batch.set(pixelConfigRef, {
-      pixelId: pixelId,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      status: 'active'
-    });
+                    <!-- Special Offer Card -->
+                    <div class="bg-blue-50 p-6 rounded-xl shadow-sm">
+                        <div class="text-center">
+                            <p class="text-2xl md:text-3xl font-bold text-blue-900 mb-2">
+                                Special Offer
+                            </p>
+                            <p class="text-lg md:text-xl text-gray-600 mb-4">
+                                Save 30% + Free Shipping
+                            </p>
+                            <a 
+                                href="#pricing-packages" 
+                                class="inline-block bg-gradient-to-r from-green-600 to-green-700 text-white font-bold py-4 px-6 md:px-8 rounded-full hover:from-green-700 hover:to-green-800 transition transform hover:scale-105 shadow-lg text-sm md:text-base"
+                            >
+                                Claim Your Discount Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    // Configurar tracking inicial
-    const trackingStatsRef = userRef.collection('tracking').doc('stats');
-    batch.set(trackingStatsRef, {
-      totalEmails: 0,
-      totalOpens: 0,
-      uniqueOpens: 0,
-      totalClicks: 0,
-      uniqueClicks: 0,
-      lastUpdate: admin.firestore.FieldValue.serverTimestamp()
-    });
+        <!-- Pricing Section -->
+        <section id="pricing-packages" class="mb-12 scroll-mt-20">
+            <h2 class="text-2xl md:text-3xl font-bold mb-8 text-center text-gray-800">
+                Choose Your Package
+            </h2>
+            <div class="grid md:grid-cols-3 gap-4 md:gap-6">
+                <!-- Basic Package -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border-2 border-gray-200 relative transform transition-all hover:scale-102">
+                    <div class="absolute -top-3 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">
+                        20% OFF
+                    </div>
+                    <h3 class="text-lg md:text-xl font-bold mb-4">1 Month Supply</h3>
+                    <img 
+                        src="https://erec-boost.com/BKR-ES-DESC/assets/1.png" 
+                        alt="Basic Package" 
+                        class="w-full rounded-lg mb-4 transform transition-transform hover:scale-105"
+                        loading="lazy"
+                    >
+                    <div class="mb-4 text-center">
+                        <span class="text-2xl md:text-3xl font-bold">$84</span>
+                        <span class="text-gray-500 line-through ml-2">$99.95</span>
+                    </div>
+                    <a 
+                        href="https://sip.mycartpanda.com/checkout/158055610:1" 
+                        class="block w-full bg-blue-600 text-white text-center py-3 rounded-lg hover:bg-blue-700 transition shadow-md text-sm md:text-base font-semibold"
+                    >
+                        Order Now
+                    </a>
+                </div>
 
-    await batch.commit();
+                <!-- Popular Package -->
+                <div class="bg-white rounded-xl shadow-xl p-6 border-2 border-blue-600 transform scale-105 relative">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-6 py-1 rounded-full text-sm font-medium shadow-md whitespace-nowrap">
+                        MOST POPULAR
+                    </div>
+                    <div class="absolute top-8 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">
+                        45% OFF
+                    </div>
+                    <h3 class="text-lg md:text-xl font-bold mb-4 mt-4">3 Month Supply</h3>
+                    <img 
+                        src="https://erec-boost.com/BKR-ES-DESC/assets/3.png" 
+                        alt="Popular Package" 
+                        class="w-full rounded-lg mb-4 transform transition-transform hover:scale-105"
+                        loading="lazy"
+                    >
+                    <div class="mb-4 text-center">
+                        <span class="text-2xl md:text-3xl font-bold">$177</span>
+                        <span class="text-gray-500 line-through ml-2">$299.85</span>
+                    </div>
+                    <a 
+                        href="https://sip.mycartpanda.com/checkout/158055048:1" 
+                        class="block w-full bg-green-600 text-white text-center py-3 rounded-lg hover:bg-green-700 transition shadow-md text-sm md:text-base font-semibold"
+                    >
+                        Order Now
+                    </a>
+                </div>
 
-    return { pixelId };
-  } catch (error) {
-    console.error('Erro ao configurar tracking:', error);
-    throw new functions.https.HttpsError('internal', error.message);
-  }
-});
+                <!-- Premium Package -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border-2 border-gray-200 relative transform transition-all hover:scale-102">
+                    <div class="absolute -top-3 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">
+                        60% OFF
+                    </div>
+                    <h3 class="text-lg md:text-xl font-bold mb-4">6 Month Supply</h3>
+                    <img 
+                        src="https://erec-boost.com/BKR-ES-DESC/assets/6.png" 
+                        alt="Premium Package" 
+                        class="w-full rounded-lg mb-4 transform transition-transform hover:scale-105"
+                        loading="lazy"
+                    >
+                    <div class="mb-4 text-center">
+                        <span class="text-2xl md:text-3xl font-bold">$294</span>
+                        <span class="text-gray-500 line-through ml-2">$599.70</span>
+                    </div>
+                    <a 
+                        href="https://sip.mycartpanda.com/checkout/158055553:1" 
+                        class="block w-full bg-blue-600 text-white text-center py-3 rounded-lg hover:bg-blue-700 transition shadow-md text-sm md:text-base font-semibold"
+                    >
+                        Order Now
+                    </a>
+                </div>
+            </div>
+        </section>
 
-exports.setupTracking = onCall({
-  ...commonConfig,
-  cors: {
-    origin: ['http://localhost:5173', 'https://flowgenie.com.br', 'https://dados.ilovedeploy.host'],
-    methods: ['POST', 'GET', 'OPTIONS'], 
-    credentials: true
-  }
- }, async (context) => {
-  if (!context.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'Usuário não autenticado');
-  }
- 
-  try {
-    const userId = context.auth.uid;
-    const userRef = admin.firestore().collection('users').doc(userId);
-    const trackingRef = userRef.collection('tracking').doc('stats');
-    const today = new Date().toISOString().split('T')[0];
- 
-    // Criar ou atualizar documento principal de tracking
-    await trackingRef.set({
-      totalEmails: 0,
-      totalOpens: 0,
-      uniqueOpens: 0,
-      totalClicks: 0,
-      uniqueClicks: 0,
-      lastUpdate: admin.firestore.FieldValue.serverTimestamp(),
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
- 
-    // Criar documento inicial de estatísticas diárias
-    const dailyStatsRef = trackingRef.collection('dailyStats').doc(today);
-    await dailyStatsRef.set({
-      date: today,
-      timestamp: admin.firestore.FieldValue.serverTimestamp(),
-      opens: admin.firestore.FieldValue.increment(0), // Initialize with 0
-      clicks: admin.firestore.FieldValue.increment(0),
-      uniqueOpens: 0,
-      uniqueClicks: 0,
-      lastUpdate: admin.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
- 
-    return {
-      success: true,
-      message: 'Tracking configurado com sucesso'
-    };
- 
-  } catch (error) {
-    console.error('Erro ao configurar tracking:', error);
-    throw new functions.https.HttpsError('internal', error.message);
-  }
- });
+        <!-- Guarantee Section -->
+        <section class="bg-white rounded-xl shadow-lg p-6 md:p-8 text-center mb-12">
+            <img 
+                src="https://erec-boost.com/BKR-ES-DESC/assets/selo.webp" 
+                alt="Guarantee" 
+                class="mx-auto h-28 md:h-40 mb-4"
+                loading="lazy"
+            >
+            <h2 class="text-xl md:text-2xl font-bold mb-4 text-gray-800">
+                60-Day Money Back Guarantee
+            </h2>
+            <p class="text-gray-600 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
+                If you're not completely satisfied with your results, simply return the unused portion for a full refund.
+                No questions asked.
+            </p>
+        </section>
+    </main>
+</div>
 
+<!-- Fixed Bottom CTA for Mobile -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200 p-4">
+    <a 
+        href="#pricing-packages" 
+        class="block w-full bg-gradient-to-r from-green-600 to-green-700 text-white text-center py-3 rounded-lg font-bold text-lg shadow-lg"
+    >
+        Order Now
+    </a>
+</div>`,
+                needsButton: false
+            }
+        ];
 
-// Função trackEvent atualizada
-exports.trackEvent = onRequest({
-  region: 'us-central1',
-  maxInstances: 10,
-  minInstances: 0,
-  memory: '256MiB',
-  cors: {
-    origin: [
-      'http://localhost:5173',
-      'https://flowgenie.com.br',
-      'https://app.flowgenie.com.br',
-      'https://dados.ilovedeploy.host',
-      'https://ilovedeploy.com'
-    ],
-    methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Accept', 'Origin'],
-    credentials: true,
-    maxAge: 3600
-  }
-}, async (req, res) => {
-  try {
-    console.log('[TRACKING] Request completo:', { 
-      method: req.method, 
-      query: req.query,
-      headers: req.headers,
-      url: req.url,
-      path: req.path,
-      origin: req.headers.origin
-    });
+        let currentQuestion = 0;
+        const progressBar = document.getElementById('progress');
+        const questionContainer = document.getElementById('questionContainer');
 
-    res.set({
-      'Access-Control-Allow-Origin': req.headers.origin || '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Accept, Origin',
-      'Access-Control-Allow-Credentials': 'true',
-      'Access-Control-Max-Age': '3600'
-    });
-
-    if (req.method === 'OPTIONS') {
-      return res.status(204).send('');
-    }
-
-    const { pid, type, url, email, eid } = req.query;
-    
-    if (!pid || typeof pid !== 'string' || pid.trim() === '') {
-      return res.status(400).json({ error: 'Pixel ID inválido' });
-    }
-    if (!type || typeof type !== 'string' || !['open', 'click'].includes(type)) {
-      return res.status(400).json({ error: 'Tipo de evento inválido' });
-    }
-    if (!email || typeof email !== 'string' || email.trim() === '') {
-      return res.status(400).json({ error: 'Email inválido' });
-    }
-    if (!eid || typeof eid !== 'string' || eid.trim() === '') {
-      return res.status(400).json({ error: 'Campaign ID inválido' });
-    }
-
-    const decodedEmail = decodeURIComponent(email);
-    const today = new Date().toISOString().split('T')[0];
-
-    const pixelsRef = admin.firestore().collectionGroup('pixel');
-    const pixelQuery = await pixelsRef.where('pixelId', '==', pid.trim()).limit(1).get();
-
-    if (pixelQuery.empty) {
-      console.error('[TRACKING] Pixel não encontrado:', pid);
-      return res.status(404).json({ error: 'Pixel não encontrado' });
-    }
-
-    const userId = pixelQuery.docs[0].ref.path.split('/')[1];
-    if (!userId) {
-      console.error('[TRACKING] User ID inválido para o pixel:', pid);
-      return res.status(500).json({ error: 'Erro interno do servidor' });
-    }
-
-    const db = admin.firestore();
-    const campaignRef = db.collection('users').doc(userId).collection('campaigns').doc(eid.trim());
-    const statsRef = campaignRef.collection('tracking').doc('stats');
-    const dailyStatsRef = statsRef.collection('dailyStats').doc(today);
-    const leadsRef = campaignRef.collection('leads').doc(decodedEmail.trim());
-    const eventRef = campaignRef.collection('events').doc();
-
-    const campaignDoc = await campaignRef.get();
-    if (!campaignDoc.exists) {
-      console.error('[TRACKING] Campanha não encontrada:', eid);
-      return res.status(404).json({ error: 'Campanha não encontrada' });
-    }
-
-    await db.runTransaction(async (transaction) => {
-      console.log('[TRACKING] Iniciando transaction');
-      
-      const leadDoc = await transaction.get(leadsRef);
-      const statsDoc = await transaction.get(statsRef);
-      const dailyStatsDoc = await transaction.get(dailyStatsRef);
-      const leadData = leadDoc.exists ? leadDoc.data() || {} : {};
-
-      const eventData = {
-        type,
-        email: decodedEmail.trim(),
-        campaignId: eid.trim(),
-        timestamp: admin.firestore.FieldValue.serverTimestamp(),
-        userAgent: req.headers['user-agent'] || '',
-        ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress || '',
-        metadata: {
-          pixelId: pid.trim(),
-          url: url ? decodeURIComponent(url) : null
-        }
-      };
-
-      if (!statsDoc.exists) {
-        transaction.set(statsRef, {
-          totalEmails: 0,
-          totalOpens: 0,
-          uniqueOpens: 0,
-          totalClicks: 0,
-          uniqueClicks: 0,
-          lastUpdate: admin.firestore.FieldValue.serverTimestamp()
-        });
-      }
-
-      if (!dailyStatsDoc.exists) {
-        transaction.set(dailyStatsRef, {
-          date: today,
-          emails: 0,
-          opens: 0,
-          clicks: 0,
-          uniqueOpens: 0,
-          uniqueClicks: 0,
-          timestamp: admin.firestore.FieldValue.serverTimestamp()
-        });
-      }
-
-      transaction.set(eventRef, eventData);
-
-      // Mantendo os campos existentes e adicionando/atualizando os novos
-      const leadUpdate = {
-        email: decodedEmail.trim(),
-        firstSeen: leadData.firstSeen || admin.firestore.FieldValue.serverTimestamp(),
-        lastActivity: admin.firestore.FieldValue.serverTimestamp(),
-        status: leadData.status || 'active',
-        metadata: {
-          lastUserAgent: eventData.userAgent,
-          lastIp: eventData.ip
-        },
-        hasOpened: type === 'open' ? true : leadData.hasOpened || false,
-        hasClicked: type === 'click' ? true : leadData.hasClicked || false,
-        totalOpens: type === 'open' ? (leadData.totalOpens || 0) + 1 : (leadData.totalOpens || 0),
-        totalClicks: type === 'click' ? (leadData.totalClicks || 0) + 1 : (leadData.totalClicks || 0),
-        // Novos campos - preservando valores existentes ou inicializando
-        totalEmailsEnviados: leadData.totalEmailsEnviados || 0,
-        ultimoEmailEnviado: leadData.ultimoEmailEnviado || null,
-        unsubscribe: leadData.unsubscribe || false,
-        evento: leadData.evento || null
-      };
-
-      if (type === 'open') {
-        transaction.update(statsRef, {
-          totalOpens: admin.firestore.FieldValue.increment(1),
-          uniqueOpens: leadData.hasOpened ? 0 : 1,
-          lastUpdate: admin.firestore.FieldValue.serverTimestamp()
-        });
-
-        transaction.update(dailyStatsRef, {
-          opens: admin.firestore.FieldValue.increment(1),
-          uniqueOpens: leadData.hasOpened ? 0 : 1
-        });
-      } 
-      else if (type === 'click') {
-        if (url) {
-          leadUpdate.lastClickUrl = decodeURIComponent(url);
-        }
-
-        transaction.update(statsRef, {
-          totalClicks: admin.firestore.FieldValue.increment(1),
-          uniqueClicks: leadData.hasClicked ? 0 : 1,
-          lastUpdate: admin.firestore.FieldValue.serverTimestamp()
-        });
-
-        transaction.update(dailyStatsRef, {
-          clicks: admin.firestore.FieldValue.increment(1),
-          uniqueClicks: leadData.hasClicked ? 0 : 1
-        });
-      }
-
-      transaction.set(leadsRef, leadUpdate, { merge: true });
-    });
-
-    if (type === 'click' && url) {
-      return res.redirect(302, decodeURIComponent(url));
-    }
-
-    if (type === 'open') {
-      res.set({
-        'Content-Type': 'image/gif',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0'
-      });
-      return res.send(Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64'));
-    }
-
-    return res.status(200).json({ success: true });
-
-  } catch (error) {
-    console.error('[TRACKING] Erro crítico:', {
-      message: error.message,
-      stack: error.stack,
-      context: req.query
-    });
-    return res.status(500).json({ 
-      error: 'Erro interno do servidor',
-      details: error.message
-    });
-  }
-});
-
-// Função helper para processar evento de abertura
-async function handleOpenEvent(transaction, params) {
-  const {
-    campaignTrackingRef,
-    campaignDailyStatsRef,
-    campaignLeadsRef,
-    decodedEmail,
-    eventData
-  } = params;
-
-  // Buscar dados existentes do lead
-  const leadDoc = await transaction.get(campaignLeadsRef);
-  const leadData = leadDoc.exists ? leadDoc.data() : {};
-
-  // Verificar primeira abertura
-  const isFirstOpen = !leadData.hasOpened;
-
-  // Atualizar dados do lead
-  transaction.set(campaignLeadsRef, {
-    email: decodedEmail,
-    firstSeen: leadData.firstSeen || admin.firestore.FieldValue.serverTimestamp(),
-    lastActivity: admin.firestore.FieldValue.serverTimestamp(),
-    totalOpens: admin.firestore.FieldValue.increment(1),
-    hasOpened: true,
-    lastOpen: admin.firestore.FieldValue.serverTimestamp(),
-    status: leadData.status || 'active',
-    metadata: {
-      ...leadData.metadata,
-      lastUserAgent: eventData.userAgent,
-      lastIp: eventData.ip
-    }
-  }, { merge: true });
-
-  if (isFirstOpen) {
-    transaction.update(campaignTrackingRef, {
-      uniqueOpens: admin.firestore.FieldValue.increment(1),
-      totalOpens: admin.firestore.FieldValue.increment(1),
-      lastUpdate: admin.firestore.FieldValue.serverTimestamp()
-    });
-
-    transaction.set(campaignDailyStatsRef, {
-      date: eventData.timestamp,
-      opens: admin.firestore.FieldValue.increment(1),
-      uniqueOpens: admin.firestore.FieldValue.increment(1),
-      timestamp: admin.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-  }
-}
-
-// Função helper para processar evento de clique
-async function handleClickEvent(transaction, params) {
-  const {
-    campaignTrackingRef,
-    campaignDailyStatsRef,
-    campaignLeadsRef,
-    decodedEmail,
-    eventData,
-    url
-  } = params;
-
-  const leadDoc = await transaction.get(campaignLeadsRef);
-  const leadData = leadDoc.exists ? leadDoc.data() : {};
-
-  const isFirstClick = !leadData.hasClicked;
-
-  transaction.set(campaignLeadsRef, {
-    email: decodedEmail,
-    firstSeen: leadData.firstSeen || admin.firestore.FieldValue.serverTimestamp(),
-    lastActivity: admin.firestore.FieldValue.serverTimestamp(),
-    totalClicks: admin.firestore.FieldValue.increment(1),
-    hasClicked: true,
-    lastClick: admin.firestore.FieldValue.serverTimestamp(),
-    lastClickUrl: url,
-    status: leadData.status || 'active',
-    metadata: {
-      ...leadData.metadata,
-      lastUserAgent: eventData.userAgent,
-      lastIp: eventData.ip
-    }
-  }, { merge: true });
-
-  if (isFirstClick) {
-    transaction.update(campaignTrackingRef, {
-      uniqueClicks: admin.firestore.FieldValue.increment(1),
-      totalClicks: admin.firestore.FieldValue.increment(1),
-      lastUpdate: admin.firestore.FieldValue.serverTimestamp()
-    });
-
-    transaction.set(campaignDailyStatsRef, {
-      date: eventData.timestamp,
-      clicks: admin.firestore.FieldValue.increment(1),
-      uniqueClicks: admin.firestore.FieldValue.increment(1),
-      timestamp: admin.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-  }
-}
-
-
-// Migration script to populate daily stats
-exports.migrateToDailyStats = onRequest({
-  ...commonConfig
-}, async (req, res) => {
-  try {
-    // Security check - add your admin token validation here
-    const { adminToken } = req.query;
-    if (adminToken !== 'YOUR_ADMIN_TOKEN') {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    const usersRef = admin.firestore().collection('users');
-    const usersSnapshot = await usersRef.get();
-
-    for (const userDoc of usersSnapshot.docs) {
-      const userId = userDoc.id;
-      console.log(`Processing user: ${userId}`);
-
-      const trackingRef = admin.firestore()
-        .collection('users')
-        .doc(userId)
-        .collection('tracking')
-        .doc('stats');
-
-      const eventsRef = trackingRef.collection('events');
-      const eventsSnapshot = await eventsRef.orderBy('timestamp').get();
-
-      const dailyStats = new Map();
-
-      // Process all events and group by date
-      for (const eventDoc of eventsSnapshot.docs) {
-        const event = eventDoc.data();
-        if (!event.timestamp) continue;
-
-        const date = event.timestamp.toDate();
-        const dateStr = date.toISOString().split('T')[0];
-        
-        if (!dailyStats.has(dateStr)) {
-          dailyStats.set(dateStr, {
-            date: dateStr,
-            opens: 0,
-            clicks: 0,
-            uniqueOpens: new Set(),
-            uniqueClicks: new Set()
-          });
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
         }
 
-        const stats = dailyStats.get(dateStr);
-        if (event.type === 'open') {
-          stats.opens++;
-          stats.uniqueOpens.add(event.email);
-        } else if (event.type === 'click') {
-          stats.clicks++;
-          stats.uniqueClicks.add(event.email);
+        function createQuestionElement(question) {
+            let content = '';
+            
+            if (question.type !== 'landing') {
+                if (question.question) {
+                    content += `<h2 class="question">${question.question}</h2>`;
+                }
+                if (question.subtitle) {
+                    content += `<p class="subtitle">${question.subtitle}</p>`;
+                }
+            }
+
+            content += getQuestionContent(question);
+
+            if (question.needsButton) {
+                content += `
+                    <button class="next-btn" id="nextBtn">
+                        ${question.buttonText || 'Continue'}
+                    </button>
+                `;
+            }
+
+            return content;
         }
-      }
 
-      // Convert stats for Firestore and write in batches
-      const batch = admin.firestore().batch();
-      let operationCount = 0;
-      const MAX_BATCH_OPERATIONS = 500;
-
-      for (const [dateStr, stats] of dailyStats) {
-        if (operationCount >= MAX_BATCH_OPERATIONS) {
-          await batch.commit();
-          batch = admin.firestore().batch();
-          operationCount = 0;
+        function getQuestionContent(question) {
+            switch(question.type) {
+                case 'age':
+                case 'treatment':
+                case 'frequency':
+                    return `
+                        <div class="options-grid">
+                            ${question.options.map(option => `
+                                <div class="option-card" role="button" tabindex="0">
+                                    ${option.image ? 
+                                        `<img src="${option.image}" alt="${option.text}" class="option-image" loading="lazy">` :
+                                        `<div class="option-icon">${option.icon}</div>`
+                                    }
+                                    <div class="option-text">${option.text}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                case 'success':
+                    return `
+                        <div class="success-story">
+                            <div class="success-icon">🔥</div>
+                            <p class="success-text">${question.content}</p>
+                            ${question.image ? `<img src="${question.image}" alt="Success Story" class="success-image" loading="lazy">` : ''}
+                        </div>
+                    `;
+                case 'news':
+                case 'landing':
+                    return question.content;
+                default:
+                    return '';
+            }
         }
 
-        const dailyStatsRef = trackingRef.collection('dailyStats').doc(dateStr);
-        batch.set(dailyStatsRef, {
-          date: dateStr,
-          opens: stats.opens,
-          clicks: stats.clicks,
-          uniqueOpens: stats.uniqueOpens.size,
-          uniqueClicks: stats.uniqueClicks.size,
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
-          updatedAt: admin.firestore.FieldValue.serverTimestamp()
-        });
+        function loadQuestion() {
+            updateProgress();
+            questionContainer.innerHTML = createQuestionElement(questions[currentQuestion]);
+            
+            if (questions[currentQuestion].options) {
+                const optionCards = document.querySelectorAll('.option-card');
+                optionCards.forEach(card => {
+                    card.addEventListener('click', () => {
+                        selectOption(card);
+                        // Automatically advance after selection
+                        setTimeout(nextQuestion, 300);
+                    });
+                });
+            }
 
-        operationCount++;
-      }
+            const nextBtn = document.getElementById('nextBtn');
+            if (nextBtn) {
+                nextBtn.addEventListener('click', nextQuestion);
+            }
 
-      if (operationCount > 0) {
-        await batch.commit();
-      }
+            // Add smooth scrolling for landing page links
+            if (questions[currentQuestion].type === 'landing') {
+                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                    anchor.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const targetId = this.getAttribute('href');
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                            targetElement.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    });
+                });
+            }
+        }
 
-      console.log(`Completed processing for user: ${userId}`);
-    }
-
-    return res.status(200).json({ 
-      success: true, 
-      message: 'Migration completed successfully' 
-    });
-
-  } catch (error) {
-    console.error('Migration error:', error);
-    return res.status(500).json({ 
-      error: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-    });
-  }
-});
-
-
-exports.migrateToNewTracking = onRequest({
-  ...commonConfig,
-  timeoutSeconds: 540 // 9 minutes for large datasets
-}, async (req, res) => {
-  try {
-    if (!req.headers.authorization) {
-      return res.status(401).json({ error: 'No authorization header' });
-    }
-
-    const token = req.headers.authorization.split('Bearer ')[1];
-    try {
-      await admin.auth().verifyIdToken(token);
-    } catch (error) {
-      return res.status(403).json({ error: 'Invalid token' });
-    }
-
-    const usersRef = admin.firestore().collection('users');
-    const usersSnapshot = await usersRef.get();
-    const results = { success: [], errors: [] };
-
-    for (const userDoc of usersSnapshot.docs) {
-      const userId = userDoc.id;
-      console.log(`Processing user ${userId}`);
-
-      try {
-        const eventsRef = admin.firestore()
-          .collection('users')
-          .doc(userId)
-          .collection('tracking')
-          .doc('stats')
-          .collection('events');
-
-        const eventsSnapshot = await eventsRef.get();
-        const dailyStats = new Map();
-
-        // Process all events
-        eventsSnapshot.forEach(eventDoc => {
-          const event = eventDoc.data();
-          if (!event.timestamp) return;
-
-          const date = event.timestamp.toDate();
-          const dateKey = date.toISOString().split('T')[0];
-
-          if (!dailyStats.has(dateKey)) {
-            dailyStats.set(dateKey, {
-              date: dateKey,
-              opens: 0,
-              clicks: 0,
-              uniqueOpens: new Set(),
-              uniqueClicks: new Set()
+        function selectOption(selectedCard) {
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.classList.remove('selected');
             });
-          }
-
-          const stats = dailyStats.get(dateKey);
-          if (event.type === 'open') {
-            stats.opens++;
-            stats.uniqueOpens.add(event.email);
-          } else if (event.type === 'click') {
-            stats.clicks++;
-            stats.uniqueClicks.add(event.email);
-          }
-        });
-
-        // Write daily stats
-        const batch = admin.firestore().batch();
-        const statsRef = admin.firestore()
-          .collection('users')
-          .doc(userId)
-          .collection('tracking')
-          .doc('stats');
-
-        for (const [dateKey, stats] of dailyStats) {
-          const dailyStatsRef = statsRef.collection('dailyStats').doc(dateKey);
-          batch.set(dailyStatsRef, {
-            date: dateKey,
-            opens: stats.opens,
-            clicks: stats.clicks,
-            uniqueOpens: stats.uniqueOpens.size,
-            uniqueClicks: stats.uniqueClicks.size,
-            timestamp: admin.firestore.Timestamp.fromDate(new Date(dateKey)),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp()
-          });
+            selectedCard.classList.add('selected');
         }
 
-        await batch.commit();
-        results.success.push(userId);
-        console.log(`Successfully processed user ${userId}`);
-      } catch (error) {
-        console.error(`Error processing user ${userId}:`, error);
-        results.errors.push({ userId, error: error.message });
-      }
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                loadQuestion();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Prevent zoom on double tap in iOS
+        document.addEventListener('gesturestart', function(e) {e.preventDefault();
+        });
+
+        // Prevent scrolling when touching the quiz container on mobile
+        document.querySelector('.quiz-container').addEventListener('touchmove', function(e) {
+            if (e.target.closest('.option-card')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Add animation when elements appear
+        function addAnimationToElements() {
+            const elements = document.querySelectorAll('.option-card, .success-story, .news-container');
+            elements.forEach(element => {
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(20px)';
+                requestAnimationFrame(() => {
+                    element.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                });
+            });
+        }
+
+        // Handle window resize
+        function handleResize() {
+            const container = document.querySelector('.quiz-container');
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+            container.style.minHeight = window.innerHeight > 700 ? '700px' : '100vh';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            handleResize();
+            loadQuestion();
+            addAnimationToElements();
+        });
+
+        // Event listeners for window resize
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('orientationchange', handleResize);
+
+        const TrackingUtils = {
+    // Get URL parameters
+    getURLParams() {
+        const searchParams = new URLSearchParams(window.location.search);
+        return {
+            src: searchParams.get('src') || 'direct',
+            utm_source: searchParams.get('utm_source'),
+            utm_medium: searchParams.get('utm_medium'),
+            utm_campaign: searchParams.get('utm_campaign')
+        };
+    },
+
+    // Save tracking data to localStorage
+    saveTrackingData() {
+        const params = this.getURLParams();
+        if (params.src || params.utm_source) {
+            localStorage.setItem('tracking_data', JSON.stringify({
+                ...params,
+                first_visit: new Date().toISOString()
+            }));
+        }
+    },
+
+    // Get tracking data
+    getTrackingData() {
+        const data = localStorage.getItem('tracking_data');
+        return data ? JSON.parse(data) : null;
+    },
+
+    // Track event
+    trackEvent(eventName, additionalData = {}) {
+        const trackingData = this.getTrackingData() || this.getURLParams();
+        const eventData = {
+            event_name: eventName,
+            timestamp: new Date().toISOString(),
+            source: trackingData.src || 'direct',
+            utm_source: trackingData.utm_source,
+            utm_medium: trackingData.utm_medium,
+            utm_campaign: trackingData.utm_campaign,
+            ...additionalData
+        };
+
+        // Log event (replace with your actual tracking implementation)
+        console.log('Event tracked:', eventData);
+
+        // Example: Send to Google Analytics
+        if (typeof gtag === 'function') {
+            gtag('event', eventName, eventData);
+        }
+
+        // Example: Send to Facebook Pixel
+        if (typeof fbq === 'function') {
+            fbq('track', eventName, eventData);
+        }
+
+        // You can add more tracking platforms here
     }
+};
 
-    return res.status(200).json({
-      message: 'Migration completed',
-      results
-    });
-
-  } catch (error) {
-    console.error('Migration error:', error);
-    return res.status(500).json({ error: error.message });
-  }
+// Initialize tracking
+document.addEventListener('DOMContentLoaded', () => {
+    TrackingUtils.saveTrackingData();
 });
 
-
-
-exports.getInteractionHistory = onCall({
-  ...commonConfig
-}, async (data, context) => {
-  if (!context.auth) {
-    throw new functions.https.HttpsError(
-      'unauthenticated',
-      'Usuário não autenticado'
-    );
-  }
-
-  try {
-    const { startDate, endDate, type } = data;
-    const userId = context.auth.uid;
-
-    const userRef = admin.firestore().collection('users').doc(userId);
-    const interactionsRef = userRef.collection('tracking').doc('stats').collection('interactions');
-
-    let query = interactionsRef;
-
-    if (startDate) {
-      const startTimestamp = admin.firestore.Timestamp.fromDate(new Date(startDate));
-      query = query.where('timestamp', '>=', startTimestamp);
-    }
-
-    if (endDate) {
-      const endTimestamp = admin.firestore.Timestamp.fromDate(new Date(endDate));
-      query = query.where('timestamp', '<=', endTimestamp);
-    }
-
-    if (type) {
-      query = query.where('type', '==', type);
-    }
-
-    query = query.orderBy('timestamp', 'desc');
-
-    const snapshot = await query.get();
-
-    const interactions = [];
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      interactions.push({
-        id: doc.id,
-        ...data,
-        timestamp: data.timestamp.toDate().toISOString()
-      });
-    });
-
-    return {
-      success: true,
-      interactions
+// Add tracking to quiz interactions
+function addTrackingToQuiz() {
+    // Track question views
+    const originalLoadQuestion = loadQuestion;
+    loadQuestion = function() {
+        originalLoadQuestion();
+        const currentQ = questions[currentQuestion];
+        TrackingUtils.trackEvent('question_view', {
+            question_number: currentQuestion + 1,
+            question_type: currentQ.type,
+            question_text: currentQ.question
+        });
     };
 
-  } catch (error) {
-    console.error('Erro ao buscar histórico:', error);
-    throw new functions.https.HttpsError('internal', error.message);
-  }
-});
-
-
-// Helper function to generate tracking URLs
-exports.generateTrackingUrls = (pixelId, emailId, targetUrl) => {
-  const baseUrl = 'https://us-central1-flowgenie-28fe4.cloudfunctions.net/trackEvent';
-  const baseParams = `pid=${pixelId}&eid=${emailId}`;
-  
-  return {
-    baseParams,
-    click: `${baseUrl}?${baseParams}&type=click&email={{email}}&url=${encodeURIComponent(targetUrl)}`,
-    open: `${baseUrl}?${baseParams}&type=open&email={{email}}`,
-    emailPlaceholder: '{{email}}',
-    url: targetUrl
-  };
-};
-
-// Função para inicializar tracking para novo usuário
-exports.initializeTracking = async (userId) => {
-  const batch = admin.firestore().batch();
-  const userRef = admin.firestore().collection('users').doc(userId);
-  
-  const statsRef = userRef.collection('tracking').doc('stats');
-  batch.set(statsRef, {
-    totalEmails: 0,
-    totalOpens: 0,
-    uniqueOpens: 0,
-    totalClicks: 0,
-    uniqueClicks: 0,
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    lastUpdate: admin.firestore.FieldValue.serverTimestamp()
-  }, { merge: true });
-
-  const today = new Date().toISOString().split('T')[0];
-  const dailyStatsRef = statsRef.collection('dailyStats').doc(today);
-  batch.set(dailyStatsRef, {
-    date: today,
-    opens: 0,
-    clicks: 0,
-    uniqueOpens: 0,
-    uniqueClicks: 0,
-    timestamp: admin.firestore.FieldValue.serverTimestamp()
-  }, { merge: true });
-
-  await batch.commit();
-};
-
-// Função para atualizar estatísticas quando um email é enviado
-exports.handleEmailSent = async (userId, emailData) => {
-  if (!emailData.email) {
-    console.error('Email não fornecido para tracking');
-    return;
-  }
-
-  const userRef = admin.firestore().collection('users').doc(userId);
-  const leadRef = userRef.collection('leads').doc(emailData.email);
-  const trackingRef = userRef.collection('tracking').doc('stats');
-  const timestamp = admin.firestore.FieldValue.serverTimestamp();
-
-  const batch = admin.firestore().batch();
-
-  // Adicionando os novos campos ao documento do lead
-  batch.set(leadRef, {
-    email: emailData.email,
-    emailId: emailData.emailId,
-    lastEmailSent: timestamp,
-    lastActivity: timestamp,
-    hasOpened: false,
-    hasClicked: false,
-    engagementScore: getInitialScore('send'),
-    // Novos campos
-    totalEmailsEnviados: 1, // Inicializa com 1 quando o documento é criado
-    ultimoEmailEnviado: timestamp,
-    unsubscribe: false, // Inicializa como false
-    evento: null // Inicializa como null
-  }, { merge: true });
-
-  batch.set(trackingRef, {
-    totalEmails: admin.firestore.FieldValue.increment(1),
-    lastEmailSent: timestamp,
-    lastUpdate: timestamp
-  }, { merge: true });
-
-  await batch.commit();
-};
-
-
-// 3. Webhook para integração com n8n
-exports.n8nWebhook = onRequest({
-  ...commonConfig,
-  cors: true
-}, async (req, res) => {
-  try {
-    const { userId, campaignId, type, customerData } = req.body;
-
-    if (!userId || !campaignId || !type) {
-      return res.status(400).json({
-        error: 'Dados incompletos',
-        required: ['userId', 'campaignId', 'type']
-      });
-    }
-
-    // Referências do Firestore
-    const userRef = admin.firestore().collection('users').doc(userId);
-    const trackingStatsRef = userRef.collection('tracking').doc('stats');
-
-    // Usar transação para garantir consistência
-    await admin.firestore().runTransaction(async (transaction) => {
-      // Buscar dados atuais de tracking
-      const trackingDoc = await transaction.get(trackingStatsRef);
-      const currentStats = trackingDoc.exists ? trackingDoc.data() : {
-        totalEmails: 0,
-        totalOpens: 0,
-        uniqueOpens: 0,
-        totalClicks: 0,
-        uniqueClicks: 0
-      };
-
-      // Incrementar totalEmails
-      transaction.set(trackingStatsRef, {
-        ...currentStats,
-        totalEmails: (currentStats.totalEmails || 0) + 1,
-        lastUpdate: admin.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-
-      // Atualizar também as estatísticas da campanha
-      const campaignRef = userRef.collection('campaigns').doc(campaignId);
-      const campaignDoc = await transaction.get(campaignRef);
-      if (campaignDoc.exists) {
-        const campaignStats = campaignDoc.data().stats || {};
-        transaction.update(campaignRef, {
-          'stats.totalEmails': (campaignStats.totalEmails || 0) + 1,
-          'stats.lastUpdate': admin.firestore.FieldValue.serverTimestamp()
+    // Track option selections
+    const originalSelectOption = selectOption;
+    selectOption = function(selectedCard) {
+        originalSelectOption(selectedCard);
+        TrackingUtils.trackEvent('option_selected', {
+            question_number: currentQuestion + 1,
+            selected_option: selectedCard.querySelector('.option-text').textContent
         });
-      }
-    });
-
-    // Resto do código do webhook...
-    const pixelDoc = await userRef.collection('pixel').doc('config').get();
-    if (!pixelDoc.exists) {
-      return res.status(404).json({ error: 'Pixel não encontrado' });
-    }
-
-    // Continuar com o processamento normal do webhook...
-    
-    return res.status(200).json({
-      success: true,
-      message: 'Email registrado e contabilizado com sucesso'
-    });
-
-  } catch (error) {
-    console.error('Erro no webhook:', error);
-    return res.status(500).json({ error: error.message });
-  }
-});
-
-// 2. Função auxiliar para buscar estatísticas de email
-exports.getEmailStats = onCall({
-  ...commonConfig
-}, async (context) => {
-  if (!context.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'Usuário não autenticado');
-  }
-
-  try {
-    const userRef = admin.firestore().collection('users').doc(context.auth.uid);
-    const statsDoc = await userRef.collection('tracking').doc('stats').get();
-
-    if (!statsDoc.exists) {
-      return {
-        totalEmails: 0,
-        totalOpens: 0,
-        uniqueOpens: 0,
-        totalClicks: 0,
-        uniqueClicks: 0
-      };
-    }
-
-    return statsDoc.data();
-  } catch (error) {
-    throw new functions.https.HttpsError('internal', 'Erro ao buscar estatísticas');
-  }
-});
-
-// 2. Função para processar interações de email
-exports.handleEmailInteraction = functions.https.onRequest((req, res) => {
-  return cors(req, res, async () => {
-    try {
-      const { userId, campaignId, type, emailId, customerData } = req.body;
-      
-      if (!userId || !campaignId || !type) {
-        return res.status(400).json({
-          error: 'Dados obrigatórios faltando',
-          required: ['userId', 'campaignId', 'type']
-        });
-      }
-
-      const campaignRef = admin.firestore()
-        .collection('users')
-        .doc(userId)
-        .collection('campaigns')
-        .doc(campaignId);
-
-      const interactionId = require('crypto').randomUUID();
-      
-      await admin.firestore().runTransaction(async (transaction) => {
-        const campaignDoc = await transaction.get(campaignRef);
-        if (!campaignDoc.exists) {
-          throw new Error('Campanha não encontrada');
-        }
-        
-        const interactionRef = campaignRef
-          .collection('interactions')
-          .doc(interactionId);
-        
-        transaction.set(interactionRef, {
-          type,
-          emailId,
-          customerData,
-          timestamp: admin.firestore.FieldValue.serverTimestamp()
-        });
-        
-        const stats = campaignDoc.data().stats || {};
-        transaction.update(campaignRef, {
-          stats: {
-            ...stats,
-            [`${type}s`]: (stats[`${type}s`] || 0) + 1,
-            lastUpdate: admin.firestore.FieldValue.serverTimestamp()
-          }
-        });
-      });
-      
-      return res.status(200).json({
-        success: true,
-        message: 'Interação processada com sucesso',
-        interactionId
-      });
-
-    } catch (error) {
-      console.error('Erro ao processar interação:', error);
-      return res.status(500).json({
-        error: error.message,
-        success: false
-      });
-    }
-  });
-});
-
-// 3. Função para verificar pixel
-exports.validatePixel = onCall(commonConfig, async (context) => {
-  try {
-    // Verificar autenticação
-    if (!context.auth) {
-      throw new Error('Não autorizado: Usuário não autenticado');
-    }
-
-    const userId = context.auth.uid;
-    console.log('[VALIDATE_PIXEL] Usuário autenticado:', userId);
-
-    // Buscar pixel existente
-    const userRef = admin.firestore().collection('users').doc(userId);
-    const pixelDoc = await userRef.collection('pixel').doc('config').get();
-
-    if (pixelDoc.exists) {
-      console.log('[VALIDATE_PIXEL] Pixel existente encontrado');
-      const pixelData = pixelDoc.data();
-      
-      return { 
-        pixelId: pixelData.pixelId,
-        isNew: false,
-        status: pixelData.status || 'active'
-      };
-    }
-
-    // Criar novo pixel
-    console.log('[VALIDATE_PIXEL] Criando novo pixel');
-    const pixelId = crypto.randomBytes(16).toString('hex');
-    
-    await userRef.collection('pixel').doc('config').set({
-      pixelId,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      status: 'active'
-    });
-
-    // Inicializar tracking stats se necessário
-    const trackingRef = userRef.collection('tracking').doc('stats');
-    const trackingDoc = await trackingRef.get();
-
-    if (!trackingDoc.exists) {
-      await trackingRef.set({
-        totalEmails: 0,
-        totalOpens: 0,
-        uniqueOpens: 0,
-        totalClicks: 0,
-        uniqueClicks: 0,
-        lastUpdate: admin.firestore.FieldValue.serverTimestamp(),
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
-      });
-    }
-
-    console.log('[VALIDATE_PIXEL] Novo pixel criado com sucesso:', pixelId);
-    
-    return {
-      pixelId,
-      isNew: true,
-      status: 'active'
     };
 
-  } catch (error) {
-    console.error('[VALIDATE_PIXEL] Erro crítico:', {
-      errorMessage: error.message,
-      errorCode: error.code,
-      errorName: error.name,
-      stack: error.stack,
-      timestamp: new Date().toISOString()
-    });
-
-    throw new Error(process.env.NODE_ENV === 'development' ? 
-      error.message : 
-      'Ocorreu um erro ao processar sua requisição'
-    );
-  }
-});
-
-
-// Atualizando a função handleEmailSent para incluir os novos campos
-exports.handleEmailSent = async (userId, emailData) => {
-  if (!emailData.email) {
-    console.error('Email não fornecido para tracking');
-    return;
-  }
-
-  const userRef = admin.firestore().collection('users').doc(userId);
-  const leadRef = userRef.collection('leads').doc(emailData.email);
-  const trackingRef = userRef.collection('tracking').doc('stats');
-  const timestamp = admin.firestore.FieldValue.serverTimestamp();
-
-  const batch = admin.firestore().batch();
-
-  // Adicionando os novos campos ao documento do lead
-  batch.set(leadRef, {
-    email: emailData.email,
-    emailId: emailData.emailId,
-    lastEmailSent: timestamp,
-    lastActivity: timestamp,
-    hasOpened: false,
-    hasClicked: false,
-    engagementScore: getInitialScore('send'),
-    // Novos campos
-    totalEmailsEnviados: 1, // Inicializa com 1 quando o documento é criado
-    ultimoEmailEnviado: timestamp,
-    unsubscribe: false, // Inicializa como false
-    evento: null // Inicializa como null
-  }, { merge: true });
-
-  batch.set(trackingRef, {
-    totalEmails: admin.firestore.FieldValue.increment(1),
-    lastEmailSent: timestamp,
-    lastUpdate: timestamp
-  }, { merge: true });
-
-  await batch.commit();
-};
-
-// Atualizando a função trackEmailSent para incluir os novos campos
-exports.trackEmailSent = onRequest({
-  ...commonConfig,
-  cors: {
-    origin: ['https://n8n.flowgenie.com.br'],
-    methods: ['POST'],
-    credentials: true
-  }
-}, async (req, res) => {
-  try {
-    console.log('Received request body:', JSON.stringify(req.body, null, 2));
-
-    const { userId, emails } = req.body;
-
-    if (!userId || !emails || !Array.isArray(emails)) {
-      console.log('Validation failed:', { userId, emails });
-      return res.status(400).json({
-        error: 'Payload inválido',
-        required: ['userId', 'emails (array)'],
-        received: { 
-          userId: userId || 'not provided',
-          emailsType: emails ? typeof emails : 'not provided',
-          isArray: emails ? Array.isArray(emails) : false
+    // Track button clicks
+    document.addEventListener('click', (e) => {
+        if (e.target.matches('.next-btn')) {
+            TrackingUtils.trackEvent('next_button_click', {
+                question_number: currentQuestion + 1
+            });
         }
-      });
-    }
 
-    for (const email of emails) {
-      if (!email.to || !email.metadata || !email.metadata.campaignId) {
-        return res.status(400).json({
-          error: 'Estrutura de email inválida',
-          required: ['to', 'metadata.campaignId'],
-          received: email
-        });
-      }
-    }
+        // Track order button clicks
+        if (e.target.matches('a[href*="checkout"]')) {
+            const packageType = e.target.closest('[class*="Package"]')?.querySelector('h3')?.textContent || 'unknown';
+            TrackingUtils.trackEvent('order_button_click', {
+                package_type: packageType
+            });
+        }
+    });
+}
 
-    const db = getFirestore();
-    const today = new Date().toISOString().split('T')[0];
+// Initialize tracking on quiz
+addTrackingToQuiz();
+    </script>
     
-    const emailsByCampaign = emails.reduce((acc, email) => {
-      const campaignId = email.metadata.campaignId;
-      if (!acc[campaignId]) {
-        acc[campaignId] = [];
-      }
-      acc[campaignId].push(email);
-      return acc;
-    }, {});
-
-    for (const [campaignId, campaignEmails] of Object.entries(emailsByCampaign)) {
-      const totalEmails = campaignEmails.length;
-      
-      const campaignRef = db
-        .collection('users')
-        .doc(userId)
-        .collection('campaigns')
-        .doc(campaignId);
-      
-      const campaignTrackingRef = campaignRef
-        .collection('tracking')
-        .doc('stats');
-      
-      const campaignDailyStatsRef = campaignTrackingRef
-        .collection('dailyStats')
-        .doc(today);
-
-      // Atualizar documentos de leads com os novos campos
-      const batch = db.batch();
-      for (const email of campaignEmails) {
-        const leadRef = campaignRef.collection('leads').doc(email.to);
-        
-        // Primeiro, tentar obter o documento existente
-        const leadDoc = await leadRef.get();
-        const currentTotalEmails = leadDoc.exists ? (leadDoc.data().totalEmailsEnviados || 0) : 0;
-
-        batch.set(leadRef, {
-          email: email.to,
-          lastActivity: FieldValue.serverTimestamp(),
-          // Novos campos e atualizações
-          totalEmailsEnviados: currentTotalEmails + 1,
-          ultimoEmailEnviado: FieldValue.serverTimestamp(),
-          unsubscribe: false,
-          evento: email.metadata.evento || null,
-          // Manter campos existentes se já existirem
-          ...(leadDoc.exists && {
-            hasOpened: leadDoc.data().hasOpened || false,
-            hasClicked: leadDoc.data().hasClicked || false,
-            engagementScore: leadDoc.data().engagementScore || 0
-          })
-        }, { merge: true });
-      }
-      await batch.commit();
-
-      // Atualizar estatísticas da campanha
-      await db.runTransaction(async (transaction) => {
-        const dailyDoc = await transaction.get(campaignDailyStatsRef);
-        
-        if (!dailyDoc.exists) {
-          transaction.set(campaignDailyStatsRef, {
-            date: today,
-            emails: totalEmails,
-            opens: 0,
-            clicks: 0,
-            uniqueOpens: 0,
-            uniqueClicks: 0,
-            timestamp: FieldValue.serverTimestamp(),
-            lastUpdate: FieldValue.serverTimestamp()
-          });
-        } else {
-          transaction.update(campaignDailyStatsRef, {
-            emails: FieldValue.increment(totalEmails),
-            lastUpdate: FieldValue.serverTimestamp()
-          });
-        }
-
-        transaction.set(campaignTrackingRef, {
-          totalEmails: FieldValue.increment(totalEmails),
-          lastUpdate: FieldValue.serverTimestamp()
-        }, { merge: true });
-      });
-
-      // Registrar eventos
-      const eventsBatch = db.batch();
-      const eventsRef = campaignRef.collection('events');
-
-      for (const email of campaignEmails) {
-        const eventDoc = eventsRef.doc();
-        eventsBatch.set(eventDoc, {
-          type: 'send',
-          email: email.to,
-          timestamp: FieldValue.serverTimestamp(),
-          metadata: {
-            ...email.metadata,
-            source: 'n8n'
-          }
-        });
-      }
-
-      await eventsBatch.commit();
-    }
-
-    return res.status(200).json({
-      success: true,
-      totalProcessed: emails.length,
-      date: today
-    });
-
-  } catch (error) {
-    console.error('Erro ao processar emails:', error);
-    console.error({
-      message: error.message,
-      stack: error.stack,
-      code: error.code,
-      details: error.details
-    });
-
-    return res.status(500).json({ 
-      error: error.message,
-      code: error.code || 'UNKNOWN_ERROR'
-    });
-  }
-});
+</body>
+</html>

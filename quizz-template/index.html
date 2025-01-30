@@ -830,22 +830,75 @@
                 });
             });
         }
-        class TrackingSystem {
+
+
+
+        // Handle window resize
+        function handleResize() {
+            const container = document.querySelector('.quiz-container');
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+            container.style.minHeight = window.innerHeight > 700 ? '700px' : '100vh';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            handleResize();
+            loadQuestion();
+            addAnimationToElements();
+        });
+
+        // Event listeners for window resize
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('orientationchange', handleResize);
+
+       // Enhanced Tracking System with Cartpanda Integration
+class TrackingSystem {
     constructor() {
         this.initializeTracking();
         this.bindEvents();
+        this.initializeCartpanda();
     }
 
     initializeTracking() {
-        // Save initial tracking data
         this.saveTrackingData();
-        
-        // Initialize session data
         this.sessionData = {
             sessionStart: new Date().toISOString(),
             userInteractions: [],
             completedSteps: new Set()
         };
+    }
+
+    initializeCartpanda() {
+        // Inicializa o objeto global do Cartpanda se não existir
+        window.cartpanda = window.cartpanda || {};
+        window.cartpanda.queue = window.cartpanda.queue || [];
+
+        // Função auxiliar para enviar eventos ao Cartpanda
+        window.cartpanda.push = function(event) {
+            window.cartpanda.queue.push(event);
+            this.processCartpandaQueue();
+        }.bind(this);
+
+        this.loadCartpandaScript();
+    }
+
+    loadCartpandaScript() {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.cartpanda.com/tracking.min.js';
+        script.async = true;
+        document.head.appendChild(script);
+    }
+
+    processCartpandaQueue() {
+        if (window.cartpanda.queue && window.cartpanda.queue.length > 0) {
+            window.cartpanda.queue.forEach(event => {
+                if (typeof window.cartpanda.track === 'function') {
+                    window.cartpanda.track(event.name, event.data);
+                }
+            });
+            window.cartpanda.queue = [];
+        }
     }
 
     getURLParams() {
@@ -859,7 +912,6 @@
             utm_term: searchParams.get('utm_term')
         };
 
-        // Clean undefined values
         Object.keys(params).forEach(key => {
             if (!params[key]) delete params[key];
         });
@@ -880,7 +932,7 @@
             try {
                 localStorage.setItem('quiz_tracking_data', JSON.stringify(trackingData));
             } catch (e) {
-                console.warn('Failed to save tracking data to localStorage:', e);
+                console.warn('Failed to save tracking data:', e);
             }
         }
     }
@@ -895,6 +947,21 @@
         }
     }
 
+    trackToCartpanda(eventName, eventData) {
+        try {
+            window.cartpanda.push({
+                name: eventName,
+                data: {
+                    ...eventData,
+                    timestamp: new Date().toISOString(),
+                    url: window.location.href
+                }
+            });
+        } catch (e) {
+            console.warn('Failed to track to Cartpanda:', e);
+        }
+    }
+
     trackEvent(eventName, additionalData = {}) {
         const trackingData = this.getTrackingData() || this.getURLParams();
         const eventData = {
@@ -905,16 +972,13 @@
             ...additionalData
         };
 
-        // Store in session data
         this.sessionData.userInteractions.push(eventData);
-
-        // Send to Google Analytics
+        
+        // Track to multiple platforms
         this.sendToGA(eventName, eventData);
-
-        // Send to Facebook Pixel
         this.sendToFBPixel(eventName, eventData);
+        this.trackToCartpanda(eventName, eventData);
 
-        // Log event for debugging
         if (window.location.hostname === 'localhost') {
             console.log('Event tracked:', eventData);
         }
@@ -961,16 +1025,30 @@
         this.sessionData.completedSteps.add(questionNumber);
     }
 
-    trackPurchaseIntent(packageType, price) {
-        this.trackEvent('purchase_intent', {
+    trackPurchaseIntent(packageType, price, productId) {
+        const eventData = {
             package_type: packageType,
             price: price,
-            currency: 'USD'
+            currency: 'USD',
+            product_id: productId
+        };
+
+        this.trackEvent('purchase_intent', eventData);
+        
+        // Evento específico para o Cartpanda
+        this.trackToCartpanda('add_to_cart', {
+            ...eventData,
+            quantity: 1
         });
     }
 
+    getProductIdFromUrl(url) {
+        const match = url.match(/checkout\/(\d+)/);
+        return match ? match[1] : null;
+    }
+
     bindEvents() {
-        // Track option selections
+        // Rastrear seleções de opções
         document.addEventListener('click', (e) => {
             if (e.target.closest('.option-card')) {
                 const optionCard = e.target.closest('.option-card');
@@ -983,9 +1061,9 @@
             }
         });
 
-        // Track button clicks
+        // Rastrear cliques em botões
         document.addEventListener('click', (e) => {
-            // Next button clicks
+            // Cliques no botão Next
             if (e.target.matches('.next-btn')) {
                 this.trackEvent('next_button_clicked', {
                     question_number: currentQuestion + 1,
@@ -993,25 +1071,29 @@
                 });
             }
 
-            // Order button clicks
+            // Cliques nos botões de checkout
             if (e.target.matches('a[href*="checkout"]')) {
-                const packageSection = e.target.closest('[class*="Package"]');
+                const checkoutLink = e.target;
+                const packageSection = checkoutLink.closest('[class*="Package"]');
+                
                 if (packageSection) {
                     const packageType = packageSection.querySelector('h3')?.textContent || 'unknown';
                     const priceElement = packageSection.querySelector('.text-2xl')?.textContent;
                     const price = priceElement ? parseFloat(priceElement.replace('$', '')) : 0;
+                    const productId = this.getProductIdFromUrl(checkoutLink.href);
 
-                    this.trackPurchaseIntent(packageType, price);
+                    // Rastrear no Cartpanda e outros sistemas
+                    this.trackPurchaseIntent(packageType, price, productId);
                 }
             }
         });
     }
 }
 
-// Initialize tracking system
+// Inicializar o sistema de tracking
 const trackingSystem = new TrackingSystem();
 
-// Modify existing quiz functions to include tracking
+// Modificar funções existentes do quiz para incluir tracking
 const originalLoadQuestion = window.loadQuestion;
 window.loadQuestion = function() {
     originalLoadQuestion();
@@ -1025,135 +1107,7 @@ window.selectOption = function(selectedCard) {
     const optionText = selectedCard.querySelector('.option-text')?.textContent;
     trackingSystem.trackQuizProgress(currentQuestion + 1, questions[currentQuestion].type, optionText);
 };
-
-
-        // Handle window resize
-        function handleResize() {
-            const container = document.querySelector('.quiz-container');
-            const vh = window.innerHeight * 0.01;
-            document.documentElement.style.setProperty('--vh', `${vh}px`);
-            container.style.minHeight = window.innerHeight > 700 ? '700px' : '100vh';
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            handleResize();
-            loadQuestion();
-            addAnimationToElements();
-        });
-
-        // Event listeners for window resize
-        window.addEventListener('resize', handleResize);
-        window.addEventListener('orientationchange', handleResize);
-
-        const TrackingUtils = {
-    // Get URL parameters
-    getURLParams() {
-        const searchParams = new URLSearchParams(window.location.search);
-        return {
-            src: searchParams.get('src') || 'direct',
-            utm_source: searchParams.get('utm_source'),
-            utm_medium: searchParams.get('utm_medium'),
-            utm_campaign: searchParams.get('utm_campaign')
-        };
-    },
-
-    // Save tracking data to localStorage
-    saveTrackingData() {
-        const params = this.getURLParams();
-        if (params.src || params.utm_source) {
-            localStorage.setItem('tracking_data', JSON.stringify({
-                ...params,
-                first_visit: new Date().toISOString()
-            }));
-        }
-    },
-
-    // Get tracking data
-    getTrackingData() {
-        const data = localStorage.getItem('tracking_data');
-        return data ? JSON.parse(data) : null;
-    },
-
-    // Track event
-    trackEvent(eventName, additionalData = {}) {
-        const trackingData = this.getTrackingData() || this.getURLParams();
-        const eventData = {
-            event_name: eventName,
-            timestamp: new Date().toISOString(),
-            source: trackingData.src || 'direct',
-            utm_source: trackingData.utm_source,
-            utm_medium: trackingData.utm_medium,
-            utm_campaign: trackingData.utm_campaign,
-            ...additionalData
-        };
-
-        // Log event (replace with your actual tracking implementation)
-        console.log('Event tracked:', eventData);
-
-        // Example: Send to Google Analytics
-        if (typeof gtag === 'function') {
-            gtag('event', eventName, eventData);
-        }
-
-        // Example: Send to Facebook Pixel
-        if (typeof fbq === 'function') {
-            fbq('track', eventName, eventData);
-        }
-
-        // You can add more tracking platforms here
-    }
-};
-
-// Initialize tracking
-document.addEventListener('DOMContentLoaded', () => {
-    TrackingUtils.saveTrackingData();
-});
-
-// Add tracking to quiz interactions
-function addTrackingToQuiz() {
-    // Track question views
-    const originalLoadQuestion = loadQuestion;
-    loadQuestion = function() {
-        originalLoadQuestion();
-        const currentQ = questions[currentQuestion];
-        TrackingUtils.trackEvent('question_view', {
-            question_number: currentQuestion + 1,
-            question_type: currentQ.type,
-            question_text: currentQ.question
-        });
-    };
-
-    // Track option selections
-    const originalSelectOption = selectOption;
-    selectOption = function(selectedCard) {
-        originalSelectOption(selectedCard);
-        TrackingUtils.trackEvent('option_selected', {
-            question_number: currentQuestion + 1,
-            selected_option: selectedCard.querySelector('.option-text').textContent
-        });
-    };
-
-    // Track button clicks
-    document.addEventListener('click', (e) => {
-        if (e.target.matches('.next-btn')) {
-            TrackingUtils.trackEvent('next_button_click', {
-                question_number: currentQuestion + 1
-            });
-        }
-
-        // Track order button clicks
-        if (e.target.matches('a[href*="checkout"]')) {
-            const packageType = e.target.closest('[class*="Package"]')?.querySelector('h3')?.textContent || 'unknown';
-            TrackingUtils.trackEvent('order_button_click', {
-                package_type: packageType
-            });
-        }
-    });
-}
-
-// Initialize tracking on quiz
-addTrackingToQuiz();
+    
     </script>
     
 </body>

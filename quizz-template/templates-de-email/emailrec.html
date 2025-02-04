@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oferta Especial - Não perca esta oportunidade!</title>
+    <title>Complete sua compra com 20% OFF!</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,7 +20,7 @@
         .header {
             text-align: center;
             padding: 20px 0;
-            background-color: #4CAF50;
+            background-color: #d32f2f;
             color: white;
         }
         .offer-text {
@@ -29,7 +29,7 @@
             color: #333;
         }
         .discount-badge {
-            background-color: #ff4444;
+            background-color: #000;
             color: white;
             padding: 10px 20px;
             border-radius: 25px;
@@ -38,35 +38,36 @@
             display: inline-block;
             margin: 20px 0;
         }
-        .benefits {
+        .cart {
             background-color: #f9f9f9;
             padding: 20px;
             margin: 20px 0;
             border-radius: 5px;
+            border: 2px dashed #d32f2f;
         }
-        .product-cards {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 30px;
-        }
-        .card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            width: 250px;
+        .timer {
             text-align: center;
-            background-color: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 24px;
+            color: #d32f2f;
+            margin: 20px 0;
+            font-weight: bold;
         }
-        .card img {
-            max-width: 150px;
-            height: auto;
+        .cta-button {
+            background-color: #d32f2f;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: block;
+            margin: 20px auto;
+            font-weight: bold;
+            text-align: center;
+            width: 80%;
+            font-size: 20px;
         }
         .price {
             font-size: 24px;
-            color: #4CAF50;
+            color: #d32f2f;
             font-weight: bold;
             margin: 10px 0;
         }
@@ -75,77 +76,33 @@
             color: #999;
             font-size: 18px;
         }
-        .cta-button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px 30px;
-            text-decoration: none;
-            border-radius: 5px;
-            display: inline-block;
-            margin: 20px 0;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Oferta Exclusiva para Você!</h1>
-            <div class="discount-badge">50% OFF</div>
+            <h1>Ei, você esqueceu algo!</h1>
+            <div class="discount-badge">20% OFF EXCLUSIVO</div>
         </div>
 
         <div class="offer-text">
-            <h2>Olá!</h2>
-            <p>Notamos que você demonstrou interesse em nosso produto e queremos oferecer uma condição super especial para você aproveitar todos os benefícios hoje mesmo!</p>
+            <h2>Sua compra está reservada</h2>
+            <p>Notamos que você não finalizou sua compra. Para garantir que você não perca essa oportunidade, liberamos um desconto exclusivo de 20% válido apenas para as próximas horas!</p>
             
-            <div class="benefits">
-                <h3>Por que escolher nosso encapsulado?</h3>
-                <p>✅ Resultados comprovados cientificamente</p>
-                <p>✅ Fórmula 100% natural</p>
-                <p>✅ Aprovado pela ANVISA</p>
-                <p>✅ Satisfação garantida ou seu dinheiro de volta</p>
+            <div class="cart">
+                <h3>Seu Carrinho:</h3>
+                <p>✓ Suplemento Natural para Libido - 3 Potes</p>
+                <p class="old-price">De: R$ 591,00</p>
+                <p class="price">Por apenas: R$ 472,80</p>
             </div>
 
-            <p>Esta oferta é válida apenas por <strong>24 horas</strong>. Não perca a oportunidade de transformar sua vida!</p>
-        </div>
-
-        <div class="product-cards">
-            <div class="card">
-                <img src="/api/placeholder/150/150" alt="1 Pote">
-                <h3>1 Pote</h3>
-                <p class="old-price">R$ 197,00</p>
-                <p class="price">R$ 98,50</p>
-                <a href="#" class="cta-button">Comprar Agora</a>
+            <div class="timer">
+                Oferta válida por 2 horas
             </div>
 
-            <div class="card">
-                <img src="/api/placeholder/150/150" alt="2 Potes">
-                <h3>2 Potes</h3>
-                <p class="old-price">R$ 394,00</p>
-                <p class="price">R$ 177,30</p>
-                <a href="#" class="cta-button">Comprar Agora</a>
-            </div>
+            <a href="#" class="cta-button">FINALIZAR COMPRA COM 20% OFF</a>
 
-            <div class="card">
-                <img src="/api/placeholder/150/150" alt="4 Potes">
-                <h3>4 Potes</h3>
-                <p class="old-price">R$ 788,00</p>
-                <p class="price">R$ 315,20</p>
-                <a href="#" class="cta-button">Comprar Agora</a>
-            </div>
-
-            <div class="card">
-                <img src="/api/placeholder/150/150" alt="6 Potes">
-                <h3>6 Potes - MELHOR OFERTA!</h3>
-                <p class="old-price">R$ 1.182,00</p>
-                <p class="price">R$ 472,80</p>
-                <a href="#" class="cta-button">Comprar Agora</a>
-            </div>
-        </div>
-
-        <div class="offer-text">
-            <p>Ainda tem dúvidas? Nossa equipe está pronta para ajudar!</p>
-            <p>Atenciosamente,<br>Equipe de Suporte</p>
+            <p style="text-align: center; font-size: 14px;">Pagamento 100% seguro | Entrega discreta</p>
         </div>
     </div>
 </body>

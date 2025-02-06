@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Flow Builder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .flow-builder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .step-card {
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid #eee;
+        }
+
+        .step-card:hover {
+            border-color: #e0e0e0;
+        }
+
+        .step-header {
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .step-header.email {
+            background: linear-gradient(to right, #EBF5FF, #ffffff);
+        }
+
+        .step-header.wait {
+            background: linear-gradient(to right, #f5f5f5, #ffffff);
+        }
+
+        .step-type {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+
+        .step-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .step-content {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            font-family: monospace;
+        }
+
+        .add-step-button {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin: 20px 0;
+        }
+
+        .add-step-button:hover {
+            border-color: #3b82f6;
+            transform: scale(1.05);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .step-option {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 12px;
+        }
+
+        .step-option:hover {
+            background: #f8fafc;
+        }
+
+        .step-option-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .step-option.email .step-option-icon {
+            background: #ebf5ff;
+            color: #3b82f6;
+        }
+
+        .step-option.wait .step-option-icon {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .delete-button {
+            color: #ef4444;
+            background: none;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 16px;
+        }
+
+        .delete-button:hover {
+            text-decoration: underline;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+            border: 2px dashed #e5e7eb;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .empty-state:hover {
+            border-color: #3b82f6;
+            background: #f0f7ff;
+        }
+
+        .empty-state-icon {
+            font-size: 32px;
+            color: #94a3b8;
+            margin-bottom: 16px;
+        }
+
+        .empty-state-text {
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="flow-builder" id="flowBuilder">
+            <div class="empty-state" id="emptyState">
+                <div class="empty-state-icon">+</div>
+                <div class="empty-state-text">Start your email sequence</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="addStepModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Add New Step</div>
+                <button class="close-button" id="closeModal">×</button>
+            </div>
+            <div class="step-option email" data-type="email">
+                <div class="step-option-icon">✉️</div>
+                <div>
+                    <div style="font-weight: 500">Email Step</div>
+                    <div style="font-size: 14px; color: #666">Add a new email to the sequence</div>
+                </div>
+            </div>
+            <div class="step-option wait" data-type="wait">
+                <div class="step-option-icon">⏱️</div>
+                <div>
+                    <div style="font-weight: 500">Wait Step</div>
+                    <div style="font-size: 14px; color: #666">Add a waiting period</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class FlowBuilder {
+            constructor() {
+                this.steps = [];
+                this.modal = document.getElementById('addStepModal');
+                this.flowBuilder = document.getElementById('flowBuilder');
+                this.emptyState = document.getElementById('emptyState');
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.renderSteps();
+            }
+
+            setupEventListeners() {
+                document.getElementById('closeModal').addEventListener('click', () => this.closeModal());
+                this.emptyState.addEventListener('click', () => this.openModal());
+                
+                document.querySelectorAll('.step-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        const type = option.dataset.type;
+                        this.addStep(type);
+                        this.closeModal();
+                    });
+                });
+
+                this.modal.addEventListener('click', (e) => {
+                    if (e.target === this.modal) this.closeModal();
+                });
+            }
+
+            openModal() {
+                this.modal.classList.add('active');
+            }
+
+            closeModal() {
+                this.modal.classList.remove('active');
+            }
+
+            addStep(type) {
+                const step = {
+                    id: Date.now(),
+                    type,
+                    ...(type === 'email' 
+                        ? { name: '', subject: '', html: '' }
+                        : { days: 1 }
+                    )
+                };
+
+                this.steps.push(step);
+                this.renderSteps();
+            }
+
+            deleteStep(id) {
+                this.steps = this.steps.filter(step => step.id !== id);
+                this.renderSteps();
+            }
+
+            updateStep(id, updates) {
+                this.steps = this.steps.map(step =>
+                    step.id === id ? { ...step, ...updates } : step
+                );
+            }
+
+            createStepElement(step) {
+                const stepElement = document.createElement('div');
+                stepElement.className = 'step-card';
+                stepElement.innerHTML = `
+                    <div class="step-header ${step.type}" data-id="${step.id}">
+                        <div class="step-type">
+                            <div class="step-icon">${step.type === 'email' ? '✉️' : '⏱️'}</div>
+                            <span>${step.type === 'email' ? (step.name || 'Untitled Email') : `Wait ${step.days} days`}</span>
+                        </div>
+                        <div>▼</div>
+                    </div>
+                    <div class="step-content" id="content-${step.id}">
+                        ${this.getStepContent(step)}
+                    </div>
+                `;
+
+                const header = stepElement.querySelector('.step-header');
+                header.addEventListener('click', () => this.toggleStep(step.id));
+
+                const content = stepElement.querySelector('.step-content');
+                const inputs = content.querySelectorAll('input, textarea');
+                inputs.forEach(input => {
+                    input.addEventListener('change', (e) => {
+                        this.updateStep(step.id, { [input.name]: e.target.value });
+                    });
+                });
+
+                const deleteButton = stepElement.querySelector('.delete-button');
+                if (deleteButton) {
+                    deleteButton.addEventListener('click', () => this.deleteStep(step.id));
+                }
+
+                return stepElement;
+            }
+
+            getStepContent(step) {
+                if (step.type === 'email') {
+                    return `
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" name="name" value="${step.name}" placeholder="Enter email name">
+                        </div>
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <input type="text" name="subject" value="${step.subject}" placeholder="Enter email subject">
+                        </div>
+                        <div class="form-group">
+                            <label>HTML Content</label>
+                            <textarea name="html" placeholder="Enter HTML content">${step.html}</textarea>
+                        </div>
+                        <button class="delete-button">Delete step</button>
+                    `;
+                } else {
+                    return `
+                        <div class="form-group">
+                            <label>Wait Duration (days)</label>
+                            <input type="number" name="days" value="${step.days}" min="1">
+                        </div>
+                        <button class="delete-button">Delete step</button>
+                    `;
+                }
+            }
+
+            toggleStep(id) {
+                const content = document.getElementById(`content-${id}`);
+                content.classList.toggle('active');
+            }
+
+            createAddButton() {
+                const button = document.createElement('button');
+                button.className = 'add-step-button';
+                button.innerHTML = '+';
+                button.addEventListener('click', () => this.openModal());
+                return button;
+            }
+
+            renderSteps() {
+                this.flowBuilder.innerHTML = '';
+                
+                if (this.steps.length === 0) {
+                    this.flowBuilder.appendChild(this.emptyState);
+                    return;
+                }
+
+                this.steps.forEach((step, index) => {
+                    const stepElement = this.createStepElement(step);
+                    this.flowBuilder.appendChild(stepElement);
+                    
+                    if (index === this.steps.length - 1) {
+                        this.flowBuilder.appendChild(this.createAddButton());
+                    }
+                });
+            }
+        }
+
+        // Initialize the flow builder
+        const flowBuilder = new FlowBuilder();
+    </script>
+</body>
+</html>

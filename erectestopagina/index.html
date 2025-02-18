@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ErecTesto Tracking</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a3c6d 0%, #2b5876 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .quiz-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        @media (max-width: 768px) {
+            .quiz-container {
+                margin: 10px;
+                border-radius: 12px;
+            }
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #2563eb);
+            transition: width 0.5s ease;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .next-btn {
+            display: inline-block;
+            width: 100%;
+            max-width: 400px;
+            padding: 16px 24px;
+            background: linear-gradient(90deg, #3b82f6, #2563eb);
+            color: white;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .next-btn:active {
+            transform: translateY(0);
+        }
+
+        .question-container {
+            padding: 24px;
+        }
+
+        @media (max-width: 480px) {
+            .question-container {
+                padding: 16px;
+            }
+        }
+
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin: 24px 0;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-4px);
+        }
+
+        @media (max-width: 768px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                margin: 16px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="mainContainer">
+        <div class="quiz-container" id="quizContainer">
+            <div class="progress-container" id="progressContainer">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="question-container" id="questionContainer">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                type: 'tracking',
+                content: `
+                    <div class="p-8 text-center">
+                        <h1 class="text-3xl font-bold text-blue-900 mb-6">Track Your ErecTesto Order</h1>
+                        <p class="text-lg text-gray-700 mb-8">Click below to check the status of your order</p>
+                        <button onclick="handleNext()" class="next-btn">
+                            Track My Order Now
+                        </button>
+                    </div>
+                `
+            },
+            {
+                type: 'loading',
+                content: `
+                    <div class="p-8 text-center">
+                        <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto mb-6"></div>
+                        <h2 class="text-2xl font-bold text-blue-900 mb-4">Searching Order Details...</h2>
+                        <p class="text-gray-600">Please wait while we locate your information</p>
+                        <div class="mt-8">
+                            <div class="h-2 bg-gray-200 rounded-full w-3/4 mx-auto mb-4">
+                                <div class="h-2 bg-blue-600 rounded-full animate-pulse" style="width: 75%"></div>
+                            </div>
+                            <p class="text-sm text-gray-500">Verifying order information...</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                type: 'message',
+                content: `
+                    <div class="p-8 text-center">
+                        <div class="bg-blue-100 p-6 rounded-xl mb-6">
+                            <h2 class="text-3xl font-bold text-blue-900 mb-4">🎉 Order Found!</h2>
+                            <p class="text-lg text-gray-800">Your ErecTesto order is being prepared for shipping.</p>
+                        </div>
+                        <div class="bg-yellow-50 border-2 border-yellow-200 p-6 rounded-xl mb-6 animate-pulse">
+                            <h3 class="text-xl font-bold text-yellow-800 mb-2">
+                                CONFIDENTIAL: Special VIP Message
+                            </h3>
+                            <p class="text-gray-700">You've been selected for an exclusive opportunity!</p>
+                        </div>
+                        <button onclick="handleNext()" class="next-btn">
+                            View Special Message
+                        </button>
+                    </div>
+                `
+            },
+            {
+                type: 'offer',
+                content: `
+                    <div class="p-8 text-center">
+                        <div class="bg-gradient-to-r from-blue-900 to-blue-800 text-white p-6 rounded-xl mb-6">
+                            <h2 class="text-2xl md:text-3xl font-bold mb-4">🔒 Exclusive VIP Access</h2>
+                            <p class="text-lg">Double Your Results with Our Premium Stack</p>
+                        </div> 
+
+                        <img 
+                        src="https://imagex1.sx.cdn.live/images/pinporn/2021/10/07/26028113.gif?width=300"
+                        class="w-full h-80 rounded-lg mb-4 transform transition-transform hover:scale-105" 
+                    >
+                        
+                        <div class="bg-green-50 p-6 rounded-xl mb-6">
+                            <p class="text-lg font-bold mb-4">
+                                BREAKTHROUGH DISCOVERY: The Secret Formula: horse-like erections and multiply your sperm production by more than 10x to drive your woman wild when you get there!!
+                            </p>
+                            <p class="text-gray-700 mb-4">
+                                When combined with ErecBoost, your results are amplified by up to 312%! You have been selected to access the best supplement available, which, when combined with ErecBoost, will make you perform like a porn star!.
+                            </p>
+                        </div>
+
+                        <div class="bg-yellow-50 p-6 rounded-xl mb-6">
+                            <h3 class="text-xl md:text-2xl font-bold text-yellow-800 mb-4">
+                                Special VIP Customer Offer
+                            </h3>
+                            <div class="flex flex-wrap justify-center items-center gap-4 mb-4">
+                                <div class="text-3xl md:text-4xl font-bold text-red-600">50% OFF</div>
+                                <div class="text-gray-500 line-through text-xl">$294.00</div>
+                                <div class="text-green-600 font-bold text-2xl md:text-3xl">$147.00</div>
+                            </div>
+                            <p class="text-sm text-gray-600">*Limited Time VIP Offer - Expires Soon!</p>
+                        </div>
+
+                        <button onclick="handleNext()" class="next-btn">
+                            YES! I Want Maximum Results Now!
+                        </button>
+
+                        <p class="text-sm text-gray-500 mt-4">
+                            🔒 Secure Checkout | 60-Day Money Back Guarantee
+                        </p>
+                    </div>
+                `
+            },
+            {
+                type: 'landing',
+                content: `
+                    <div class="landing-page bg-gray-50">
+    <!-- Sticky Offer Banner -->
+    <div class="fixed top-0 left-0 right-0 z-50 bg-red-600 text-white py-3 text-center shadow-lg">
+        <p class="text-sm md:text-base animate-pulse font-medium px-4">
+            🔥 Special Offer: Save 30% + Free Shipping Today Only!
+        </p>
+    </div>
+
+    <!-- Header Section with padding-top to account for fixed banner -->
+    <header class="bg-gradient-to-r from-blue-900 to-blue-800 text-white pt-20 pb-12 px-4 md:pt-24 md:pb-16">
+        <div class="container mx-auto max-w-4xl text-center">
+            <h1 class="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
+                Breakthrough Natural Solution for Men's Health
+            </h1>
+            <p class="text-lg md:text-xl opacity-90">
+                Clinically Proven | Doctor Recommended | 100% Natural
+            </p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-12 max-w-6xl">
+        <!-- Hero Section -->
+        <section class="bg-white rounded-2xl shadow-xl overflow-hidden mb-12">
+            <div class="grid md:grid-cols-2 gap-6 md:gap-8 p-6 md:p-8">
+                <!-- Product Image -->
+                <div class="flex items-center justify-center">
+                    <img 
+                        src="https://thumbor.cartpanda.com/kFsYUWwgxCBFjRXsNt0a3C4mC8U=/200x0/https://assets.mycartpanda.com/static/products_images/7f/b5/84/1733786702.png" 
+                        alt="Product Image" 
+                        class="rounded-lg shadow-lg w-full max-w-md transform transition-transform hover:scale-105"
+                        loading="lazy"
+                    >
+                </div>
+
+                <!-- Benefits & CTA -->
+                <div class="space-y-6">
+                    <!-- Benefits Card -->
+                    <div class="bg-green-50 p-6 rounded-xl shadow-sm">
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">
+                            Clinically Proven Benefits
+                        </h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-center text-green-800">
+                                <svg class="w-5 h-5 md:w-6 md:h-6 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="text-sm md:text-base">Enhanced Performance (92% Success Rate)</span>
+                            </li>
+                            <li class="flex items-center text-green-800">
+                                <svg class="w-5 h-5 md:w-6 md:h-6 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="text-sm md:text-base">Improved Confidence (88% Reported)</span>
+                            </li>
+                            <li class="flex items-center text-green-800">
+                                <svg class="w-5 h-5 md:w-6 md:h-6 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="text-sm md:text-base">100% Natural Formula</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Special Offer Card -->
+                    <div class="bg-blue-50 p-6 rounded-xl shadow-sm">
+                        <div class="text-center">
+                            <p class="text-2xl md:text-3xl font-bold text-blue-900 mb-2">
+                                Special Offer
+                            </p>
+                            <p class="text-lg md:text-xl text-gray-600 mb-4">
+                                Save 30% + Free Shipping
+                            </p>
+                            <a 
+                                href="#pricing-packages" 
+                                class="inline-block bg-gradient-to-r from-green-600 to-green-700 text-white font-bold py-4 px-6 md:px-8 rounded-full hover:from-green-700 hover:to-green-800 transition transform hover:scale-105 shadow-lg text-sm md:text-base"
+                            >
+                                Claim Your Discount Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing-packages" class="mb-12 scroll-mt-20">
+            <h2 class="text-2xl md:text-3xl font-bold mb-8 text-center text-gray-800">
+                Choose Your Package
+            </h2>
+            <div class="grid md:grid-cols-3 gap-4 md:gap-6">
+                <!-- Basic Package -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border-2 border-gray-200 relative transform transition-all hover:scale-102">
+                    <div class="absolute -top-3 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">
+                        20% OFF
+                    </div>
+                    <h3 class="text-lg md:text-xl font-bold mb-4">1 Month Supply</h3>
+                    <img 
+                        src="https://thumbor.cartpanda.com/vWwz2htodvi55tUodFGwpD9FMs4=/200x0/https://assets.mycartpanda.com/static/products_images/29/a4/4b/1733786322.png" 
+                        alt="Basic Package" 
+                        class="w-full rounded-lg mb-4 transform transition-transform hover:scale-105"
+                        loading="lazy"
+                    >
+                    <div class="mb-4 text-center">
+                        <span class="text-2xl md:text-3xl font-bold">$58.80</span>
+                        <span class="text-gray-500 line-through ml-2">$84.00</span>
+                    </div>
+                    <a 
+                        href="https://sip.mycartpanda.com/checkout/167020854:1?src=flowgenie&discount=EREC30" 
+                        class="block w-full bg-blue-600 text-white text-center py-3 rounded-lg hover:bg-blue-700 transition shadow-md text-sm md:text-base font-semibold"
+                    >
+                        Order Now
+                    </a>
+                </div>
+
+                <!-- Popular Package -->
+                <div class="bg-white rounded-xl shadow-xl p-6 border-2 border-blue-600 transform scale-105 relative">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-6 py-1 rounded-full text-sm font-medium shadow-md whitespace-nowrap">
+                        MOST POPULAR
+                    </div>
+                    <div class="absolute top-8 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">
+                        45% OFF
+                    </div>
+                    <h3 class="text-lg md:text-xl font-bold mb-4 mt-4">3 Month Supply</h3>
+                    <img 
+                        src="https://thumbor.cartpanda.com/rJKiTBaLS_lCf7g3BijSKYPKTVs=/200x0/https://assets.mycartpanda.com/static/products_images/21/b5/29/1733786413.png" 
+                        alt="Popular Package" 
+                        class="w-full rounded-lg mb-4 transform transition-transform hover:scale-105"
+                        loading="lazy"
+                    >
+                    <div class="mb-4 text-center">
+                        <span class="text-2xl md:text-3xl font-bold">$123.90</span>
+                        <span class="text-gray-500 line-through ml-2">$177.00</span>
+                    </div>
+                    <a 
+                        href="https://sip.mycartpanda.com/checkout/167032017:1?src=flowgenie&discount=EREC30 " 
+                        class="block w-full bg-green-600 text-white text-center py-3 rounded-lg hover:bg-green-700 transition shadow-md text-sm md:text-base font-semibold"
+                    >
+                        Order Now
+                    </a>
+                </div>
+
+                <!-- Premium Package -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border-2 border-gray-200 relative transform transition-all hover:scale-102">
+                    <div class="absolute -top-3 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">
+                        60% OFF
+                    </div>
+                    <h3 class="text-lg md:text-xl font-bold mb-4">6 Month Supply</h3>
+                    <img 
+                        src="https://thumbor.cartpanda.com/kFsYUWwgxCBFjRXsNt0a3C4mC8U=/200x0/https://assets.mycartpanda.com/static/products_images/7f/b5/84/1733786702.png" 
+                        alt="Premium Package" 
+                        class="w-full rounded-lg mb-4 transform transition-transform hover:scale-105"
+                        loading="lazy"
+                    >
+                    <div class="mb-4 text-center">
+                        <span class="text-2xl md:text-3xl font-bold">$205.80</span>
+                        <span class="text-gray-500 line-through ml-2">$294.00</span>
+                    </div>
+                    <a 
+                        href="https://sip.mycartpanda.com/checkout/167033143:1?src=flowgenie&discount=EREC30" 
+                        class="block w-full bg-blue-600 text-white text-center py-3 rounded-lg hover:bg-blue-700 transition shadow-md text-sm md:text-base font-semibold"
+                    >
+                        Order Now
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Guarantee Section -->
+        <section class="bg-white rounded-xl shadow-lg p-6 md:p-8 text-center mb-12">
+            <img 
+                src="https://erec-boost.com/BKR-ES-DESC/assets/selo.webp" 
+                alt="Guarantee" 
+                class="mx-auto h-28 md:h-40 mb-4"
+                loading="lazy"
+            >
+            <h2 class="text-xl md:text-2xl font-bold mb-4 text-gray-800">
+                60-Day Money Back Guarantee
+            </h2>
+            <p class="text-gray-600 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
+                If you're not completely satisfied with your results, simply return the unused portion for a full refund.
+                No questions asked.
+            </p>
+        </section>
+    </main>
+</div>
+
+<!-- Fixed Bottom CTA for Mobile -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200 p-4">
+    <a 
+        href="#pricing-packages" 
+        class="block w-full bg-gradient-to-r from-green-600 to-green-700 text-white text-center py-3 rounded-lg font-bold text-lg shadow-lg"
+    >
+        Order Now
+    </a>
+</div>
+                `
+            }
+        ];
+
+        let currentQuestion = 0;
+        const progressBar = document.getElementById('progress');
+        const questionContainer = document.getElementById('questionContainer');
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function handleNext() {
+            if (currentQuestion === 0) {
+                currentQuestion++;
+                loadQuestion();
+                setTimeout(() => {
+                    currentQuestion++;
+                    loadQuestion();
+                }, 3000);
+            } else if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                loadQuestion();
+            }
+        }
+
+        function loadQuestion() {
+            updateProgress();
+            questionContainer.innerHTML = questions[currentQuestion].content;
+        }
+
+        document.addEventListener('DOMContentLoaded', loadQuestion);
+        document.addEventListener('gesturestart', e => e.preventDefault());
+    </script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Richards: Professional Recommendation for Your ErecBoost Order</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f0f5fa;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 650px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: #f9f9f9;
+            padding: 25px 30px;
+            border-bottom: 3px solid #2b5876;
+        }
+        .doctor-letterhead {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .doctor-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #2b5876;
+        }
+        .doctor-credentials {
+            flex-grow: 1;
+        }
+        .doctor-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2b5876;
+            margin: 0 0 5px 0;
+        }
+        .doctor-title {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+            font-style: italic;
+        }
+        .content {
+            padding: 30px 40px;
+        }
+        .greeting {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #2b5876;
+        }
+        .medical-note {
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 25px 0;
+            position: relative;
+        }
+        .medical-note:before {
+            content: 'CLINICAL OBSERVATION';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #2b5876;
+            color: white;
+            font-size: 12px;
+            padding: 2px 10px;
+            border-radius: 3px;
+        }
+        .medical-note p {
+            margin-top: 10px;
+            font-size: 15px;
+        }
+        .prescription-box {
+            background-color: #eef7ff;
+            border: 2px dashed #2b5876;
+            border-radius: 5px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        .prescription-header {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2b5876;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .prescription-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .rx-symbol {
+            font-size: 24px;
+            margin-right: 15px;
+            color: #2b5876;
+            font-weight: bold;
+        }
+        .medication-details {
+            flex-grow: 1;
+        }
+        .medication-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .price-display {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+        .original-price {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 16px;
+            margin-right: 15px;
+        }
+        .current-price {
+            color: #2b5876;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .cta-button {
+            display: block;
+            background: linear-gradient(90deg, #2b5876 0%, #4e4376 100%);
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            padding: 16px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 5px;
+            margin: 30px auto;
+            width: 80%;
+        }
+        .medical-stamp {
+            text-align: center;
+            margin: 40px 0 20px;
+        }
+        .stamp-image {
+            max-width: 120px;
+            opacity: 0.8;
+        }
+        .signature-block {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .signature {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 28px;
+            margin-bottom: 5px;
+            color: #2b5876;
+        }
+        .credentials-line {
+            color: #666;
+            font-size: 14px;
+        }
+        .medical-disclaimer {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #777;
+            font-style: italic;
+        }
+        .footer {
+            background-color: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            border-top: 1px solid #e0e0e0;
+        }
+        .confidential-header {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            padding: 10px;
+            background: #f0f0f0;
+            border-bottom: 1px dashed #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="confidential-header">
+            CONFIDENTIAL MEDICAL COMMUNICATION - FOR RECIPIENT ONLY
+        </div>
+        
+        <div class="header">
+            <div class="doctor-letterhead">
+                <img src="https://erec-boost.com/BKR-ES-DESC/assets/doctor-photo.jpg" alt="Dr. James Richards" class="doctor-photo">
+                <div class="doctor-credentials">
+                    <h1 class="doctor-name">Dr. James Richards, M.D.</h1>
+                    <p class="doctor-title">Board Certified in Men's Health | 28 Years of Clinical Practice<br>
+                    Medical Consultant, ErecBoost Formulations<br>
+                    Fellow, American Academy of Men's Health</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <p class="greeting">Dear Patient,</p>
+            
+            <p>I rarely contact customers directly, but I noticed your incomplete order for our ErecBoost formula and felt compelled to reach out personally.</p>
+            
+            <p>As the lead formulation consultant for ErecBoost, I've seen remarkable clinical results with patients in my private practice. The proprietary blend of adaptogens, circulation enhancers, and testosterone optimizers works synergistically in a way I haven't seen with other supplements.</p>
+            
+            <div class="medical-note">
+                <p><strong>My Clinical Observation:</strong> Men who begin the formula within the recommended therapeutic window (typically 45-90 days) show significantly better outcomes in all measured parameters:</p>
+                <ul>
+                    <li>Testosterone bioavailability: +42% average increase</li>
+                    <li>Nitric oxide production: 3.7× enhancement</li>
+                    <li>Circulation markers: 28% improvement</li>
+                    <li>Energy metabolites: 56% higher sustained levels</li>
+                </ul>
+            </div>
+            
+            <p>This is why I've authorized our billing department to extend a one-time <strong>20% professional courtesy discount</strong> to ensure you can begin your regimen promptly.</p>
+            
+            <div class="prescription-box">
+                <div class="prescription-header">Therapeutic Recommendation</div>
+                <div class="prescription-item">
+                    <div class="rx-symbol">Rx</div>
+                    <div class="medication-details">
+                        <div class="medication-name">ErecBoost Premium Formula</div>
+                        <div class="dosage">3 Month Supply (90 capsules)</div>
+                        <div class="directions">Take 1 capsule daily with water, preferably in morning</div>
+                    </div>
+                </div>
+                <div class="price-display">
+                    <span class="original-price">$177.00</span>
+                    <span class="current-price">$123.90</span>
+                </div>
+            </div>
+            
+            <p><strong>Important Medical Note:</strong> While results vary by individual, our longitudinal data shows that consistent use over 90 days provides optimal outcomes. This three-bottle package ensures you maintain therapeutic levels throughout the critical adaptation period.</p>
+            
+            <p>I've instructed our pharmacy team to hold this reservation for 24 hours, after which your allocation will be released to other patients in our waitlist system.</p>
+            
+            <a href="https://news.flowhosted.com/erecboostpaginadesconto/" class="cta-button">Access Your Doctor-Approved Discount</a>
+            
+            <div class="medical-stamp">
+                <img src="https://erec-boost.com/BKR-ES-DESC/assets/medical-stamp.png" alt="Medical Approval Stamp" class="stamp-image">
+            </div>
+            
+            <div class="signature-block">
+                <p>To your continued health,</p>
+                <p class="signature">James Richards</p>
+                <p class="credentials-line">Dr. James Richards, M.D.</p>
+                <p class="credentials-line">Medical Consultant, ErecBoost Formulations</p>
+                <p class="credentials-line">Fellow, American Academy of Men's Health</p>
+            </div>
+            
+            <div class="medical-disclaimer">
+                This communication contains medical information intended for the recipient only. The statements here have not been evaluated by the FDA. This product is not intended to diagnose, treat, cure or prevent any disease.
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 Men's Health Medical Associates. All Rights Reserved.</p>
+            <p>1234 Medical Center Drive, Suite 500, Health City, HC 12345</p>
+            <p>For medical emergencies, please contact your primary care physician or call 911.</p>
+        </div>
+    </div>
+</body>
+</html>

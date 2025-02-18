@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Complete Your Purchase with 20% OFF!</title>
+    <title>Special Exclusive Offer For You!</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -37,13 +37,20 @@
             font-weight: bold;
             display: inline-block;
             margin: 20px 0;
+            animation: pulse 2s infinite;
         }
-        .cart {
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .mystery-box {
             background-color: #f9f9f9;
             padding: 20px;
             margin: 20px 0;
             border-radius: 5px;
             border: 2px dashed #d32f2f;
+            text-align: center;
         }
         .timer {
             text-align: center;
@@ -64,41 +71,45 @@
             text-align: center;
             width: 80%;
             font-size: 20px;
+            transition: background-color 0.3s ease;
         }
-        .price {
-            font-size: 24px;
-            color: #d32f2f;
+        .cta-button:hover {
+            background-color: #b71c1c;
+        }
+        .bonus-tag {
+            background-color: #ffd700;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 3px;
             font-weight: bold;
+            display: inline-block;
             margin: 10px 0;
-        }
-        .old-price {
-            text-decoration: line-through;
-            color: #999;
-            font-size: 18px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Hey, you forgot something!</h1>
+            <h1>Wait! We have a surprise for you!</h1>
             <div class="discount-badge">EXCLUSIVE 20% OFF</div>
         </div>
         <div class="offer-text">
-            <h2>Your purchase is reserved</h2>
-            <p>We noticed that you didn't complete your purchase. To ensure you don't miss this opportunity, we've unlocked an exclusive 20% discount valid only for the next few hours!</p>
+            <h2>A unique offer has been unlocked for you!</h2>
+            <p>For a limited time only, we've prepared something special: an exclusive 20% discount on your next purchase!</p>
             
-            <div class="cart">
-                <h3>Your Cart:</h3>
-                <p>✓ Natural Libido Supplement - 3 Bottles</p>
-                <p class="old-price">From: $591.00</p>
-                <p class="price">For only: $472.80</p>
+            <div class="mystery-box">
+                <h3>🎁 Your Special Offer</h3>
+                <p>We've unlocked an exclusive discount + surprise benefits!</p>
+                <span class="bonus-tag">+ SPECIAL BONUS</span>
             </div>
+            
             <div class="timer">
-                Offer valid for 2 hours
+                Offer valid for only 2 hours
             </div>
-            <a href="https://news.flowhosted.com/erecboostpaginadesconto/" class="cta-button">COMPLETE PURCHASE WITH 20% OFF</a>
-            <p style="text-align: center; font-size: 14px;">100% secure payment | Discreet delivery</p>
+            
+            <a href="https://news.flowhosted.com/erecboostpaginadesconto/" class="cta-button">CLAIM MY DISCOUNT NOW</a>
+            
+            <p style="text-align: center; font-size: 14px;">100% secure payment | Discreet delivery guaranteed</p>
         </div>
     </div>
 </body>

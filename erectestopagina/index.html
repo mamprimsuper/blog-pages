@@ -141,57 +141,52 @@
     <script>
         const questions = [
             {
-                type: 'age',
-                question: "What is your age range?",
-                subtitle: "To offer you the best personalized solution",
-                options: [
-                    { text: "30-40 years", image: "https://www.cnnbrasil.com.br/wp-content/uploads/sites/12/2023/06/india.webp?w=495" },
-                    { text: "41-50 years", image: "https://img.freepik.com/fotos-premium/homem-de-terno-e-gravata-posando-para-uma-foto-ia-geradora_97167-19520.jpg" },
-                    { text: "51-60 years", image: "https://img.freepik.com/fotos-premium/homem-velho-feliz-observando-residencia-ia-gerativa_94628-7061.jpg?w=360" },
-                    { text: "60+ years", image: "https://d1muf25xaso8hp.cloudfront.net/https://img.criativodahora.com.br/2025/01/criativo-67808e3d1342aimg-2025-01-1067808e3d1342e.jpg?w=380&h=&auto=compress&dpr=1&fit=max" }
-                ],
-                needsButton: false
+                type: 'tracking',
+                content: `
+                    <div class="p-8 text-center">
+                        <h1 class="text-3xl font-bold text-blue-900 mb-6">Track Your ErecTesto Order</h1>
+                        <p class="text-lg text-gray-700 mb-8">Click below to check the status of your order</p>
+                        <button onclick="handleNext()" class="next-btn">
+                            Track My Order Now
+                        </button>
+                    </div>
+                `
             },
             {
-                type: 'success',
-                question: "Did you know?",
-                subtitle: "More than 14,000 men in your age group have already recovered their libido naturally and quickly! And they've returned to having a more active sex life than in their youth",
-                content: "Discover the method behind how to achieve prolonged hours of erection and make your partner beg for mercy from so much pleasure you'll give her, while also naturally increasing your libido by 13x, turning you into a machine in bed.",
-                image: "https://imagex1.sx.cdn.live/images/pinporn/2015/09/03/13681565.gif?width=300",
-                needsButton: true
+                type: 'loading',
+                content: `
+                    <div class="p-8 text-center">
+                        <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto mb-6"></div>
+                        <h2 class="text-2xl font-bold text-blue-900 mb-4">Searching Order Details...</h2>
+                        <p class="text-gray-600">Please wait while we locate your information</p>
+                        <div class="mt-8">
+                            <div class="h-2 bg-gray-200 rounded-full w-3/4 mx-auto mb-4">
+                                <div class="h-2 bg-blue-600 rounded-full animate-pulse" style="width: 75%"></div>
+                            </div>
+                            <p class="text-sm text-gray-500">Verifying order information...</p>
+                        </div>
+                    </div>
+                `
             },
             {
-                type: 'treatment',
-                question: "What treatment are you currently using?",
-                subtitle: "Help us better understand your situation",
-                options: [
-                    { text: "Medications", icon: "💊" },
-                    { text: "Supplements", icon: "🌿" },
-                    { text: "No treatment", icon: "❌" },
-                    { text: "Physical Activity", icon: "🏃‍♂️" }
-                ],
-                needsButton: false
-            },
-            {
-                type: 'frequency',
-                question: "How often do you have relations with your partner?",
-                subtitle: "Your answer is confidential and helps us personalize your solution",
-                options: [
-                    { text: "Rarely or never", icon: "😔" },
-                    { text: "1-2 times per month", icon: "😐" },
-                    { text: "1-2 times per week", icon: "🙂" },
-                    { text: "3+ times per week", icon: "😄" }
-                ],
-                needsButton: false
-            },
-            {
-                type: 'success',
-                question: "We've analyzed your answers and it's time to solve this problem once and for all!",
-                subtitle: "Click the button below and discover how thousands of men just like you regained their stamina and confidence in bed in less than 2 weeks",
-                buttonText: "I want to discover the solution!",
-                content: "Get back to having an overwhelming libido and lasting hours in bed with your partner!",
-                image: "https://imagex1.sx.cdn.live/images/pinporn/2019/12/03/22268284.gif?width=300",
-                needsButton: true
+                type: 'message',
+                content: `
+                    <div class="p-8 text-center">
+                        <div class="bg-blue-100 p-6 rounded-xl mb-6">
+                            <h2 class="text-3xl font-bold text-blue-900 mb-4">🎉 Order Found!</h2>
+                            <p class="text-lg text-gray-800">Your ErecTesto order is being prepared for shipping.</p>
+                        </div>
+                        <div class="bg-yellow-50 border-2 border-yellow-200 p-6 rounded-xl mb-6 animate-pulse">
+                            <h3 class="text-xl font-bold text-yellow-800 mb-2">
+                                CONFIDENTIAL: Special VIP Message
+                            </h3>
+                            <p class="text-gray-700">You've been selected for an exclusive opportunity!</p>
+                        </div>
+                        <button onclick="handleNext()" class="next-btn">
+                            View Special Message
+                        </button>
+                    </div>
+                `
             },
             {
                 type: 'offer',

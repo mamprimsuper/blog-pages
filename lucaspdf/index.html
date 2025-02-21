@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>30 Dias Sem Pornografia – Guia Completo</title>
+  <title>30 Dias Sem Pornografia - Guia Interativo</title>
   <style>
     :root {
       --primary: #0f172a;
@@ -12,7 +12,6 @@
       --background: #f8fafc;
       --card: #ffffff;
     }
-
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       line-height: 1.7;
@@ -22,7 +21,6 @@
       background: var(--background);
       color: var(--primary);
     }
-
     .header {
       text-align: center;
       padding: 60px 20px;
@@ -33,30 +31,23 @@
       position: relative;
       overflow: hidden;
     }
-
     .header::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(45deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(45deg, rgba(59,130,246,0.1) 0%, transparent 100%);
       z-index: 1;
     }
-
     .header-content {
       position: relative;
       z-index: 2;
     }
-
     .header h1 {
       font-size: 3em;
       margin-bottom: 20px;
       font-weight: 800;
       letter-spacing: -0.03em;
     }
-
     .header p {
       font-size: 1.3em;
       opacity: 0.9;
@@ -64,71 +55,6 @@
       margin: 0 auto;
       font-weight: 300;
     }
-
-    .intro {
-      font-size: 1.2em;
-      color: var(--secondary);
-      text-align: center;
-      max-width: 700px;
-      margin: 30px auto;
-      padding: 20px;
-      line-height: 1.8;
-    }
-
-    .day-card {
-      background: var(--card);
-      border-radius: 16px;
-      padding: 35px;
-      margin: 30px 0;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .day-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    }
-
-    .day-title {
-      color: var(--primary);
-      font-size: 1.8em;
-      font-weight: 700;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      letter-spacing: -0.02em;
-    }
-
-    .day-title::before {
-      content: '';
-      display: inline-block;
-      width: 4px;
-      height: 24px;
-      background: var(--accent);
-      margin-right: 12px;
-      border-radius: 2px;
-    }
-
-    .day-content {
-      color: var(--secondary);
-      font-size: 1.1em;
-      margin-top: 15px;
-      line-height: 1.6;
-    }
-
-    .day-content p {
-      margin-bottom: 15px;
-    }
-
-    .highlight {
-      background: linear-gradient(to right, #f0f9ff, #e0f2fe);
-      padding: 25px;
-      border-radius: 12px;
-      margin: 25px 0;
-      font-weight: 500;
-      color: var(--primary);
-    }
-
     .author-bio {
       background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
       color: white;
@@ -138,22 +64,16 @@
       position: relative;
       overflow: hidden;
     }
-
     .author-bio::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(45deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(45deg, rgba(59,130,246,0.1) 0%, transparent 100%);
     }
-
     .author-bio-content {
       position: relative;
       z-index: 2;
     }
-
     .author-bio h2 {
       color: white;
       font-size: 1.8em;
@@ -161,42 +81,120 @@
       font-weight: 700;
       letter-spacing: -0.02em;
     }
-
-    .cta-section {
-      text-align: center;
-      padding: 40px;
-      margin: 40px 0;
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-      border-radius: 16px;
-      color: white;
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      margin: 30px 0;
+      overflow: hidden;
     }
-
-    .cta-button {
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0;
+      transition: width 0.5s ease;
+    }
+    .day-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 35px;
+      margin: 30px 0;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1),
+                  0 2px 4px -1px rgba(0,0,0,0.06);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .day-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1),
+                  0 4px 6px -2px rgba(0,0,0,0.05);
+    }
+    .day-title {
+      color: var(--primary);
+      font-size: 1.8em;
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      letter-spacing: -0.02em;
+    }
+    .day-title::before {
+      content: '';
       display: inline-block;
-      padding: 15px 30px;
+      width: 4px;
+      height: 24px;
+      background: var(--accent);
+      margin-right: 12px;
+      border-radius: 2px;
+    }
+    .day-content {
+      color: var(--secondary);
+      font-size: 1.1em;
+    }
+    .highlight {
+      background: linear-gradient(to right, #f0f9ff, #e0f2fe);
+      padding: 25px;
+      border-radius: 12px;
+      margin: 25px 0;
+      font-weight: 500;
+      color: var(--primary);
+    }
+    .activity {
+      background: #f8fafc;
+      padding: 30px;
+      border-radius: 12px;
+      margin: 25px 0;
+      border: 1px solid #e2e8f0;
+    }
+    .activity-title {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 1.2em;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+    }
+    .activity-title::before {
+      content: '→';
+      margin-right: 10px;
+      color: var(--accent);
+    }
+    .quote {
+      font-style: italic;
+      padding: 20px;
+      border-left: 3px solid var(--accent);
+      margin: 20px 0;
+      background: #f8fafc;
+    }
+    /* Navegação */
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      margin: 20px 0;
+    }
+    .navigation button {
+      padding: 10px 20px;
+      font-size: 1em;
       background: var(--accent);
       color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: 600;
-      margin-top: 20px;
-      transition: transform 0.2s ease;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
     }
-
-    .cta-button:hover {
-      transform: translateY(-2px);
+    .navigation button:disabled {
+      background: #a5b4fc;
+      cursor: default;
     }
-
-    @media (max-width: 768px) {
-      body {
-        padding: 20px 15px;
-      }
-      .header h1 {
-        font-size: 2em;
-      }
-      .day-card {
-        padding: 25px;
-      }
+    .navigation button:hover:not(:disabled) {
+      background: #2563eb;
+    }
+    /* Páginas */
+    .page {
+      display: none;
+    }
+    .page.active {
+      display: block;
     }
   </style>
 </head>
@@ -209,437 +207,375 @@
     </div>
   </div>
 
-  <!-- Introdução -->
-  <div class="intro">
-    <p>
-      Estudos de sites populares de pornografia mostram que cerca de 85% dos homens consomem pornografia – esse número pode chegar a mais de 90% se considerarmos aqueles que já consumiram em algum momento. 
-      O que você tem em suas mãos é um material para ajudar a sair dessa estatística e transformar a sua vida. Minha orientação é que você siga rigorosamente as ações sugeridas aqui ao longo dos próximos 30 dias e garanto que sua vida será outra. 
-      <strong>NÃO É PARA FAZER TODA A LEITURA DE UMA VEZ, RESPEITE UM DIA DE CADA VEZ.</strong>
-    </p>
-  </div>
-
   <!-- Sobre o Autor -->
   <div class="author-bio">
     <div class="author-bio-content">
       <h2>Sobre o Autor</h2>
-      <p>
-        Me chamo Mário Fernandes, sou psicólogo há 9 anos, especializado em famílias e adição sexual (vício em pornografia). Sou casado há 20 anos com a Isabela, pai do Tiago e da Larissa e também atuo como pastor há mais de 10 anos.
-      </p>
+      <p>Me chamo Mário Fernandes, psicólogo há 9 anos, especializado em famílias e adição sexual (vício em pornografia). Sou casado há 20 anos com a Isabela, pai do Tiago e da Larissa. Também sou pastor atuando com famílias há mais de 10 anos.</p>
     </div>
+  </div>
+
+  <!-- Barra de Progresso -->
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
   </div>
 
   <!-- Conteúdo dos 30 dias -->
-  
-  <!-- DIA 1 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 1 - Hora da mudança</h2>
-    <div class="day-content">
-      <p>
-        Hoje você está começando uma nova fase em sua vida, é a fase da mudança, onde você vai transformar sua maneira de olhar para si, para sua masculinidade e para a mulher.
-      </p>
-      <p>
-        Mas você tem um inimigo: sua mente. É nela que a maior batalha é travada e você precisa aprender a dominar melhor os seus pensamentos.
-      </p>
-      <p>
-        Nesse dia, sua atividade é muito simples: separe 5 minutos e dedique-se a visualizar quem você gostaria de ser. Imagine como seria sua vida sem pornografia – pense em momentos onde você se sinta produtivo, valorizado e capaz.
-      </p>
+  <div id="pages-container">
+    <!-- Página 1 -->
+    <div class="page active" data-page="1">
+      <div class="day-card">
+        <h2 class="day-title">DIA 1 - Hora da mudança</h2>
+        <div class="day-content">
+          <p>Hoje você inicia uma nova fase, transformando a forma de ver a si mesmo, sua masculinidade e seu olhar para a mulher.</p>
+          <div class="highlight">
+            <p>Mas você tem um inimigo: sua mente. É nela que a maior batalha acontece.</p>
+          </div>
+          <div class="quote">
+            "A transformação começa com o primeiro passo."
+          </div>
+          <div class="activity">
+            <div class="activity-title">Atividade do Dia</div>
+            <p>Separe 5 minutos para visualizar quem você deseja ser. Imagine uma vida sem pornografia.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Página 2 -->
+    <div class="page" data-page="2">
+      <div class="day-card">
+        <h2 class="day-title">DIA 2 - Alimente o seu espírito</h2>
+        <div class="day-content">
+          <p>Nenhum vício é vencido sem uma conexão espiritual forte. Conecte-se diariamente com sua fé e fortaleça sua espiritualidade.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Página 3 -->
+    <div class="page" data-page="3">
+      <div class="day-card">
+        <h2 class="day-title">DIA 3 - Tudo começa com uma escolha</h2>
+        <div class="day-content">
+          <p>O vício é ativado por gatilhos. É hora de honrar suas decisões e combater esses impulsos.</p>
+          <div class="activity">
+            <div class="activity-title">Atividade do Dia</div>
+            <p>Ao acordar, faça uma higiene mental e, antes de dormir, medite por alguns minutos visualizando sua vida sem o vício.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Página 4 -->
+    <div class="page" data-page="4">
+      <div class="day-card">
+        <h2 class="day-title">DIA 4 - Não desista</h2>
+        <div class="day-content">
+          <p>Seu corpo começará a reagir à mudança. É hora de criar novos hábitos e se manter firme.</p>
+          <div class="activity">
+            <div class="activity-title">Atividade do Dia</div>
+            <p>Leia o texto bíblico de Mateus capítulo 5 e reflita sobre sua mensagem.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Página 5 -->
+    <div class="page" data-page="5">
+      <div class="day-card">
+        <h2 class="day-title">DIA 5 - PEC</h2>
+        <div class="day-content">
+          <p>Pensamentos geram emoções, que por sua vez influenciam comportamentos. Reflita sobre quais pensamentos te prejudicam.</p>
+          <div class="activity">
+            <div class="activity-title">Atividade do Dia</div>
+            <p>Anote seus pensamentos e reflita sobre as emoções que eles despertam.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Página 6 -->
+    <div class="page" data-page="6">
+      <div class="day-card">
+        <h2 class="day-title">DIA 6 - Você não está sozinho</h2>
+        <div class="day-content">
+          <p>Entenda o que a pornografia tem roubado da sua vida. Reflita sobre perdas e impactos pessoais.</p>
+          <div class="activity">
+            <div class="activity-title">Atividade do Dia</div>
+            <p>Assista ao filme "A prova de fogo" e anote uma ação imediata para combater o vício.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Página 7 -->
+    <div class="page" data-page="7">
+      <div class="day-card">
+        <h2 class="day-title">DIA 7 - Autoavaliação</h2>
+        <div class="day-content">
+          <p>Mantenha a vigilância sobre suas emoções. Avalie seu estresse, ansiedade e humor diariamente.</p>
+          <div class="activity">
+            <div class="activity-title">Atividade do Dia</div>
+            <p>Dê uma nota de 0 a 10 para cada estado e registre sua média.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Página 8 -->
+    <div class="page" data-page="8">
+      <div class="day-card">
+        <h2 class="day-title">DIA 8 - Eu e minha mente fantasiosa</h2>
+        <div class="day-content">
+          <p>As imagens criadas pelo vício são persistentes. É hora de redirecionar o foco para pensamentos saudáveis.</p>
+          <div class="activity">
+            <div class="activity-title">Atividade do Dia</div>
+            <p>Pratique o "foco distorcido": substitua imagens indesejadas por aquelas que você quer cultivar.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Página 9 -->
+    <div class="page" data-page="9">
+      <div class="day-card">
+        <h2 class="day-title">DIA 9 - A queda faz parte do processo</h2>
+        <div class="day-content">
+          <p>Recaídas podem acontecer. O importante é não desistir e aprender com cada obstáculo.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Página 10 -->
+    <div class="page" data-page="10">
+      <div class="day-card">
+        <h2 class="day-title">DIA 10 - É assim que o teu cérebro reage</h2>
+        <div class="day-content">
+          <p>Pensar que o consumo é normal pode mascarar seus efeitos negativos. Respire fundo e afirme sua liberdade.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Página 11 -->
+    <div class="page" data-page="11">
+      <div class="day-card">
+        <h2 class="day-title">DIA 11 - O plano perfeito</h2>
+        <div class="day-content">
+          <p>Não espere um plano perfeito para mudar. Apenas comece e adapte-se conforme o progresso.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Página 12 -->
+    <div class="page" data-page="12">
+      <div class="day-card">
+        <h2 class="day-title">DIA 12 - Mentalize</h2>
+        <div class="day-content">
+          <p>Crie uma imagem clara de como seria sua vida sem pornografia. Visualize essa realidade todos os dias.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Página 13 -->
+    <div class="page" data-page="13">
+      <div class="day-card">
+        <h2 class="day-title">DIA 13 - Coloque tudo no papel</h2>
+        <div class="day-content">
+          <p>Anote todas as suas atividades diárias. Registre cada passo para criar consistência e autoconhecimento.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Página 14 -->
+    <div class="page" data-page="14">
+      <div class="day-card">
+        <h2 class="day-title">DIA 14 - Onde você quer chegar?</h2>
+        <div class="day-content">
+          <p>Defina seus objetivos e trace um plano para os próximos meses. Saiba onde você quer estar.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Página 15 -->
+    <div class="page" data-page="15">
+      <div class="day-card">
+        <h2 class="day-title">DIA 15 - Antes só do que mal acompanhado</h2>
+        <div class="day-content">
+          <p>Reavalie suas amizades. Construa relações que fortaleçam seus valores e ajudem na sua evolução.</p>
+          <div class="activity">
+            <div class="activity-title">Atividade do Dia</div>
+            <p>Liste 10 pessoas de confiança, selecione 3 e escolha uma para prestar contas do seu progresso.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Página 16 -->
+    <div class="page" data-page="16">
+      <div class="day-card">
+        <h2 class="day-title">DIA 16 - Compartilhe com alguém</h2>
+        <div class="day-content">
+          <p>Dividir suas dificuldades e conquistas com alguém pode ser transformador. Não lute sozinho.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Página 17 -->
+    <div class="page" data-page="17">
+      <div class="day-card">
+        <h2 class="day-title">DIA 17 - Negação</h2>
+        <div class="day-content">
+          <p>Reconheça o problema. Sair da fase da negação é essencial para avançar na recuperação.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Página 18 -->
+    <div class="page" data-page="18">
+      <div class="day-card">
+        <h2 class="day-title">DIA 18 - A Culpa</h2>
+        <div class="day-content">
+          <p>Transforme a culpa em combustível para a mudança. Liberte-se do passado e recomece.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Página 19 -->
+    <div class="page" data-page="19">
+      <div class="day-card">
+        <h2 class="day-title">DIA 19 - Tudo ou nada</h2>
+        <div class="day-content">
+          <p>Comprometa-se de corpo e alma com a mudança. Hoje, dê tudo de si para vencer o vício.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Página 20 -->
+    <div class="page" data-page="20">
+      <div class="day-card">
+        <h2 class="day-title">DIA 20 - Uma avaliação sincera</h2>
+        <div class="day-content">
+          <p>Pare e reflita sobre suas dificuldades e vitórias. Registre seus sentimentos para ajustar sua jornada.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Página 21 -->
+    <div class="page" data-page="21">
+      <div class="day-card">
+        <h2 class="day-title">DIA 21 - Recomeço</h2>
+        <div class="day-content">
+          <p>Novos começos são essenciais. Reavalie áreas da sua vida e trace um novo caminho para a recuperação.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Página 22 -->
+    <div class="page" data-page="22">
+      <div class="day-card">
+        <h2 class="day-title">DIA 22 - Visão além do alcance</h2>
+        <div class="day-content">
+          <p>Visualize seu futuro livre do vício. Foque em seus maiores desejos e objetivos de vida.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Página 23 -->
+    <div class="page" data-page="23">
+      <div class="day-card">
+        <h2 class="day-title">DIA 23 - Estabeleça metas</h2>
+        <div class="day-content">
+          <p>Defina metas de curto, médio e longo prazo. Escreva seus objetivos e crie um plano para alcançá-los.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Página 24 -->
+    <div class="page" data-page="24">
+      <div class="day-card">
+        <h2 class="day-title">DIA 24 - O Registro</h2>
+        <div class="day-content">
+          <p>Mantenha um diário para registrar os acontecimentos do dia. Use a escrita como forma de catarse e autoconhecimento.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Página 25 -->
+    <div class="page" data-page="25">
+      <div class="day-card">
+        <h2 class="day-title">DIA 25 - Limite seu Acesso</h2>
+        <div class="day-content">
+          <p>Identifique os momentos de maior tentação e adote estratégias para limitar o acesso à pornografia.</p>
+          <div class="activity">
+            <div class="activity-title">Atividade do Dia</div>
+            <p>Considere usar aplicativos ou outras ferramentas para bloquear conteúdos indesejados.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Página 26 -->
+    <div class="page" data-page="26">
+      <div class="day-card">
+        <h2 class="day-title">DIA 26 - Celebre as pequenas vitórias</h2>
+        <div class="day-content">
+          <p>Recompense-se por cada conquista. Pequenos avanços constroem a jornada rumo à liberdade.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Página 27 -->
+    <div class="page" data-page="27">
+      <div class="day-card">
+        <h2 class="day-title">DIA 27 - Respire fundo</h2>
+        <div class="day-content">
+          <p>Quando os obstáculos aparecerem, respire fundo e reconecte-se com seu propósito. Persista com paciência e determinação.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Página 28 -->
+    <div class="page" data-page="28">
+      <div class="day-card">
+        <h2 class="day-title">DIA 28 - Sexualidade saudável</h2>
+        <div class="day-content">
+          <p>Reavalie seus conceitos sobre sexualidade. Busque fontes que promovam uma visão saudável e ética do sexo.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Página 29 -->
+    <div class="page" data-page="29">
+      <div class="day-card">
+        <h2 class="day-title">DIA 29 - Uma vitória, não é guerra ganha</h2>
+        <div class="day-content">
+          <p>Se chegou até aqui, celebre suas vitórias. Mas mantenha a vigilância, pois a jornada continua.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Página 30 -->
+    <div class="page" data-page="30">
+      <div class="day-card">
+        <h2 class="day-title">DIA 30 - Cruzando a linha de chegada</h2>
+        <div class="day-content">
+          <p>Você completou os 30 dias! Reconheça sua perseverança e saiba que, a partir de agora, o processo continua. Repita as etapas sempre que necessário e siga firme em sua transformação.</p>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- DIA 2 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 2 - Alimente o seu espírito</h2>
-    <div class="day-content">
-      <p>
-        Nenhum vício é vencido sem uma conexão espiritual forte. O excesso que o vício traz à sua vida revela uma falta.
-      </p>
-      <p>
-        Conecte-se com a sua espiritualidade, busque-a diariamente. Faça a leitura de Efésios 5 na Bíblia e aprenda a se vestir, a cada dia, com a força espiritual que há em Deus.
-      </p>
-    </div>
+  <!-- Navegação -->
+  <div class="navigation">
+    <button id="prevBtn" disabled>Anterior</button>
+    <button id="nextBtn">Próximo</button>
   </div>
 
-  <!-- DIA 3 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 3 - Tudo começa com uma escolha</h2>
-    <div class="day-content">
-      <p>
-        O vício é ativado por gatilhos – momentos em que damos espaço e legitimidade a pensamentos e ações que fragilizam nosso ser. É hora de honrar suas decisões: quantas vezes você disse que não cairia e acabou cedendo?
-      </p>
-      <p>
-        Não é só o seu esforço que te livrará, mas também deve nascer dentro de você um sentimento de indignação para que decida que o vício não dominará mais sua mente.
-      </p>
-      <p>
-        <strong>Atividade:</strong> Todos os dias, ao acordar, faça uma higiene mental do que tem te prejudicado e, antes de dormir, pratique alguns minutos de mentalização e meditação, visualizando sua vida sem o vício. Reduza excessos como internet, redes sociais e jogos.
-      </p>
-    </div>
-  </div>
+  <script>
+    const pages = document.querySelectorAll('.page');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const progressFill = document.getElementById('progressFill');
+    let currentPage = 0;
+    const totalPages = pages.length;
 
-  <!-- DIA 4 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 4 - Não desista</h2>
-    <div class="day-content">
-      <p>
-        Se você tem seguido as orientações, pode ser que já esteja alguns dias sem consumir pornografia. A partir de agora, seu corpo reagirá à mudança: sua mente precisará recusar as oportunidades que a levam à autossabotagem.
-      </p>
-      <p>
-        É o momento de criar novos hábitos – uma válvula de escape para descarregar a ansiedade. Prepare-se, pois agora é hora de perseverar. Não desista!
-      </p>
-      <p>
-        <strong>Atividade:</strong> Leitura do texto bíblico de Mateus capítulo 5.
-      </p>
-    </div>
-  </div>
+    function updatePage() {
+      pages.forEach((page, index) => {
+        page.classList.toggle('active', index === currentPage);
+      });
+      // Atualiza a barra de progresso
+      const progressPercent = ((currentPage + 1) / totalPages) * 100;
+      progressFill.style.width = progressPercent + '%';
+      
+      // Atualiza os botões
+      prevBtn.disabled = currentPage === 0;
+      nextBtn.disabled = currentPage === totalPages - 1;
+    }
 
-  <!-- DIA 5 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 5 - PEC</h2>
-    <div class="day-content">
-      <p>
-        Qual o maior problema na hora de gerir o que você sente? São os pensamentos – cada pensamento gera uma emoção que, por sua vez, define um comportamento.
-      </p>
-      <p>
-        Reflita: quais pensamentos estão mais presentes na sua mente? Que emoções eles geram? E como você age por causa disso?
-      </p>
-      <p>
-        Anote tudo o que vier à sua mente, seja num papel ou no celular.
-      </p>
-    </div>
-  </div>
+    prevBtn.addEventListener('click', () => {
+      if (currentPage > 0) {
+        currentPage--;
+        updatePage();
+      }
+    });
 
-  <!-- DIA 6 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 6 - Você não está sozinho</h2>
-    <div class="day-content">
-      <p>
-        Hoje é o sexto dia – parabéns por ter chegado até aqui. É importante entender o que a pornografia tem roubado da sua vida. Muitos perdem empregos, casamentos são destruídos e inúmeros homens já estiveram à beira do colapso.
-      </p>
-      <p>
-        <strong>Atividade:</strong> Assista ao filme "A prova de fogo" e escreva qual ação imediata você precisa tomar para acabar com a pornografia.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 7 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 7 - Autoavaliação</h2>
-    <div class="day-content">
-      <p>
-        Um dos maiores perigos no combate ao vício é a autossuficiência – a falta de avaliar a si mesmo durante o processo pode levar à recaída.
-      </p>
-      <p>
-        Imagine um soldado de guarda: ele não pode vacilar. Da mesma forma, você precisa estar sempre alerta.
-      </p>
-      <p>
-        <strong>Atividade:</strong> Avalie diariamente seu estresse, ansiedade e humor. Dê uma nota de 0 (muito mal) a 10 (excelente). Por exemplo:
-      </p>
-      <p>
-        Estresse: 7<br>
-        Ansiedade: 6<br>
-        Humor: 8<br>
-        Média: (7+6+8)/3 = 7
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 8 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 8 - Eu e minha mente fantasiosa</h2>
-    <div class="day-content">
-      <p>
-        Depois de tanto tempo consumindo pornografia, é natural que o cérebro crie inúmeras imagens. Contudo, essas memórias não desaparecem da noite para o dia.
-      </p>
-      <p>
-        Para os viciados, essas imagens são ainda mais persistentes. Assim, é necessário criar momentos para desviar o foco dessas lembranças e direcionar a atenção para imagens saudáveis.
-      </p>
-      <p>
-        <strong>Atividade:</strong> Pratique o “foco distorcido”: treine seu cérebro para substituir a imagem indesejada pela imagem que você deseja, por exemplo, focando na sua esposa se você é casado.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 9 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 9 - A queda faz parte do processo de recuperação, mas ela não é uma bengala</h2>
-    <div class="day-content">
-      <p>
-        É comum que recaídas ocorram – cerca de 90% das pessoas que lutam contra um vício passam por isso. Entretanto, a intenção aqui não é justificar as recaídas, mas sim conscientizá-lo para que, se acontecer, você não desista da caminhada.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 10 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 10 - É assim que o teu cérebro fica com a pornografia</h2>
-    <div class="day-content">
-      <p>
-        Muitos homens acreditavam que consumir pornografia era algo normal – afinal, essa prática era incentivada desde a juventude. Porém, o consumo precoce gera uma série de problemas: perda de massa cinzenta, baixa produtividade, visão distorcida do parceiro, entre outros.
-      </p>
-      <p>
-        Neste dia, respire fundo três vezes e afirme para si mesmo que sua mente, seu corpo e sua vida estão livres de todo vício.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 11 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 11 - O plano perfeito</h2>
-    <div class="day-content">
-      <p>
-        Muitos homens acreditam que precisam de um plano perfeito para mudar – e por isso nunca começam. A verdade é que só existe um plano: aquele que você acredita e segue até conseguir.
-      </p>
-      <p>
-        Estes 30 dias serão suficientes para mudar a rota da sua vida.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 12 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 12 - Mentalize</h2>
-    <div class="day-content">
-      <p>
-        Sua mente é uma ferramenta poderosa para vencer o vício. Crie uma imagem clara de como seria sua vida sem a pornografia – este é o passo que você precisa dar hoje.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 13 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 13 - Coloque tudo no papel</h2>
-    <div class="day-content">
-      <p>
-        Já se passaram 13 dias de mudança. Se você teve alguma recaída, mantenha-se firme.
-      </p>
-      <p>
-        Lembre-se: muitas das atividades aqui são cumulativas. Anote todas as ações diárias – nada deve ficar de fora. Essa prática ajudará a criar consistência.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 14 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 14 - Onde você quer chegar?</h2>
-    <div class="day-content">
-      <p>
-        Embora clichê, é fundamental saber para onde se quer ir. Se você duvida de querer abandonar o vício, dificilmente o vencerá.
-      </p>
-      <p>
-        Pare, reflita sobre o propósito da sua vida e crie um plano para os próximos 6, 9 e 12 meses. Dedique sua energia a esse projeto.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 15 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 15 - Antes só do que mal acompanhado</h2>
-    <div class="day-content">
-      <p>
-        Como dizia minha falecida vozinha: “Me diga com quem você anda e eu direi quem você é.” Se suas amizades te levam ao abismo, é hora de mudá-las.
-      </p>
-      <p>
-        <strong>Atividade:</strong> Faça uma lista com pelo menos 10 pessoas de sua confiança que compartilhem dos mesmos valores. Selecione três e, por fim, escolha uma pessoa para prestar contas sobre sua evolução e desafios.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 16 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 16 - Compartilhe com alguém</h2>
-    <div class="day-content">
-      <p>
-        Ninguém supera um problema sozinho. Ter alguém para compartilhar suas dificuldades e prestar contas pode acelerar o processo de recuperação.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 17 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 17 - Negação</h2>
-    <div class="day-content">
-      <p>
-        Muitos permanecem anos na fase da negação, ignorando ou minimizando o problema. É hora de aumentar sua consciência sobre os danos que o vício causa e aceitar que mudanças são necessárias.
-      </p>
-      <p>
-        Se você conseguir sair da negação e reconhecer a necessidade de tratamento, já terá dado um grande passo.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 18 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 18 - A Culpa</h2>
-    <div class="day-content">
-      <p>
-        A culpa pode ser um ladrão de energia, fazendo você se sentir paralisado e preso ao passado. Ela impede o progresso e precisa ser transformada.
-      </p>
-      <p>
-        Dê um novo significado à culpa: encare-a como uma oportunidade para recomeçar.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 19 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 19 - Tudo ou nada</h2>
-    <div class="day-content">
-      <p>
-        Para vencer o vício, é preciso um compromisso total – ou você se entrega de corpo e alma à mudança ou não dá chance nenhuma para que o vício continue.
-      </p>
-      <p>
-        Sinta a indignação, bata na mesa e diga “basta” de vez!
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 20 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 20 - Uma avaliação sincera</h2>
-    <div class="day-content">
-      <p>
-        Hoje é o vigésimo dia. Celebre cada vitória, mas também pare para refletir sobre as dificuldades enfrentadas. Anote como se sentiu ao superar cada etapa.
-      </p>
-      <p>
-        Essa avaliação é fundamental para manter o foco e ajustar sua trajetória.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 21 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 21 - Recomeço</h2>
-    <div class="day-content">
-      <p>
-        Às vezes é necessário recomeçar em diversas áreas da vida – relacionamentos, carreira, amizades e, principalmente, a própria jornada de superação.
-      </p>
-      <p>
-        Escreva seus motivos para lutar e mantenha-os em um lugar visível. Visualize e sinta essa nova jornada a cada dia.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 22 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 22 - Visão além do alcance</h2>
-    <div class="day-content">
-      <p>
-        Qual é o seu maior desejo? Seu objetivo de se livrar da pornografia? Foque neles e visualize-se livre, feliz e vivendo a vida que sempre sonhou.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 23 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 23 - Estabeleça metas</h2>
-    <div class="day-content">
-      <p>
-        Para manter a disciplina, é fundamental saber onde se quer chegar. Estabeleça metas de curto, médio e longo prazo.
-      </p>
-      <p>
-        Reserve um tempo para escrever tudo o que você deseja conquistar e coloque essas metas em prática.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 24 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 24 - O Registro</h2>
-    <div class="day-content">
-      <p>
-        Seu subconsciente armazenou inúmeras imagens relacionadas à pornografia. Embora não seja possível apagar essas lembranças de imediato, você pode criar novos registros.
-      </p>
-      <p>
-        <strong>Atividade:</strong> Pegue um caderno e mantenha um diário onde você documenta os acontecimentos do dia. Use essa prática como uma catarse para liberar o que te aflige.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 25 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 25 - Limite seu Acesso</h2>
-    <div class="day-content">
-      <p>
-        Um jovem certa vez disse que mais consumia pornografia à noite, quando voltava do trabalho e ia dormir. Como ele morava com a mãe, sugeriu-se deixar o celular com ela ou em outro local.
-      </p>
-      <p>
-        Muitas vezes o acesso facilitado ao celular é o que alimenta o vício. Considere usar apps que bloqueiem sites eróticos ou outras estratégias que limitem seu acesso.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 26 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 26 - Celebre as pequenas vitórias</h2>
-    <div class="day-content">
-      <p>
-        O cérebro adora recompensas. Cada novo hábito precisa ser celebrado para reforçar a mudança.
-      </p>
-      <p>
-        Mesmo que o avanço seja pequeno, comemore cada dia sem pornografia. Encontre motivos diários para agradecer e reconhecer seu progresso.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 27 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 27 - Respire fundo</h2>
-    <div class="day-content">
-      <p>
-        Em sua jornada, barreiras sempre surgirão. Quando elas aparecerem, respire fundo, oxigene sua mente e concentre-se no que precisa ser feito.
-      </p>
-      <p>
-        Esse recurso exigirá paciência e perseverança – você está pronto para o desafio?
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 28 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 28 - Sexualidade saudável</h2>
-    <div class="day-content">
-      <p>
-        Ao longo da vida, acumulamos visões distorcidas sobre a sexualidade. É hora de ressignificar esses conceitos.
-      </p>
-      <p>
-        Leia livros, participe de seminários e assista a filmes que promovam uma visão saudável da sexualidade. Escolha com cuidado as fontes de informação para que os valores morais e éticos prevaleçam.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 29 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 29 - Uma vitória, não é guerra ganha</h2>
-    <div class="day-content">
-      <p>
-        Se você chegou até aqui cumprindo as etapas, parabéns! Contudo, esteja alerta: recaídas podem ocorrer, e a autossuficiência pode ser um inimigo perigoso.
-      </p>
-      <p>
-        Celebre suas vitórias, mas mantenha a vigilância e continue se esforçando. A continuidade no processo é a chave para a vitória final.
-      </p>
-    </div>
-  </div>
-
-  <!-- DIA 30 -->
-  <div class="day-card">
-    <h2 class="day-title">DIA 30 - Cruzando a linha de chegada</h2>
-    <div class="day-content">
-      <p>
-        Finalmente chegamos ao 30° dia! É com alegria que reconheço sua perseverança e compromisso em vencer o vício.
-      </p>
-      <p>
-        Daqui para frente, você deverá continuar firme, repetindo o processo quantas vezes forem necessárias. Lembre-se: para se libertar do vício, é preciso perseverança dia após dia. Aos poucos, o desejo enfraquecerá e você ganhará mais controle sobre si mesmo.
-      </p>
-      <p>
-        Siga firme!
-      </p>
-    </div>
-  </div>
-
-  <!-- CTA -->
-  <div class="cta-section">
-    <h2>Conheça o PROTOCOLO ANTI PORNOGRAFIA</h2>
-    <p>Clique no link abaixo e agende uma consulta GRATUITA para dar continuidade à sua transformação.</p>
-    <a href="https://whatsss.link/f6rd6i" class="cta-button">Agendar Consulta</a>
-  </div>
+    nextBtn.addEventListener('click', () => {
+      if (currentPage < totalPages - 1) {
+        currentPage++;
+        updatePage();
+      }
+    });
+  </script>
 </body>
 </html>

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ErecTesto – Unleash Your True Potential</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* Reset & Global Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f4f8;
+      color: #343a40;
+      line-height: 1.6;
+    }
+    a {
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    img {
+      max-width: 100%;
+      display: block;
+    }
+    /* Sticky Banner */
+    .sticky-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background-color: #e3342f;
+      color: #fff;
+      padding: 12px 20px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      font-weight: 500;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #1d2b64, #f8cdda);
+      color: #fff;
+      padding: 120px 20px 60px;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    header p {
+      font-size: 1.25rem;
+      opacity: 0.9;
+    }
+    /* Main Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    /* Hero Section */
+    .hero {
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      margin-bottom: 40px;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      padding: 30px;
+    }
+    @media (min-width: 768px) {
+      .hero-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .hero img {
+      border-radius: 12px;
+      transition: transform 0.3s ease;
+    }
+    .hero img:hover {
+      transform: scale(1.05);
+    }
+    .benefits {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .benefits-card,
+    .offer-card {
+      background: #f0fff4;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+    .offer-card {
+      background: #ebf8ff;
+      text-align: center;
+      padding: 30px 20px;
+    }
+    .benefits-card h3 {
+      font-size: 1.5rem;
+      color: #2f855a;
+      margin-bottom: 15px;
+    }
+    .benefits-card ul {
+      list-style: none;
+    }
+    .benefits-card ul li {
+      display: flex;
+      align-items: center;
+      font-size: 1rem;
+      color: #2f855a;
+      margin-bottom: 12px;
+    }
+    .benefits-card ul li svg {
+      margin-right: 10px;
+    }
+    .offer-card p.offer-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #2b6cb0;
+      margin-bottom: 10px;
+    }
+    .offer-card p.offer-subtitle {
+      font-size: 1.25rem;
+      color: #4a5568;
+      margin-bottom: 20px;
+    }
+    .offer-card a {
+      background: linear-gradient(90deg, #38a169, #2f855a);
+      color: #fff;
+      padding: 15px 30px;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .offer-card a:hover {
+      background: linear-gradient(90deg, #2f855a, #276749);
+    }
+    /* Doctor Recommendation Section */
+    .doctor-recommendation {
+      background: #edf2f7;
+      border-left: 6px solid #38a169;
+      padding: 30px 20px;
+      border-radius: 12px;
+      margin-bottom: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .doctor-recommendation img {
+      border-radius: 50%;
+      max-width: 100px;
+      margin-bottom: 15px;
+    }
+    .doctor-recommendation blockquote {
+      font-style: italic;
+      color: #2d3748;
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+    }
+    .doctor-recommendation cite {
+      font-size: 0.9rem;
+      color: #4a5568;
+    }
+    /* Pricing Section */
+    .pricing-section {
+      margin-bottom: 40px;
+    }
+    .pricing-section h2 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 30px;
+      color: #2d3748;
+    }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    @media (min-width: 768px) {
+      .pricing-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    .pricing-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+      position: relative;
+      text-align: center;
+      border: 2px solid #e2e8f0;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+    .pricing-card:hover {
+      transform: scale(1.02);
+      border-color: #cbd5e0;
+    }
+    .pricing-card .discount-badge {
+      position: absolute;
+      top: -15px;
+      right: 15px;
+      background: #e53e3e;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    .pricing-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 15px;
+      color: #2d3748;
+    }
+    .pricing-card .price {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #2d3748;
+    }
+    .pricing-card .old-price {
+      text-decoration: line-through;
+      color: #718096;
+      font-size: 1rem;
+      margin-left: 10px;
+    }
+    .pricing-card a {
+      background: #3182ce;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      display: block;
+      margin-top: 20px;
+    }
+    .pricing-card a:hover {
+      background: #2b6cb0;
+    }
+    /* Center product images in pricing cards */
+    .pricing-card img {
+      margin-left: auto;
+      margin-right: auto;
+    }
+    /* Guarantee Section */
+    .guarantee {
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .guarantee img {
+      max-height: 120px;
+      margin-bottom: 20px;
+    }
+    .guarantee h2 {
+      font-size: 1.75rem;
+      color: #2d3748;
+      margin-bottom: 15px;
+    }
+    .guarantee p {
+      font-size: 1rem;
+      color: #4a5568;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    /* Testimonials Section */
+    .testimonials {
+      margin-bottom: 40px;
+    }
+    .testimonials h2 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 30px;
+      color: #2d3748;
+    }
+    .testimonial-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    @media (min-width: 768px) {
+      .testimonial-list {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .testimonial-item {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+      position: relative;
+    }
+    .testimonial-item p {
+      font-size: 1rem;
+      color: #4a5568;
+      margin-bottom: 10px;
+    }
+    .testimonial-item .author {
+      font-weight: 600;
+      color: #2d3748;
+      font-size: 0.9rem;
+      text-align: right;
+    }
+    /* Fixed Bottom CTA for Mobile */
+    .fixed-cta {
+      display: none;
+    }
+    @media (max-width: 767px) {
+      .fixed-cta {
+        display: block;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #fff;
+        padding: 15px 20px;
+        box-shadow: 0 -4px 8px rgba(0,0,0,0.1);
+        border-top: 1px solid #e2e8f0;
+        text-align: center;
+        z-index: 1000;
+      }
+      .fixed-cta a {
+        background: linear-gradient(90deg, #38a169, #2f855a);
+        color: #fff;
+        padding: 15px 30px;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 600;
+        display: inline-block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sticky Offer Banner -->
+  <div class="sticky-banner">
+    🔥 Special Offer: Save 30% + Free Shipping Today Only!
+  </div>
+
+  <!-- Header Section -->
+  <header>
+    <div class="container">
+      <h1>Breakthrough Natural Solution for Men's Health</h1>
+      <p>Clinically Proven | Doctor Recommended | 100% Natural</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-grid">
+        <!-- Product Image -->
+        <div>
+          <img src="https://thumbor.cartpanda.com/kFsYUWwgxCBFjRXsNt0a3C4mC8U=/200x0/https://assets.mycartpanda.com/static/products_images/7f/b5/84/1733786702.png" alt="ErecTesto Product">
+        </div>
+        <!-- Benefits & Offer -->
+        <div class="benefits">
+          <div class="benefits-card">
+            <h3>Clinically Proven Benefits</h3>
+            <ul>
+              <li>
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" width="20" height="20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                Enhanced Performance (92% Success Rate)
+              </li>
+              <li>
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" width="20" height="20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                Improved Confidence (88% Reported)
+              </li>
+              <li>
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" width="20" height="20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                100% Natural Formula
+              </li>
+            </ul>
+          </div>
+          <div class="offer-card">
+            <p class="offer-title">Special Offer</p>
+            <p class="offer-subtitle">Save 30% + Free Shipping</p>
+            <a href="#pricing-packages">Claim Your Discount Now</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Doctor Recommendation Section -->
+    <section class="doctor-recommendation">
+      <img src="data:image/jpeg;base64,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" alt="Doctor Profile">
+      <blockquote>"ErecTesto has been a game-changer for my patients. It significantly enhances performance and confidence, delivering truly impressive results."</blockquote>
+      <cite>– Dr. John Smith, Urology Specialist</cite>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing-packages" class="pricing-section">
+      <h2>Choose Your Package</h2>
+      <div class="pricing-grid">
+        <!-- Basic Package -->
+        <div class="pricing-card">
+          <div class="discount-badge">30% OFF</div>
+          <h3>3 Month Supply</h3>
+          <img src="https://thumbor.cartpanda.com/rJKiTBaLS_lCf7g3BijSKYPKTVs=/200x0/https://assets.mycartpanda.com/static/products_images/21/b5/29/1733786413.png" alt="Basic Package">
+          <div class="price-container" style="margin-top: 15px;">
+            <span class="price">$177.00</span>
+            <span class="old-price">$123.90</span>
+          </div>
+          <a href="https://primalignite.site/checkout/167020854:1?src=eml-flowgenie&discount=FLOW30">Order Now</a>
+        </div>
+        <!-- Popular Package -->
+        <div class="pricing-card" style="border-color: #3182ce;">
+          <div class="discount-badge">30% OFF</div>
+          <h3>6 Month Supply</h3>
+          <img src="https://thumbor.cartpanda.com/kFsYUWwgxCBFjRXsNt0a3C4mC8U=/200x0/https://assets.mycartpanda.com/static/products_images/7f/b5/84/1733786702.png" alt="Popular Package">
+          <div class="price-container" style="margin-top: 15px;">
+            <span class="price">$174.00</span>
+            <span class="old-price">$121.80</span>
+          </div>
+          <a href="https://primalignite.site/checkout/167033143:1?src=eml-flowgenie&discount=FLOW30">Order Now</a>
+        </div>
+        <!-- Premium Package -->
+        <div class="pricing-card">
+          <div class="discount-badge">30% OFF</div>
+          <h3>10 Month Supply</h3>
+          <img  src="https://thumbor.cartpanda.com/DBVU-qwHbirtlX4Pbdgy6MeHNfg=/200x0/https://assets.mycartpanda.com/static/products_images/00/36/22/1739380582.png" alt="Premium Package">
+          <div class="price-container" style="margin-top: 15px;">
+            <span class="price">$207.00</span>
+            <span class="old-price">$144.90</span>
+          </div>
+          <a href="https://primalignite.site/checkout/167032017:1?src=eml-flowgenie&discount=FLOW30">Order Now</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Guarantee Section -->
+    <section class="guarantee">
+      <img src="https://erec-boost.com/BKR-ES-DESC/assets/selo.webp" alt="Money Back Guarantee">
+      <h2>60-Day Money Back Guarantee</h2>
+      <p>If you're not completely satisfied with your results, simply return the unused portion for a full refund. No questions asked.</p>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+      <h2>What Our Customers Say</h2>
+      <div class="testimonial-list">
+        <div class="testimonial-item">
+          <p>"ErecTesto has transformed my life! I've seen incredible improvements in both performance and confidence."</p>
+          <div class="author">– Michael R.</div>
+        </div>
+        <div class="testimonial-item">
+          <p>"I was skeptical at first, but after using ErecTesto for just a few weeks, the results speak for themselves."</p>
+          <div class="author">– David L.</div>
+        </div>
+        <div class="testimonial-item">
+          <p>"This product is a breakthrough. I highly recommend ErecTesto to anyone looking to boost their performance naturally."</p>
+          <div class="author">– Jason T.</div>
+        </div>
+        <div class="testimonial-item">
+          <p>"Finally, a product that delivers on its promise. ErecTesto has helped me regain my confidence and improve my performance."</p>
+          <div class="author">– Ryan P.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Fixed Bottom CTA for Mobile -->
+  <div class="fixed-cta">
+    <a href="#pricing-packages">Order Now</a>
+  </div>
+</body>
+</html>

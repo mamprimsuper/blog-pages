@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Men's Health Quiz</title>
+
+    <script>
+        window.cartpanda = window.cartpanda || {
+            shop: 'flowhosted',
+            platform: 'custom',
+            queue: []
+        };
+    </script>
+    <script async src="https://cdn.cartpanda.com/tracking.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Montserrat', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            background: linear-gradient(135deg, #1a3c6d 0%, #2b5876 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+            color: #333;
+            touch-action: manipulation;
+        }
+
+        html {
+            height: -webkit-fill-available;
+        }
+
+        .quiz-container {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .progress-container {
+            margin-bottom: 20px;
+            padding: 0 4px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #2b5876 0%, #4e4376 100%);
+            border-radius: 8px;
+            transition: width 0.3s ease;
+        }
+
+        .question-container {
+            text-align: center;
+            padding: 0 8px;
+        }
+
+        .question {
+            font-size: 1.25rem;
+            color: #1a3c6d;
+            margin-bottom: 16px;
+            line-height: 1.3;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            padding: 0 8px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 0 4px;
+        }
+
+        .option-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 72px;
+            user-select: none;
+        }
+
+        .option-card:active {
+            transform: scale(0.98);
+        }
+
+        .option-card.selected {
+            background: #2b5876;
+            border-color: #2b5876;
+            color: white;
+        }
+
+        .option-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .option-icon {
+            font-size: 1.8rem;
+            min-width: 40px;
+        }
+
+        .option-text {
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: left;
+            flex: 1;
+        }
+
+        .next-btn {
+            background: linear-gradient(90deg, #2b5876 0%, #4e4376 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin: 16px auto;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .next-btn:active {
+            transform: scale(0.98);
+        }
+
+        .success-story {
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin: 16px 4px;
+        }
+
+        .success-icon {
+            font-size: 2rem;
+            color: #2b5876;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .success-text {
+            font-size: 1rem;
+            color: #333;
+            line-height: 1.4;
+            margin-bottom: 16px;
+        }
+
+        .success-image {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 12px;
+            margin: 16px auto;
+            display: block;
+        }
+
+        /* News Section Styles */
+        .news-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .news-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .news-logo {
+            margin-bottom: 10px;
+        }
+
+        .news-logo-img {
+            height: 30px;
+            object-fit: contain;
+        }
+
+        .news-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .news-source {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a3c6d;
+        }
+
+        .news-date {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .news-headline {
+            font-size: 2rem;
+            line-height: 1.3;
+            color: #1a3c6d;
+            margin-bottom: 25px;
+            font-weight: 700;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .key-points {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 30px auto;
+            max-width: 700px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .key-points h3 {
+            color: #1a3c6d;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.3rem;
+        }
+
+        .key-points ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .key-points li {
+            margin-bottom: 12px;
+            padding-left: 30px;
+            position: relative;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .key-points li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #2ecc71;
+            font-weight: bold;
+        }
+
+        .expert-quote {
+            border-left: 4px solid #2b5876;
+            padding: 25px;
+            background: #f8f9fa;
+            margin: 40px auto;
+            max-width: 700px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .expert-quote p {
+            font-size: 1.1rem;
+            color: #333;
+            font-style: italic;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .expert-quote cite {
+            color: #666;
+            font-style: normal;
+            font-size: 0.9rem;
+            display: block;
+            text-align: right;
+        }
+
+        /* Landing Page Styles */
+        .landing-page {
+            background: #fff;
+        }
+
+        /* Responsive Styles */
+        @media (min-width: 768px) {
+            .quiz-container {
+                padding: 32px;
+            }
+
+            .question {
+                font-size: 1.6rem;
+            }
+
+            .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .options-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .option-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 24px;
+            }
+
+            .option-image {
+                width: 80px;
+                height: 80px;
+            }
+
+            .option-text {
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .quiz-container {
+                padding: 12px;
+            }
+
+            .question {
+                font-size: 1.2rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .option-card {
+                padding: 12px;
+            }
+
+            .next-btn {
+                font-size: 1rem;
+                padding: 14px;
+            }
+        }
+
+        @media (hover: hover) {
+            .option-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            }
+
+            .next-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(43,88,118,0.2);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+        </div>
+        <div class="question-container" id="questionContainer">
+            <!-- Content will be dynamically inserted here -->
+        </div>
+    </div>
+    
+
+    <script>
+        const questions = [
+            
+            {
+                type: 'success',
+                question: "Did you know?",
+                subtitle: "More than 14,000 men in your age group have already recovered their libido naturally and quickly! And they've returned to having a more active sex life than in their youth",
+                content: "Discover the method behind how to achieve prolonged hours of erection and make your partner beg for mercy from so much pleasure you'll give her, while also naturally increasing your libido by 13x, turning you into a machine in bed.",
+                image: "https://imagex1.sx.cdn.live/images/pinporn/2015/09/03/13681565.gif?width=300",
+                needsButton: true
+            },       
+            {
+                type: 'landing',
+                content: `
+                <!-- Landing Page Container -->
+<div class="landing-page bg-gray-50">
+    <!-- Sticky Offer Banner -->
+    <div class="fixed top-0 left-0 right-0 z-50 bg-red-600 text-white py-3 text-center shadow-lg">
+        <p class="text-sm md:text-base animate-pulse font-medium px-4">
+            🔥 Special Offer: Save 30% + Free Shipping Today Only!
+        </p>
+    </div>
+
+    <!-- Header Section with padding-top to account for fixed banner -->
+    <header class="bg-gradient-to-r from-blue-900 to-blue-800 text-white pt-20 pb-12 px-4 md:pt-24 md:pb-16">
+        <div class="container mx-auto max-w-4xl text-center">
+            <h1 class="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
+                Breakthrough Natural Solution for Men's Health
+            </h1>
+            <p class="text-lg md:text-xl opacity-90">
+                Clinically Proven | Doctor Recommended | 100% Natural
+            </p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-12 max-w-6xl">
+        <!-- Hero Section -->
+        <section class="bg-white rounded-2xl shadow-xl overflow-hidden mb-12">
+            <div class="grid md:grid-cols-2 gap-6 md:gap-8 p-6 md:p-8">
+                <!-- Product Image -->
+                <div class="flex items-center justify-center">
+                    <img 
+                        src="https://erec-boost.com/BKR-ES-DESC/assets/6.png" 
+                        alt="Product Image" 
+                        class="rounded-lg shadow-lg w-full max-w-md transform transition-transform hover:scale-105"
+                        loading="lazy"
+                    >
+                </div>
+
+                <!-- Benefits & CTA -->
+                <div class="space-y-6">
+                    <!-- Benefits Card -->
+                    <div class="bg-green-50 p-6 rounded-xl shadow-sm">
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">
+                            Clinically Proven Benefits
+                        </h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-center text-green-800">
+                                <svg class="w-5 h-5 md:w-6 md:h-6 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="text-sm md:text-base">Enhanced Performance (92% Success Rate)</span>
+                            </li>
+                            <li class="flex items-center text-green-800">
+                                <svg class="w-5 h-5 md:w-6 md:h-6 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="text-sm md:text-base">Improved Confidence (88% Reported)</span>
+                            </li>
+                            <li class="flex items-center text-green-800">
+                                <svg class="w-5 h-5 md:w-6 md:h-6 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="text-sm md:text-base">100% Natural Formula</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Special Offer Card -->
+                    <div class="bg-blue-50 p-6 rounded-xl shadow-sm">
+                        <div class="text-center">
+                            <p class="text-2xl md:text-3xl font-bold text-blue-900 mb-2">
+                                Special Offer
+                            </p>
+                            <p class="text-lg md:text-xl text-gray-600 mb-4">
+                                Save 30% + Free Shipping
+                            </p>
+                            <a 
+                                href="#pricing-packages" 
+                                class="inline-block bg-gradient-to-r from-green-600 to-green-700 text-white font-bold py-4 px-6 md:px-8 rounded-full hover:from-green-700 hover:to-green-800 transition transform hover:scale-105 shadow-lg text-sm md:text-base"
+                            >
+                                Claim Your Discount Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing-packages" class="mb-12 scroll-mt-20">
+            <h2 class="text-2xl md:text-3xl font-bold mb-8 text-center text-gray-800">
+                Choose Your Package
+            </h2>
+            <div class="grid md:grid-cols-3 gap-4 md:gap-6">
+                <!-- Basic Package -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border-2 border-gray-200 relative transform transition-all hover:scale-102">
+                    <div class="absolute -top-3 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">
+                        30% OFF
+                    </div>
+                    <h3 class="text-lg md:text-xl font-bold mb-4">2 Month Supply</h3>
+                    <img 
+                        src="https://thumbor.cartpanda.com/MhAA9uVvlLpE92nNFKNzbwd3UUE=/200x0/https://assets.mycartpanda.com/static/products_images/f2/8f/8c/1727964646.png" 
+                        alt="Basic Package" 
+                        class="w-full rounded-lg mb-4 transform transition-transform hover:scale-105"
+                        loading="lazy"
+                    >
+                    <div class="mb-4 text-center">
+                        <span class="text-2xl md:text-3xl font-bold">$123.90</span>
+                        <span class="text-gray-500 line-through ml-2">$77.00</span>
+                    </div>
+                    <a 
+                        href="https://primalignite.site/checkout/158673688:1?src=eml-flowgenie&discount=FLOW30   " 
+                        class="block w-full bg-blue-600 text-white text-center py-3 rounded-lg hover:bg-blue-700 transition shadow-md text-sm md:text-base font-semibold"
+                    >
+                        Order Now
+                    </a>
+                </div>
+
+                <!-- Popular Package -->
+                <div class="bg-white rounded-xl shadow-xl p-6 border-2 border-blue-600 transform scale-105 relative">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-6 py-1 rounded-full text-sm font-medium shadow-md whitespace-nowrap">
+                        MOST POPULAR
+                    </div>
+                    <div class="absolute top-8 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">
+                        30% OFF
+                    </div>
+                    <h3 class="text-lg md:text-xl font-bold mb-4 mt-4">4 Month Supply</h3>
+                    <img 
+                        src="https://thumbor.cartpanda.com/OJxUk9mAkgLPq-ORdXNI1oNAX9M=/200x0/https://assets.mycartpanda.com/static/products_images/09/d7/1e/1727913122.png" 
+                        alt="Popular Package" 
+                        class="w-full rounded-lg mb-4 transform transition-transform hover:scale-105"
+                        loading="lazy"
+                    >
+                    <div class="mb-4 text-center">
+                        <span class="text-2xl md:text-3xl font-bold">$163.80</span>
+                        <span class="text-gray-500 line-through ml-2">$234.00</span>
+                    </div>
+                    <a 
+                        href="https://primalignite.site/checkout/158733995:1?src=eml-flowgenie&discount=FLOW30" 
+                        class="block w-full bg-green-600 text-white text-center py-3 rounded-lg hover:bg-green-700 transition shadow-md text-sm md:text-base font-semibold"
+                    >
+                        Order Now
+                    </a>
+                </div>
+
+                <!-- Premium Package -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border-2 border-gray-200 relative transform transition-all hover:scale-102">
+                    <div class="absolute -top-3 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">
+                        30% OFF
+                    </div>
+                    <h3 class="text-lg md:text-xl font-bold mb-4">10 Month Supply</h3>
+                    <img 
+                        src="https://thumbor.cartpanda.com/2KYu4_LFFWQtnW-9GfhLm5RsNIY=/200x0/https://assets.mycartpanda.com/static/products_images/24/61/7f/1727965541.png" 
+                        alt="Premium Package" 
+                        class="w-full rounded-lg mb-4 transform transition-transform hover:scale-105"
+                        loading="lazy"
+                    >
+                    <div class="mb-4 text-center">
+                        <span class="text-2xl md:text-3xl font-bold">$182.70</span>
+                        <span class="text-gray-500 line-through ml-2">$261.00</span>
+                    </div>
+                    <a 
+                        href="https://primalignite.site/checkout/158768980:1?src=eml-flowgenie&discount=FLOW30" 
+                        class="block w-full bg-blue-600 text-white text-center py-3 rounded-lg hover:bg-blue-700 transition shadow-md text-sm md:text-base font-semibold"
+                    >
+                        Order Now
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Guarantee Section -->
+        <section class="bg-white rounded-xl shadow-lg p-6 md:p-8 text-center mb-12">
+            <img 
+                src="https://erec-boost.com/BKR-ES-DESC/assets/selo.webp" 
+                alt="Guarantee" 
+                class="mx-auto h-28 md:h-40 mb-4"
+                loading="lazy"
+            >
+            <h2 class="text-xl md:text-2xl font-bold mb-4 text-gray-800">
+                60-Day Money Back Guarantee
+            </h2>
+            <p class="text-gray-600 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
+                If you're not completely satisfied with your results, simply return the unused portion for a full refund.
+                No questions asked.
+            </p>
+        </section>
+    </main>
+</div>
+
+<!-- Fixed Bottom CTA for Mobile -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200 p-4">
+    <a 
+        href="#pricing-packages" 
+        class="block w-full bg-gradient-to-r from-green-600 to-green-700 text-white text-center py-3 rounded-lg font-bold text-lg shadow-lg"
+    >
+        Order Now
+    </a>
+</div>`,
+                needsButton: false
+            }
+        ];
+
+        let currentQuestion = 0;
+        const progressBar = document.getElementById('progress');
+        const questionContainer = document.getElementById('questionContainer');
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function createQuestionElement(question) {
+            let content = '';
+            
+            if (question.type !== 'landing') {
+                if (question.question) {
+                    content += `<h2 class="question">${question.question}</h2>`;
+                }
+                if (question.subtitle) {
+                    content += `<p class="subtitle">${question.subtitle}</p>`;
+                }
+            }
+
+            content += getQuestionContent(question);
+
+            if (question.needsButton) {
+                content += `
+                    <button class="next-btn" id="nextBtn">
+                        ${question.buttonText || 'Continue'}
+                    </button>
+                `;
+            }
+
+            return content;
+        }
+
+        function getQuestionContent(question) {
+            switch(question.type) {
+                case 'age':
+                case 'treatment':
+                case 'frequency':
+                    return `
+                        <div class="options-grid">
+                            ${question.options.map(option => `
+                                <div class="option-card" role="button" tabindex="0">
+                                    ${option.image ? 
+                                        `<img src="${option.image}" alt="${option.text}" class="option-image" loading="lazy">` :
+                                        `<div class="option-icon">${option.icon}</div>`
+                                    }
+                                    <div class="option-text">${option.text}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                case 'success':
+                    return `
+                        <div class="success-story">
+                            <div class="success-icon">🔥</div>
+                            <p class="success-text">${question.content}</p>
+                            ${question.image ? `<img src="${question.image}" alt="Success Story" class="success-image" loading="lazy">` : ''}
+                        </div>
+                    `;
+                case 'news':
+                case 'landing':
+                    return question.content;
+                default:
+                    return '';
+            }
+        }
+
+        function loadQuestion() {
+            updateProgress();
+            questionContainer.innerHTML = createQuestionElement(questions[currentQuestion]);
+            
+            if (questions[currentQuestion].options) {
+                const optionCards = document.querySelectorAll('.option-card');
+                optionCards.forEach(card => {
+                    card.addEventListener('click', () => {
+                        selectOption(card);
+                        // Automatically advance after selection
+                        setTimeout(nextQuestion, 300);
+                    });
+                });
+            }
+
+            const nextBtn = document.getElementById('nextBtn');
+            if (nextBtn) {
+                nextBtn.addEventListener('click', nextQuestion);
+            }
+
+            // Add smooth scrolling for landing page links
+            if (questions[currentQuestion].type === 'landing') {
+                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                    anchor.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const targetId = this.getAttribute('href');
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                            targetElement.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    });
+                });
+            }
+        }
+
+        function selectOption(selectedCard) {
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            selectedCard.classList.add('selected');
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                loadQuestion();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Prevent zoom on double tap in iOS
+        document.addEventListener('gesturestart', function(e) {e.preventDefault();
+        });
+
+        // Prevent scrolling when touching the quiz container on mobile
+        document.querySelector('.quiz-container').addEventListener('touchmove', function(e) {
+            if (e.target.closest('.option-card')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Add animation when elements appear
+        function addAnimationToElements() {
+            const elements = document.querySelectorAll('.option-card, .success-story, .news-container');
+            elements.forEach(element => {
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(20px)';
+                requestAnimationFrame(() => {
+                    element.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                });
+            });
+        }
+
+
+
+        // Handle window resize
+        function handleResize() {
+            const container = document.querySelector('.quiz-container');
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+            container.style.minHeight = window.innerHeight > 700 ? '700px' : '100vh';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            handleResize();
+            loadQuestion();
+            addAnimationToElements();
+        });
+
+        // Event listeners for window resize
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('orientationchange', handleResize);
+
+
+
+
+
+
+        
+// FlowHosted Quiz Tracking System
+class TrackingSystem {
+    constructor() {
+        this.domain = 'news.flowhosted.com';
+        this.cartpandaDomain = 'sip.mycartpanda.com';
+        this.initializeTracking();
+        this.bindEvents();
+        this.initializeCartpanda();
+    }
+
+    initializeTracking() {
+        this.saveTrackingData();
+        this.sessionData = {
+            sessionStart: new Date().toISOString(),
+            source: this.getSource(),
+            userInteractions: []
+        };
+    }
+
+    getSource() {
+        return {
+            domain: this.domain,
+            path: window.location.pathname,
+            full_url: window.location.href,
+            referrer: document.referrer
+        };
+    }
+
+    initializeCartpanda() {
+        // Inicializar Cartpanda com configuração específica para FlowHosted
+        window.cartpanda = {
+            shop: 'flowhosted',
+            platform: 'custom',
+            queue: []
+        };
+
+        // Função de tracking do Cartpanda
+        window.cartpanda.track = function(event, data) {
+            const trackingData = {
+                ...data,
+                source: this.domain,
+                path: window.location.pathname
+            };
+
+            fetch('https://sip.mycartpanda.com/track', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    event,
+                    data: trackingData,
+                    timestamp: new Date().toISOString()
+                })
+            }).catch(error => console.warn('Cartpanda tracking error:', error));
+        };
+
+        this.loadCartpandaScript();
+    }
+
+    loadCartpandaScript() {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.cartpanda.com/tracking.min.js';
+        script.async = true;
+        document.head.appendChild(script);
+    }
+
+    getURLParams() {
+        const searchParams = new URLSearchParams(window.location.search);
+        return {
+            src: searchParams.get('src') || 'flowhosted',
+            utm_source: searchParams.get('utm_source'),
+            utm_medium: searchParams.get('utm_medium'),
+            utm_campaign: searchParams.get('utm_campaign'),
+            utm_content: searchParams.get('utm_content'),
+            quiz_variant: 'men_health'
+        };
+    }
+
+    saveTrackingData() {
+        const params = this.getURLParams();
+        const trackingData = {
+            ...params,
+            domain: this.domain,
+            first_visit: new Date().toISOString(),
+            session_id: this.generateSessionId()
+        };
+            
+        try {
+            localStorage.setItem('flowhosted_tracking', JSON.stringify(trackingData));
+        } catch (e) {
+            console.warn('Failed to save tracking data:', e);
+        }
+    }
+
+    generateSessionId() {
+        return 'fh_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    getTrackingData() {
+        try {
+            const data = localStorage.getItem('flowhosted_tracking');
+            return data ? JSON.parse(data) : null;
+        } catch (e) {
+            console.warn('Failed to retrieve tracking data:', e);
+            return null;
+        }
+    }
+
+    trackToCartpanda(eventName, eventData) {
+        const cartpandaData = {
+            ...eventData,
+            domain: this.domain,
+            quiz_id: 'men_health',
+            session_id: this.sessionData.sessionId
+        };
+
+        if (window.cartpanda && typeof window.cartpanda.track === 'function') {
+            window.cartpanda.track(eventName, cartpandaData);
+        } else {
+            window.cartpanda.queue.push({
+                name: eventName,
+                data: cartpandaData
+            });
+        }
+    }
+
+    trackEvent(eventName, additionalData = {}) {
+        const trackingData = {
+            event: eventName,
+            timestamp: new Date().toISOString(),
+            domain: this.domain,
+            page: window.location.pathname,
+            ...this.getURLParams(),
+            ...additionalData
+        };
+
+        this.sessionData.userInteractions.push(trackingData);
+        this.trackToCartpanda(eventName, trackingData);
+
+        // Debug mode
+        if (window.location.hostname.includes('localhost') || window.location.search.includes('debug=true')) {
+            console.log('Event tracked:', trackingData);
+        }
+
+        return trackingData;
+    }
+
+    trackQuizProgress(questionNumber, questionType, answer = null) {
+        const eventData = {
+            quiz_id: 'men_health',
+            question_number: questionNumber,
+            question_type: questionType,
+            step: `${questionNumber}/${questions.length}`,
+            answer: answer
+        };
+
+        this.trackEvent('quiz_progress', eventData);
+    }
+
+    trackPurchaseIntent(packageType, price, productId) {
+        const eventData = {
+            product_id: productId,
+            package_type: packageType,
+            price: price,
+            currency: 'USD',
+            quiz_id: 'men_health',
+            checkout_url: `https://${this.cartpandaDomain}/checkout/${productId}`
+        };
+
+        this.trackEvent('purchase_intent', eventData);
+        
+        // Evento específico para o Cartpanda
+        this.trackToCartpanda('add_to_cart', {
+            ...eventData,
+            quantity: 1
+        });
+    }
+
+    getProductIdFromUrl(url) {
+        // Extrair ID do produto da URL do Cartpanda
+        const match = url.match(/checkout\/(\d+)/);
+        return match ? match[1] : null;
+    }
+
+    bindEvents() {
+        // Rastrear seleções do quiz
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.option-card')) {
+                const optionCard = e.target.closest('.option-card');
+                const optionText = optionCard.querySelector('.option-text')?.textContent;
+                
+                this.trackEvent('quiz_option_selected', {
+                    question_number: currentQuestion + 1,
+                    selected_option: optionText
+                });
+            }
+
+            // Rastrear cliques no botão Next
+            if (e.target.matches('.next-btn')) {
+                this.trackEvent('quiz_next', {
+                    current_step: currentQuestion + 1,
+                    total_steps: questions.length
+                });
+            }
+
+            // Rastrear cliques no checkout
+            if (e.target.matches('a[href*="checkout"]')) {
+                const checkoutLink = e.target;
+                const packageSection = checkoutLink.closest('[class*="Package"]');
+                
+                if (packageSection) {
+                    const packageType = packageSection.querySelector('h3')?.textContent || 'unknown';
+                    const priceElement = packageSection.querySelector('.text-2xl')?.textContent;
+                    const price = priceElement ? parseFloat(priceElement.replace('$', '')) : 0;
+                    const productId = this.getProductIdFromUrl(checkoutLink.href);
+
+                    this.trackPurchaseIntent(packageType, price, productId);
+                }
+            }
+        });
+    }
+}
+
+// Inicializar o sistema de tracking
+const trackingSystem = new TrackingSystem();
+
+// Modificar funções existentes do quiz
+const originalLoadQuestion = window.loadQuestion;
+window.loadQuestion = function() {
+    originalLoadQuestion();
+    const currentQ = questions[currentQuestion];
+    trackingSystem.trackQuizProgress(currentQuestion + 1, currentQ.type);
+};
+
+const originalSelectOption = window.selectOption;
+window.selectOption = function(selectedCard) {
+    originalSelectOption(selectedCard);
+    const optionText = selectedCard.querySelector('.option-text')?.textContent;
+    trackingSystem.trackQuizProgress(currentQuestion + 1, questions[currentQuestion].type, optionText);
+};
+       
+    
+    </script>
+    
+</body>
+</html>

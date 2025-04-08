@@ -116,7 +116,7 @@
             const successMessage = document.getElementById('success-message');
             const submitButton = document.getElementById('submit-btn');
             
-            // Validación de email
+            // Validação de email
             emailInput.addEventListener('input', function() {
                 if (emailInput.validity.valid) {
                     emailError.style.display = 'none';
@@ -128,7 +128,9 @@
             form.addEventListener('submit', function(event) {
                 event.preventDefault();
                 
-                if (!emailInput.validity.valid) {
+                // Validação adicional do email
+                const emailValue = emailInput.value.trim();
+                if (!emailValue || !isValidEmail(emailValue)) {
                     emailError.style.display = 'block';
                     return;
                 }
@@ -137,43 +139,74 @@
                 submitButton.disabled = true;
                 submitButton.textContent = 'Enviando...';
                 
-                // Preparar los datos para el webhook
-                const email = emailInput.value;
+                // Preparar os dados para o webhook
                 const data = {
-                    email: email,
+                    email: emailValue,
                     timestamp: new Date().toISOString(),
                     source: window.location.href,
                     event: "user criado"
                 };
                 
-                // Enviar datos al webhook
+                console.log('Enviando dados:', data); // Log para debugging
+                
+                // Enviar dados ao webhook
                 fetch('https://economia-webhook.flowhosted.com/webhook/form', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify(data)
                 })
                 .then(response => {
+                    console.log('Status da resposta:', response.status);
+                    
+                    // Verificar se a resposta foi bem-sucedida
                     if (!response.ok) {
-                        throw new Error('Error en la respuesta del servidor');
+                        return response.text().then(text => {
+                            console.error('Erro na resposta do servidor:', text);
+                            throw new Error(`Erro na resposta do servidor: ${response.status} ${text}`);
+                        });
                     }
-                    return response.json();
+                    
+                    // Tentar fazer parse do JSON apenas se tivermos conteúdo
+                    if (response.headers.get('content-length') === '0') {
+                        return {};
+                    }
+                    
+                    return response.json().catch(e => {
+                        console.log('A resposta não é um JSON válido:', e);
+                        return {};
+                    });
                 })
                 .then(data => {
-                    // Redirigir a la página después del envío exitoso
-                    window.location.href = 'https://joyce-ensena.online/organic';
+                    console.log('Dados recebidos:', data);
+                    
+                    // Mostrar mensagem de sucesso
+                    successMessage.style.display = 'block';
+                    form.style.display = 'none';
+                    
+                    // Redirecionar após mostrar brevemente a mensagem de sucesso
+                    setTimeout(() => {
+                        window.location.href = 'https://joyce-ensena.online/organic';
+                    }, 1500);
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    alert('Ha ocurrido un error al verificar. Por favor, inténtalo de nuevo.');
+                    console.error('Erro completo:', error);
+                    alert('Ocorreu um erro ao verificar. Por favor, tente novamente.');
                 })
                 .finally(() => {
-                    // Restaurar el botón
+                    // Restaurar o botão
                     submitButton.disabled = false;
                     submitButton.textContent = '¡Soy humano!';
                 });
             });
+            
+            // Função auxiliar para validação de email
+            function isValidEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            }
         });
     </script>
 </body>

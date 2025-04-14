@@ -48,6 +48,7 @@
             color: #ff4c4c;
         }
 
+        input[type="text"],
         input[type="email"] {
             width: 100%;
             padding: 12px;
@@ -95,6 +96,12 @@
         
         <form id="verification-form">
             <div class="form-group">
+                <label for="name">Nombre<span class="required">*</span></label>
+                <input type="text" id="name" name="name" placeholder="Escribe tu nombre." required>
+                <div class="error-message" id="name-error">Por favor, introduce tu nombre.</div>
+            </div>
+            
+            <div class="form-group">
                 <label for="email">Email<span class="required">*</span></label>
                 <input type="email" id="email" name="email" placeholder="Escribe tu correo electrónico." required>
                 <div class="error-message" id="email-error">Por favor, introduce un email válido.</div>
@@ -111,46 +118,52 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('verification-form');
+            const nameInput = document.getElementById('name');
             const emailInput = document.getElementById('email');
+            const nameError = document.getElementById('name-error');
             const emailError = document.getElementById('email-error');
             const successMessage = document.getElementById('success-message');
             const submitButton = document.getElementById('submit-btn');
-            
-            // Validação de email
-            emailInput.addEventListener('input', function() {
-                if (emailInput.validity.valid) {
-                    emailError.style.display = 'none';
-                } else {
-                    emailError.style.display = 'block';
-                }
+
+            // Validação de nome e email
+            nameInput.addEventListener('input', function() {
+                nameError.style.display = nameInput.value.trim() ? 'none' : 'block';
             });
-            
+
+            emailInput.addEventListener('input', function() {
+                emailError.style.display = emailInput.validity.valid ? 'none' : 'block';
+            });
+
             form.addEventListener('submit', function(event) {
                 event.preventDefault();
-                
-                // Validação adicional do email
+
+                const nameValue = nameInput.value.trim();
                 const emailValue = emailInput.value.trim();
+
+                if (!nameValue) {
+                    nameError.style.display = 'block';
+                    return;
+                }
+
                 if (!emailValue || !isValidEmail(emailValue)) {
                     emailError.style.display = 'block';
                     return;
                 }
-                
-                // Deshabilitar el botón durante el envío
+
                 submitButton.disabled = true;
                 submitButton.textContent = 'Enviando...';
-                
-                // Preparar os dados para o webhook
+
                 const data = {
+                    name: nameValue,
                     email: emailValue,
                     timestamp: new Date().toISOString(),
                     source: window.location.href,
                     event: "user criado"
                 };
-                
-                console.log('Enviando dados:', data); // Log para debugging
-                
-                // Enviar dados ao webhook
-                fetch('https://economia-webhook.flowhosted.com/webhook/form', {
+
+                console.log('Enviando datos:', data);
+
+                fetch('https://get.emailserverside.com/webhook/3c8b3a85afd6978c56b54e2396ac6fdfba8b491099f6fc39bc9887cafda8454e', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -159,50 +172,31 @@
                     body: JSON.stringify(data)
                 })
                 .then(response => {
-                    console.log('Status da resposta:', response.status);
-                    
-                    // Verificar se a resposta foi bem-sucedida
                     if (!response.ok) {
                         return response.text().then(text => {
-                            console.error('Erro na resposta do servidor:', text);
-                            throw new Error(`Erro na resposta do servidor: ${response.status} ${text}`);
+                            throw new Error(Erro: ${response.status} ${text});
                         });
                     }
-                    
-                    // Tentar fazer parse do JSON apenas se tivermos conteúdo
-                    if (response.headers.get('content-length') === '0') {
-                        return {};
-                    }
-                    
-                    return response.json().catch(e => {
-                        console.log('A resposta não é um JSON válido:', e);
-                        return {};
-                    });
+
+                    return response.headers.get('content-length') === '0' ? {} : response.json().catch(() => ({}));
                 })
                 .then(data => {
-                    console.log('Dados recebidos:', data);
-                    
-                    // Mostrar mensagem de sucesso
                     successMessage.style.display = 'block';
                     form.style.display = 'none';
-                    
-                    // Redirecionar após mostrar brevemente a mensagem de sucesso
                     setTimeout(() => {
                         window.location.href = 'https://joyce-ensena.online/organic';
-                    }, 1500);
+                    }, 500);
                 })
                 .catch(error => {
                     console.error('Erro completo:', error);
                     alert('Ocorreu um erro ao verificar. Por favor, tente novamente.');
                 })
                 .finally(() => {
-                    // Restaurar o botão
                     submitButton.disabled = false;
                     submitButton.textContent = '¡Soy humano!';
                 });
             });
-            
-            // Função auxiliar para validação de email
+
             function isValidEmail(email) {
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 return emailRegex.test(email);

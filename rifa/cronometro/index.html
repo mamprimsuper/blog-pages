@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio dos 10 Segundos - Rifa do Milhão</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #0a1929;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+        
+        .container {
+            background: linear-gradient(145deg, rgba(14, 37, 71, 0.8), rgba(5, 24, 53, 0.9));
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            max-width: 90%;
+            width: 550px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .glow {
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.5) 0%, rgba(37, 99, 235, 0) 70%);
+            border-radius: 50%;
+            z-index: -1;
+        }
+        
+        .glow:nth-child(2) {
+            top: auto;
+            bottom: -70px;
+            left: auto;
+            right: -70px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.5) 0%, rgba(124, 58, 237, 0) 70%);
+        }
+        
+        h1 {
+            margin-bottom: 1rem;
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+            letter-spacing: 1px;
+        }
+        
+        .instructions {
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .timer-container {
+            position: relative;
+            margin: 2rem 0;
+        }
+        
+        .timer-bg {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, rgba(30, 58, 138, 0.5) 0%, rgba(30, 58, 138, 0) 70%);
+            border-radius: 50%;
+            z-index: -1;
+        }
+        
+        .timer {
+            font-size: 4.5rem;
+            font-weight: 700;
+            color: #f3f4f6;
+            text-shadow: 0 0 15px rgba(59, 130, 246, 0.7);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .timer.highlight {
+            transform: scale(1.1);
+            color: #10b981;
+            text-shadow: 0 0 20px rgba(16, 185, 129, 0.8);
+            animation: winPulse 1.5s infinite;
+        }
+        
+        .timer.adjusting {
+            transition: color 0.3s ease;
+            color: #f59e0b;
+        }
+        
+        @keyframes winPulse {
+            0% { transform: scale(1.1); text-shadow: 0 0 20px rgba(16, 185, 129, 0.8); }
+            50% { transform: scale(1.2); text-shadow: 0 0 30px rgba(16, 185, 129, 1); }
+            100% { transform: scale(1.1); text-shadow: 0 0 20px rgba(16, 185, 129, 0.8); }
+        }
+        
+        .buy-button {
+            background: linear-gradient(145deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.5);
+            animation: buttonPulse 2s infinite;
+            display: inline-block;
+            letter-spacing: 1px;
+        }
+        
+        .buy-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.6);
+        }
+        
+        @keyframes buttonPulse {
+            0% { transform: scale(1); box-shadow: 0 4px 15px rgba(245, 158, 11, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 4px 20px rgba(245, 158, 11, 0.7); }
+            100% { transform: scale(1); box-shadow: 0 4px 15px rgba(245, 158, 11, 0.5); }
+        }
+        
+        .action-btn {
+            background: linear-gradient(145deg, #3b82f6, #6366f1);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.5);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            letter-spacing: 1px;
+        }
+        
+        .action-btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+        
+        .action-btn:hover:before {
+            left: 100%;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
+        }
+        
+        .action-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .action-btn:disabled {
+            background: linear-gradient(145deg, #64748b, #475569);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 10px rgba(71, 85, 105, 0.4);
+        }
+        
+        .try-again-btn {
+            background: transparent;
+            color: #3b82f6;
+            border: 1px solid #3b82f6;
+            padding: 0.7rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .try-again-btn:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .result {
+            background: rgba(17, 24, 39, 0.7);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            display: none;
+            animation: fadeIn 0.5s;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .success {
+            border-left: 5px solid #10b981;
+        }
+        
+        .fail {
+            border-left: 5px solid #ef4444;
+        }
+        
+        .offer {
+            margin-top: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f59e0b;
+            text-shadow: 0 2px 5px rgba(245, 158, 11, 0.3);
+        }
+        
+        .attempts-counter {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 1rem;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f59e0b;
+            opacity: 0;
+            z-index: 10;
+        }
+        
+        /* Carrossel de Depoimentos */
+        .testimonials {
+            margin-top: 3rem;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .testimonials-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+        }
+        
+        .testimonials-container {
+            display: flex;
+            animation: scrollTestimonials 30s linear infinite;
+            width: max-content;
+        }
+        
+        .testimonial-card {
+            width: 260px;
+            background: rgba(17, 24, 39, 0.7);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-right: 20px;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .testimonial-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+        
+        .testimonial-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #3b82f6, #6366f1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            margin-right: 10px;
+        }
+        
+        .testimonial-info {
+            flex: 1;
+        }
+        
+        .testimonial-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .testimonial-win {
+            font-size: 0.8rem;
+            color: #10b981;
+        }
+        
+        .testimonial-text {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: left;
+        }
+        
+        @keyframes scrollTestimonials {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-1160px); /* Ajustar baseado no número de cards */
+            }
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: #071426;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .timer {
+                font-size: 3.8rem;
+            }
+            
+            .action-btn {
+                padding: 0.9rem 2rem;
+                font-size: 1.1rem;
+            }
+            
+            .testimonial-card {
+                width: 220px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="container">
+            <div class="glow"></div>
+            <div class="glow"></div>
+            
+            <h1>DESAFIO DOS 10 SEGUNDOS</h1>
+            
+            <div class="instructions">
+                <p>Pare EXATAMENTE nos 10.00 segundos e ganhe até<br>1000 NÚMEROS na RIFA DO MILHÃO!</p>
+            </div>
+            
+            <div class="timer-container">
+                <div class="timer-bg"></div>
+                <div class="timer" id="timer">0.00</div>
+            </div>
+            
+            <button class="action-btn" id="actionBtn">INICIAR</button>
+            <button class="try-again-btn" id="tryAgainBtn">TENTAR NOVAMENTE</button>
+            
+            <div class="attempts-counter" id="attemptsCounter">Você tem 3 tentativas</div>
+            
+            <div class="result" id="result"></div>
+            
+            <div class="testimonials">
+                <div class="testimonials-title">GANHADORES RECENTES</div>
+                <div class="testimonials-container" id="testimonialsContainer">
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <div class="testimonial-avatar">MC</div>
+                            <div class="testimonial-info">
+                                <div class="testimonial-name">Marcos C.</div>
+                                <div class="testimonial-win">Ganhou R$ 50.000</div>
+                            </div>
+                        </div>
+                        <div class="testimonial-text">
+                            "Comprei apenas 200 números e ganhei! Não acreditei quando recebi a ligação. A rifa é 100% confiável."
+                        </div>
+                    </div>
+                    
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <div class="testimonial-avatar">AF</div>
+                            <div class="testimonial-info">
+                                <div class="testimonial-name">Ana F.</div>
+                                <div class="testimonial-win">Ganhou um carro 0km</div>
+                            </div>
+                        </div>
+                        <div class="testimonial-text">
+                            "Joguei o desafio dos 10 segundos e ganhei 1000 números extras. Um deles foi o sorteado! Melhor decisão da minha vida."
+                        </div>
+                    </div>
+                    
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <div class="testimonial-avatar">RS</div>
+                            <div class="testimonial-info">
+                                <div class="testimonial-name">Roberto S.</div>
+                                <div class="testimonial-win">Ganhou R$ 25.000</div>
+                            </div>
+                        </div>
+                        <div class="testimonial-text">
+                            "Era cético no início, mas fui surpreendido! Participei da rifa e em menos de um mês o dinheiro estava na minha conta."
+                        </div>
+                    </div>
+                    
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <div class="testimonial-avatar">LP</div>
+                            <div class="testimonial-info">
+                                <div class="testimonial-name">Luana P.</div>
+                                <div class="testimonial-win">Ganhou uma moto</div>
+                            </div>
+                        </div>
+                        <div class="testimonial-text">
+                            "Consegui acertar o desafio na primeira tentativa! Ganhei números extras e um deles foi sorteado. Agora tenho uma moto zero!"
+                        </div>
+                    </div>
+                    
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <div class="testimonial-avatar">JT</div>
+                            <div class="testimonial-info">
+                                <div class="testimonial-name">José T.</div>
+                                <div class="testimonial-win">Ganhou R$ 100.000</div>
+                            </div>
+                        </div>
+                        <div class="testimonial-text">
+                            "Jamais imaginei que ganharia na rifa. Comprei os números promocionais e fui premiado! Paguei todas as minhas dívidas."
+                        </div>
+                    </div>
+                    
+                    <!-- Repetir os mesmos cartões para criar o efeito de loop infinito -->
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <div class="testimonial-avatar">MC</div>
+                            <div class="testimonial-info">
+                                <div class="testimonial-name">Marcos C.</div>
+                                <div class="testimonial-win">Ganhou R$ 50.000</div>
+                            </div>
+                        </div>
+                        <div class="testimonial-text">
+                            "Comprei apenas 200 números e ganhei! Não acreditei quando recebi a ligação. A rifa é 100% confiável."
+                        </div>
+                    </div>
+                    
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <div class="testimonial-avatar">AF</div>
+                            <div class="testimonial-info">
+                                <div class="testimonial-name">Ana F.</div>
+                                <div class="testimonial-win">Ganhou um carro 0km</div>
+                            </div>
+                        </div>
+                        <div class="testimonial-text">
+                            "Joguei o desafio dos 10 segundos e ganhei 1000 números extras. Um deles foi o sorteado! Melhor decisão da minha vida."
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        © 2025 Copyright - Rifa do Milhão | Todos os direitos reservados
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const timer = document.getElementById('timer');
+            const actionBtn = document.getElementById('actionBtn');
+            const tryAgainBtn = document.getElementById('tryAgainBtn');
+            const resultDiv = document.getElementById('result');
+            const attemptsCounter = document.getElementById('attemptsCounter');
+            
+            let lastTimerUpdate = 0;
+            let startTime;
+            let timerInterval;
+            let isRunning = false;
+            let attempts = 3;
+            let round = 1;
+            let updateRate = 80; // Milissegundos entre atualizações (determina o delay)
+            
+            // Iniciar ou parar dependendo do estado atual
+            actionBtn.addEventListener('click', function() {
+                if (!isRunning) {
+                    // INICIAR
+                    startTime = Date.now();
+                    isRunning = true;
+                    
+                    timerInterval = setInterval(updateTimer, updateRate);
+                    
+                    actionBtn.textContent = 'PARAR';
+                    tryAgainBtn.style.display = 'none';
+                    resultDiv.style.display = 'none';
+                    timer.classList.remove('highlight');
+                } else {
+                    // PARAR
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    
+                    const finalTime = parseFloat(timer.textContent);
+                    attempts--;
+                    updateAttemptsCounter();
+                    
+                    checkResult(finalTime);
+                    actionBtn.textContent = 'INICIAR';
+                    
+                    // Verificar se acabaram as tentativas
+                    if (attempts <= 0) {
+                        actionBtn.disabled = true;
+                        tryAgainBtn.style.display = 'inline-block';
+                    }
+                }
+            });
+            
+            // Tentar novamente depois das 3 tentativas
+            tryAgainBtn.addEventListener('click', function() {
+                const currentTime = Date.now();
+                const cooldownExpiry = parseInt(localStorage.getItem('cooldownExpiry') || '0');
+                
+                if (currentTime < cooldownExpiry) {
+                    // Ainda em cooldown
+                    const remainingMinutes = Math.ceil((cooldownExpiry - currentTime) / 60000);
+                    resultDiv.className = 'result fail';
+                    resultDiv.innerHTML = `<p>Você precisa esperar mais ${remainingMinutes} minutos para tentar novamente.</p>`;
+                    resultDiv.style.display = 'block';
+                    return;
+                }
+                
+                // Reset do jogo
+                attempts = 3;
+                round++;
+                updateAttemptsCounter();
+                
+                // A segunda rodada é um pouco mais fácil
+                if (round > 1) {
+                    updateRate = 100; // Deixa o timer um pouco mais lento
+                }
+                
+                timer.textContent = '0.00';
+                actionBtn.disabled = false;
+                tryAgainBtn.style.display = 'none';
+                resultDiv.style.display = 'none';
+            });
+            
+            // Atualizar o cronômetro com o delay solicitado
+            function updateTimer() {
+                const now = Date.now();
+                
+                // Adiciona delay artificial
+                const elapsedRealTime = (now - startTime) / 1000;
+                const displayTime = Math.min(elapsedRealTime, 15);
+                
+                timer.textContent = displayTime.toFixed(2);
+                lastTimerUpdate = now;
+                
+                // Limitar a 15 segundos para evitar que o jogo continue indefinidamente
+                if (displayTime >= 15) {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    
+                    actionBtn.textContent = 'INICIAR';
+                    
+                    attempts--;
+                    updateAttemptsCounter();
+                    
+                    if (attempts <= 0) {
+                        actionBtn.disabled = true;
+                        tryAgainBtn.style.display = 'inline-block';
+                    }
+                    
+                    resultDiv.className = 'result fail';
+                    resultDiv.innerHTML = `<p>Tempo esgotado! Você demorou muito.</p>
+                                          <p>Tente novamente para ganhar seus números!</p>`;
+                    resultDiv.style.display = 'block';
+                }
+            }
+            
+            // Atualizar o contador de tentativas
+            function updateAttemptsCounter() {
+                if (attempts > 0) {
+                    attemptsCounter.textContent = `Você tem ${attempts} tentativa${attempts !== 1 ? 's' : ''}`;
+                } else {
+                    attemptsCounter.textContent = 'Suas tentativas acabaram';
+                    
+                    // Definir cooldown de 5 minutos
+                    const cooldownExpiry = Date.now() + (5 * 60 * 1000); // 5 minutos
+                    localStorage.setItem('cooldownExpiry', cooldownExpiry.toString());
+                }
+            }
+            
+            // Verificar o resultado e mostrar a mensagem apropriada
+            function checkResult(time) {
+                const exactTarget = 10.00;
+                
+                // A margem de erro aumenta ligeiramente na segunda rodada
+                const closeTarget = round > 1 ? 0.30 : 0.25;
+                
+                // Vamos "ajustar" o tempo para 10.00 se estiver próximo (truque para todos ganharem)
+                const isClose = Math.abs(time - exactTarget) <= closeTarget;
+                
+                // Mostrar a animação de delay antes de revelar o resultado
+                if (isClose) {
+                    timer.textContent = time.toFixed(2);
+                    
+                    // Efeito de delay simulando o tempo "ajustando" para 10.00
+                    const delayAnimation = 800; // 800ms de delay
+                    
+                    // Desabilitar o botão durante a animação
+                    actionBtn.disabled = true;
+                    
+                    setTimeout(() => {
+                        // Animação suave para 10.00
+                        timer.classList.add('adjusting');
+                        
+                        // Incrementar ou decrementar para 10.00
+                        const steps = 5;
+                        const timeChange = (exactTarget - time) / steps;
+                        let currentStep = 1;
+                        
+                        const adjustInterval = setInterval(() => {
+                            const adjustedTime = time + (timeChange * currentStep);
+                            timer.textContent = adjustedTime.toFixed(2);
+                            
+                            currentStep++;
+                            if (currentStep > steps) {
+                                clearInterval(adjustInterval);
+                                timer.textContent = exactTarget.toFixed(2);
+                                
+                                // Mostre o resultado após o ajuste
+                                showWinResult();
+                                
+                                // Remover classe após a animação
+                                setTimeout(() => {
+                                    timer.classList.remove('adjusting');
+                                }, 300);
+                            }
+                        }, 120);
+                    }, delayAnimation);
+                } else {
+                    // Não acertou - mostrar resultado de falha imediatamente
+                    resultDiv.className = 'result fail';
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = `<p>Você parou em ${time.toFixed(2)} segundos, precisa ser 10.00!</p>
+                                          <p>Você ainda tem ${attempts} tentativa${attempts !== 1 ? 's' : ''}.</p>
+                                          <p>Dica: Conte mentalmente um segundo por número.</p>`;
+                    
+                    if (attempts <= 0) {
+                        resultDiv.innerHTML += `<p>Suas tentativas acabaram! Aguarde 5 minutos para tentar novamente.</p>`;
+                    }
+                }
+                
+                // Função de vitória chamada após o delay de ajuste
+                function showWinResult() {
+                    resultDiv.className = 'result success';
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = `
+                        <p>PARABÉNS! Você conseguiu parar em 10.00 segundos!</p>
+                        <div class="offer">SUPER OFERTA EXCLUSIVA!</div>
+                        <p>10.000 NÚMEROS POR APENAS R$ 29,90</p>
+                        <p>Aproveite agora esta oportunidade especial!</p>
+                        <button id="buyButton" class="buy-button">COMPRAR AGORA</button>
+                    `;
+                    
+                    // Configurar o botão de compra
+                    document.getElementById('buyButton').addEventListener('click', function() {
+                        // Aqui poderia direcionar para uma página de pagamento
+                        alert('Parabéns! Sua compra foi registrada com sucesso!');
+                    });
+                    
+                    timer.classList.add('highlight');
+                    createConfetti(true); // Criar super confetti
+                    
+                    // Quando ganhou, não precisa mais jogar
+                    attempts = 0;
+                    actionBtn.disabled = true;
+                    updateAttemptsCounter();
+                }
+                
+            }
+            
+            // Criar efeito de confete para celebrar a vitória - com opção super
+            function createConfetti(superEffect = false) {
+                const container = document.querySelector('.container');
+                const mainContent = document.querySelector('.main-content');
+                
+                // Quantidade de confetes - muito mais no modo super
+                const count = superEffect ? 300 : 150;
+                
+                // Adicionar som de comemoração
+                if (superEffect) {
+                    const celebrationSound = new Audio('data:audio/wav;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=');
+                    celebrationSound.play().catch(e => console.log('Áudio não foi reproduzido:', e));
+                }
+                
+                // Adicionar explosão de fogos de artifício
+                if (superEffect) {
+                    for (let i = 0; i < 5; i++) {
+                        setTimeout(() => {
+                            createFirework(container);
+                        }, i * 300);
+                    }
+                }
+                
+                for (let i = 0; i < count; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    
+                    // Posição aleatória - mais espalhado no modo super
+                    const parent = superEffect ? mainContent : container;
+                    const x = Math.random() * parent.offsetWidth;
+                    const y = superEffect ? (-50 - Math.random() * 200) : (-20 - Math.random() * 100);
+                    
+                    // Cores mais vibrantes no modo super
+                    const colors = superEffect 
+                        ? ['#10b981', '#3b82f6', '#ef4444', '#f59e0b', '#8b5cf6', '#fcd34d', '#a3e635', '#fda4af', '#22d3ee'] 
+                        : ['#10b981', '#3b82f6', '#ef4444', '#f59e0b', '#8b5cf6'];
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    // Tamanhos maiores no modo super
+                    const size = superEffect ? (8 + Math.random() * 15) : (5 + Math.random() * 10);
+                    
+                    // Formatos diferentes no modo super
+                    const isRound = superEffect ? Math.random() > 0.3 : true;
+                    
+                    // Aplicar estilos
+                    confetti.style.left = `${x}px`;
+                    confetti.style.top = `${y}px`;
+                    confetti.style.backgroundColor = color;
+                    confetti.style.width = `${size}px`;
+                    confetti.style.height = `${size}px`;
+                    confetti.style.position = 'absolute';
+                    confetti.style.borderRadius = isRound ? '50%' : '0';
+                    confetti.style.opacity = '0';
+                    confetti.style.zIndex = '1000';
+                    
+                    if (!isRound) {
+                        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    }
+                    
+                    parent.appendChild(confetti);
+                    
+                    // Animação mais longa e variada no modo super
+                    const duration = superEffect ? (2 + Math.random() * 4) : (1 + Math.random() * 3);
+                    const delay = Math.random() * (superEffect ? 1.5 : 0.8);
+                    
+                    // Movimento mais dramático no modo super
+                    const xMovement = superEffect ? (Math.random() - 0.5) * 500 : (Math.random() - 0.5) * 300;
+                    const yMovement = superEffect ? 600 + Math.random() * 400 : 400 + Math.random() * 200;
+                    
+                    confetti.style.animation = `fadeIn ${duration}s ease-out ${delay}s forwards`;
+                    confetti.style.transform = `translate(${xMovement}px, ${yMovement}px) rotate(${Math.random() * 720}deg)`;
+                    confetti.style.transition = `transform ${duration}s ease-out, opacity ${duration}s ease-out`;
+                    
+                    // Remover após a animação
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, (duration + delay) * 1000 + 2000);
+                    
+                    // Iniciar animação
+                    setTimeout(() => {
+                        confetti.style.opacity = '1';
+                    }, 10);
+                }
+            }
+            
+            // Criar efeito de fogos de artifício
+            function createFirework(container) {
+                const x = 100 + Math.random() * (container.offsetWidth - 200);
+                const y = 100 + Math.random() * (container.offsetHeight - 200);
+                
+                // Criar o centro da explosão
+                const center = document.createElement('div');
+                center.style.position = 'absolute';
+                center.style.left = `${x}px`;
+                center.style.top = `${y}px`;
+                center.style.width = '10px';
+                center.style.height = '10px';
+                center.style.borderRadius = '50%';
+                center.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                center.style.boxShadow = '0 0 20px 10px rgba(255, 255, 255, 0.5)';
+                center.style.zIndex = '1000';
+                container.appendChild(center);
+                
+                // Animação de pulso
+                center.animate([
+                    { transform: 'scale(0.1)', opacity: 1 },
+                    { transform: 'scale(3)', opacity: 0 }
+                ], {
+                    duration: 800,
+                    easing: 'ease-out'
+                });
+                
+                // Remover após a animação
+                setTimeout(() => center.remove(), 800);
+                
+                // Criar as partículas da explosão
+                const colors = ['#ffcc00', '#ff9900', '#ff5500', '#ff0000', '#ff00ff'];
+                
+                for (let i = 0; i < 50; i++) {
+                    const particle = document.createElement('div');
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    const size = 2 + Math.random() * 5;
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = 50 + Math.random() * 100;
+                    
+                    particle.style.position = 'absolute';
+                    particle.style.left = `${x}px`;
+                    particle.style.top = `${y}px`;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.borderRadius = '50%';
+                    particle.style.backgroundColor = color;
+                    particle.style.boxShadow = `0 0 ${size}px ${size / 2}px ${color}`;
+                    particle.style.zIndex = '1000';
+                    container.appendChild(particle);
+                    
+                    const destX = x + Math.cos(angle) * distance;
+                    const destY = y + Math.sin(angle) * distance;
+                    
+                    // Animação de trajetória
+                    particle.animate([
+                        { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                        { transform: `translate(${destX - x}px, ${destY - y}px) scale(0.5)`, opacity: 0.7 },
+                        { transform: `translate(${destX - x}px, ${destY - y}px) scale(0.2)`, opacity: 0 }
+                    ], {
+                        duration: 800 + Math.random() * 600,
+                        easing: 'cubic-bezier(0.1, 0.8, 0.9, 1)'
+                    });
+                    
+                    // Remover após a animação
+                    setTimeout(() => particle.remove(), 1500);
+                }
+            }
+            
+            // Inicializar o contador de tentativas
+            updateAttemptsCounter();
+            
+            // Duplicar os cards de depoimentos para criar um loop contínuo
+            const testimonialsContainer = document.getElementById('testimonialsContainer');
+            const originalCards = testimonialsContainer.querySelectorAll('.testimonial-card');
+            
+            // Ajustar a animação com base no número de cards
+            const totalWidth = originalCards.length * 280; // largura do card + margem
+            document.documentElement.style.setProperty('--total-width', `-${totalWidth}px`);
+        });
+    </script>
+</body>
+</html>

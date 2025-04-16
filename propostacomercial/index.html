@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FlowGenie - Proposta Comercial</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+        
+        :root {
+            --dark-bg: #0D0B14;
+            --accent: #6C63FF;
+            --light-accent: #8C82FF;
+            --text: #FFFFFF;
+            --secondary-text: #B8B8B8;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text);
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        .slide-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .slide {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+        
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0);
+            position: relative;
+            pointer-events: auto;
+        }
+        
+        .slide-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 2.5rem;
+            border-radius: 10px;
+            background: rgba(20, 17, 28, 0.7);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow-y: auto;
+            max-height: calc(100vh - 8rem);
+        }
+        
+        h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin-bottom: 1.5rem;
+            color: var(--text);
+            position: relative;
+            display: inline-block;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+        
+        h2 {
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            border-bottom: 1px solid rgba(108, 99, 255, 0.2);
+            padding-bottom: 0.5rem;
+        }
+        
+        h3 {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            margin-bottom: 1rem;
+            margin-top: 2rem;
+            color: var(--light-accent);
+            font-weight: 600;
+            letter-spacing: -0.2px;
+        }
+        
+        p {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            color: var(--secondary-text);
+        }
+        
+        strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+        
+        ul {
+            list-style-type: none;
+            margin-left: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        li {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            line-height: 1.6;
+            margin-bottom: 1.2rem;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent);
+            border-radius: 50%;
+        }
+        
+        .date {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            margin-bottom: 2rem;
+            color: var(--secondary-text);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 1rem;
+            display: inline-block;
+        }
+        
+        .navigation {
+            position: fixed;
+            bottom: 4rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            z-index: 100;
+            padding: 0.5rem 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 30px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .nav-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
+            display: block;
+        }
+        
+        .nav-btn.active {
+            background: var(--accent);
+            transform: scale(1.2);
+        }
+        
+        .nav-btn:hover {
+            background: var(--accent);
+        }
+        
+        .prev-next {
+            position: fixed;
+            bottom: 1rem;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 1rem;
+            z-index: 99;
+        }
+        
+        .btn {
+            background: rgba(108, 99, 255, 0.2);
+            color: var(--text);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid rgba(108, 99, 255, 0.3);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .btn:hover {
+            background: var(--accent);
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+        }
+        
+        .solution {
+            margin-top: 2rem;
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 3px solid var(--accent);
+        }
+        
+        .solution:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .solution-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 1rem;
+        }
+        
+        .price {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 700;
+            color: var(--accent);
+            margin: 1.5rem 0;
+            display: inline-block;
+            position: relative;
+        }
+        
+        .price::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+        }
+        
+        .detail {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .tools {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .tool {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .tool-icon {
+            width: clamp(40px, 10vw, 50px);
+            height: clamp(40px, 10vw, 50px);
+            transition: all 0.3s ease;
+        }
+        
+        .tool:hover .tool-icon {
+            transform: scale(1.1);
+        }
+        
+        .tool-name {
+            font-size: clamp(0.7rem, 2vw, 0.8rem);
+            color: var(--secondary-text);
+        }
+        
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s forwards;
+            opacity: 0;
+        }
+        
+        .delay-1 {
+            animation-delay: 0.2s;
+        }
+        
+        .delay-2 {
+            animation-delay: 0.4s;
+        }
+        
+        .delay-3 {
+            animation-delay: 0.6s;
+        }
+        
+        .delay-4 {
+            animation-delay: 0.8s;
+        }
+        
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+        }
+        
+        /* Media queries - Mais estruturadas e consistentes */
+        @media (max-width: 992px) {
+            .slide-content {
+                padding: 2rem;
+                max-height: calc(100vh - 7rem);
+            }
+            
+            .solution {
+                padding: 1.8rem;
+                margin-top: 1.8rem;
+                margin-bottom: 1.8rem;
+            }
+            
+            .tools {
+                justify-content: space-around;
+                gap: 1.2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .two-columns {
+                grid-template-columns: 1fr;
+                gap: 1.8rem;
+            }
+            
+            .slide-content {
+                padding: 1.5rem;
+                max-height: calc(100vh - 6rem);
+                margin: 0 0.5rem;
+            }
+            
+            .navigation {
+                bottom: 4.5rem;
+            }
+            
+            .solution {
+                padding: 1.5rem;
+                margin-top: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .solution-title {
+                margin-bottom: 1rem;
+            }
+            
+            .tools {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            li {
+                padding-left: 1.3rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .slide {
+                padding: 1rem;
+            }
+            
+            .slide-content {
+                padding: 1.2rem;
+                max-height: calc(100vh - 5rem);
+                border-radius: 8px;
+                margin: 0;
+            }
+            
+            .navigation {
+                bottom: 4.2rem;
+                padding: 0.4rem 0.8rem;
+            }
+            
+            .prev-next {
+                padding: 0 0.8rem;
+            }
+            
+            .btn {
+                padding: 0.6rem 1rem;
+            }
+            
+            .solution {
+                padding: 1.2rem;
+                margin-top: 1.2rem;
+                margin-bottom: 1.2rem;
+            }
+            
+            .solution-title {
+                margin-bottom: 0.8rem;
+                padding-bottom: 0.8rem;
+            }
+            
+            .tools {
+                gap: 0.8rem;
+            }
+            
+            .tool-icon {
+                width: 40px;
+                height: 40px;
+            }
+            
+            li::before {
+                width: 6px;
+                height: 6px;
+                top: 0.45rem;
+            }
+            
+            .price::after {
+                width: 40px;
+                height: 2px;
+                bottom: -6px;
+            }
+            
+            h1::after {
+                width: 60px;
+                height: 3px;
+                bottom: -8px;
+            }
+        }
+        
+        @media (max-width: 375px) {
+            .slide {
+                padding: 0.8rem;
+            }
+            
+            .slide-content {
+                padding: 1rem;
+                border-radius: 6px;
+            }
+            
+            .btn {
+                padding: 0.5rem 0.8rem;
+            }
+            
+            .navigation {
+                bottom: 4rem;
+                gap: 0.4rem;
+            }
+            
+            .nav-btn {
+                width: 10px;
+                height: 10px;
+            }
+            
+            .solution {
+                padding: 1rem;
+                margin-top: 1rem;
+                margin-bottom: 1rem;
+            }
+        }
+        
+        @media (min-height: 800px) {
+            .slide-content {
+                max-height: calc(100vh - 10rem);
+            }
+        }
+        
+        @media (min-width: 1600px) {
+            .slide-content {
+                max-width: 1400px;
+                padding: 3rem;
+            }
+        }
+        
+        /* Acessibilidade e usabilidade aprimoradas */
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+        
+        .btn:focus, .nav-btn:focus {
+            outline: 2px solid var(--light-accent);
+            outline-offset: 2px;
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            .slide, .fade-in, .solution, .tool-icon, .btn, .nav-btn.active {
+                transition: none;
+            }
+            
+            .fade-in {
+                animation: none;
+                opacity: 1;
+            }
+            
+            .slide-container {
+                scroll-behavior: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles-js" aria-hidden="true"></div>
+    
+    <div class="slide-container">
+        <!-- Slide 1: Capa -->
+        <div class="slide active" id="slide-1" role="region" aria-label="Capa">
+            <div class="slide-content">
+                <h1 class="fade-in">FlowGenie</h1>
+                <div class="date fade-in delay-1"><strong>Data:</strong> 16 de Abril, 2025</div>
+                <div class="fade-in delay-1">
+                    <h2>Proposta Comercial</h2>
+                </div>
+                <div class="fade-in delay-2">
+                    <h3>Soluções em IA e Automação</h3>
+                    <p>Transforme seu atendimento e gestão de clientes com nossa solução de inteligência artificial e automação de processos comerciais.</p>
+                </div>
+                
+                <div class="tools fade-in delay-3">
+                    <div class="tool">
+                        <svg class="tool-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path fill="#6C63FF" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <circle cx="12" cy="12" r="4" fill="#6C63FF" opacity="0.4"/>
+                        </svg>
+                        <span class="tool-name">Inteligência Artificial</span>
+                    </div>
+                    <div class="tool">
+                        <svg class="tool-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path fill="#25D366" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <path fill="#25D366" d="M12 6.5c-3.03 0-5.5 2.47-5.5 5.5 0 1.15.36 2.22.97 3.11l-.94 2.89 3.01-.94c.84.53 1.84.84 2.92.84 3.03 0 5.5-2.47 5.5-5.5S15.03 6.5 12 6.5zm2.5 7.5h-5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5h5c.28 0 .5.22.5.5s-.22.5-.5.5zm0-2h-5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5h5c.28 0 .5.22.5.5s-.22.5-.5.5z"/>
+                        </svg>
+                        <span class="tool-name">WhatsApp</span>
+                    </div>
+                    <div class="tool">
+                        <svg class="tool-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path fill="#4285F4" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <path fill="#4285F4" d="M12 7v5.5l4.5 2.7-0.75 1.2L11 13V7z"/>
+                        </svg>
+                        <span class="tool-name">Google Agenda</span>
+                    </div>
+                    <div class="tool">
+                        <svg class="tool-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path fill="#FF5722" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <path fill="#FF5722" d="M15 6H9c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H9V8h6v8z"/>
+                            <path fill="#FF5722" d="M10 9h4v2h-4z" opacity="0.6"/>
+                            <path fill="#FF5722" d="M10 12h4v1h-4z" opacity="0.6"/>
+                            <path fill="#FF5722" d="M10 14h4v1h-4z" opacity="0.6"/>
+                        </svg>
+                        <span class="tool-name">CRM</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 2: Solução 1 -->
+        <div class="slide" id="slide-2" role="region" aria-label="Solução 01">
+            <div class="slide-content">
+                <h2 class="fade-in">Solução 01</h2>
+                <h3 class="fade-in">Agente de IA integrado com Multiatendimento</h3>
+                
+                <div class="solution fade-in delay-1">
+                    <div class="solution-title">
+                        <h3>Características</h3>
+                    </div>
+                    <ul>
+                        <li><strong>Agente de IA:</strong> Faz o pré-atendimento e direciona leads para setores (financeiro, construtivo, supply chain, customer success...)</li>
+                        <li><strong>Multiatendimento:</strong> Com um número de whatsapp é possível cadastrar diferentes colaboradores em diferentes setores de atendimento</li>
+                        <li><strong>Agendamentos Automáticos:</strong> A IA pode efetuar agendamentos automáticos de reuniões se baseando no calendário google. Interpreta áudio e texto</li>
+                        <li><strong>Gerenciamento de CRM:</strong> Dependendo da resposta do Lead a IA direciona para a etapa correspondente dentro do CRM</li>
+                    </ul>
+                </div>
+                
+                <div class="fade-in delay-2">
+                    <h3>Descrição</h3>
+                    <p>Automatize o atendimento inicial e direcione os clientes para o departamento correto, aumentando a eficiência do seu processo comercial.</p>
+                </div>
+                
+                <div class="tools fade-in delay-3">
+                    <div class="tool">
+                        <svg class="tool-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path fill="#6C63FF" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <circle cx="8" cy="9" r="2" fill="#6C63FF"/>
+                            <circle cx="16" cy="9" r="2" fill="#6C63FF"/>
+                            <path fill="#6C63FF" d="M12 18c2.28 0 4.22-1.66 5-4H7c.78 2.34 2.72 4 5 4z"/>
+                        </svg>
+                        <span class="tool-name">Agente IA</span>
+                    </div>
+                    <div class="tool">
+                        <svg class="tool-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path fill="#25D366" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <path fill="#25D366" d="M12 6.5c-3.03 0-5.5 2.47-5.5 5.5 0 1.15.36 2.22.97 3.11l-.94 2.89 3.01-.94c.84.53 1.84.84 2.92.84 3.03 0 5.5-2.47 5.5-5.5S15.03 6.5 12 6.5zm2.5 7.5h-5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5h5c.28 0 .5.22.5.5s-.22.5-.5.5zm0-2h-5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5h5c.28 0 .5.22.5.5s-.22.5-.5.5z"/>
+                        </svg>
+                        <span class="tool-name">WhatsApp</span>
+                    </div>
+                    <div class="tool">
+                        <svg class="tool-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path fill="#4285F4" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <path fill="#4285F4" d="M12 7v5.5l4.5 2.7-0.75 1.2L11 13V7z"/>
+                        </svg>
+                        <span class="tool-name">Agendamento</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 3: Solução 2 -->
+        <div class="slide" id="slide-3" role="region" aria-label="Solução 02">
+            <div class="slide-content">
+                <h2 class="fade-in">Solução 02</h2>
+                <h3 class="fade-in">Criação de Processo Comercial e Implementação de CRM</h3>
+                
+                <div class="solution fade-in delay-1">
+                    <div class="solution-title">
+                        <h3>Características</h3>
+                    </div>
+                    <ul>
+                        <li><strong>Criação do CRM e automações:</strong> Será criado o CRM e definido suas etapas da jornada do cliente, além disso, algumas automações serão feitas dependendo sucesso do contato com o cliente (ex: envio de contrato)</li>
+                        <li><strong>Multiatendimento:</strong> Com um número de whatsapp é possível cadastrar diferentes colaboradores em diferentes setores de atendimento</li>
+                        <li><strong>Agendamentos Automáticos:</strong> A IA pode efetuar agendamentos automáticos de reuniões se baseando no calendário google. Interpreta áudio e texto</li>
+                        <li><strong>Gerenciamento de CRM:</strong> Dependendo da resposta do Lead a IA direciona para a etapa correspondente dentro do CRM</li>
+                    </ul>
+                </div>
+                
+                <div class="fade-in delay-2">
+                    <h3>Descrição</h3>
+                    <p>Organize todo o processo de vendas com um CRM personalizado que se adapta ao seu modelo de negócio e automatiza tarefas repetitivas.</p>
+                </div>
+                
+                <div class="tools fade-in delay-3">
+                    <div class="tool">
+                        <svg class="tool-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path fill="#FF5722" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <path fill="#FF5722" d="M15 6H9c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H9V8h6v8z"/>
+                            <path fill="#FF5722" d="M10 9h4v2h-4z" opacity="0.6"/>
+                            <path fill="#FF5722" d="M10 12h4v1h-4z" opacity="0.6"/>
+                            <path fill="#FF5722" d="M10 14h4v1h-4z" opacity="0.6"/>
+                        </svg>
+                        <span class="tool-name">CRM</span>
+                    </div>
+                    <div class="tool">
+                        <svg class="tool-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path fill="#00BCD4" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <path fill="#00BCD4" d="M15 6v12l-6-6z" opacity="0.7"/>
+                        </svg>
+                        <span class="tool-name">Processos</span>
+                    </div>
+                    <div class="tool">
+                        <svg class="tool-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path fill="#8BC34A" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <path fill="#8BC34A" d="M12 6c-3.3 0-6 2.7-6 6s2.7 6 6 6 6-2.7 6-6-2.7-6-6-6zm3 7H9c-.55 0-1-.45-1-1s.45-1 1-1h6c.55 0 1 .45 1 1s-.45 1-1 1zm0-2H9c-.55 0-1-.45-1-1s.45-1 1-1h6c.55 0 1 .45 1 1s-.45 1-1 1z" opacity="0.7"/>
+                        </svg>
+                        <span class="tool-name">Automação</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 4: Planos e Valores -->
+        <div class="slide" id="slide-4" role="region" aria-label="Planos e Valores">
+            <div class="slide-content">
+                <h2 class="fade-in">Planos e Valores</h2>
+                
+                <div class="two-columns">
+                    <div class="solution fade-in delay-1">
+                        <div class="solution-title">
+                            <h3>Agente IA com Multiatendimento</h3>
+                        </div>
+                        <div class="price">R$ 7.000</div>
+                        <p><strong>Pagamento único</strong> | Implementação em até 15 dias úteis</p>
+                        
+                        <h3>Inclui:</h3>
+                        <ul>
+                            <li>Agente de IA para pré-atendimento</li>
+                            <li>Multiatendimento via WhatsApp</li>
+                            <li>Agendamentos automáticos</li>
+                            <li>Gerenciamento de CRM</li>
+                            <li>Treinamento para equipe</li>
+                            <li>Suporte técnico por 3 meses</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="solution fade-in delay-2">
+                        <div class="solution-title">
+                            <h3>CRM com Processo Comercial</h3>
+                        </div>
+                        <div class="price">R$ 6.000</div>
+                        <p><strong>Pagamento único</strong> | Implementação em até 15 dias úteis</p>
+                        
+                        <h3>Inclui:</h3>
+                        <ul>
+                            <li>Criação do CRM personalizado</li>
+                            <li>Definição de jornada do cliente</li>
+                            <li>Automações de processos</li>
+                            <li>Integração completa</li>
+                            <li>Treinamento para equipe</li>
+                            <li>Suporte técnico por 3 meses</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="tools fade-in delay-4">
+                    <div class="tool">
+                        <svg class="tool-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path fill="#2196F3" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <path fill="#2196F3" d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm1 10h-2v-2h2v2zm0-4h-2V8h2v4z" opacity="0.7"/>
+                        </svg>
+                        <span class="tool-name">Suporte</span>
+                    </div>
+                    <div class="tool">
+                        <svg class="tool-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path fill="#9C27B0" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <path fill="#9C27B0" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm2 5h-4v-2h4v2z" opacity="0.7"/>
+                        </svg>
+                        <span class="tool-name">Treinamento</span>
+                    </div>
+                    <div class="tool">
+                        <svg class="tool-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path fill="#FFC107" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <path fill="#FFC107" d="M13 7h-2v5h5v-2h-3z" opacity="0.7"/>
+                        </svg>
+                        <span class="tool-name">Implementação</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="navigation" id="navigation" role="navigation" aria-label="Navegação de slides">
+        <!-- Navigation dots will be added by JavaScript -->
+    </div>
+    
+    <div class="prev-next" role="navigation" aria-label="Botões de navegação">
+        <button class="btn" id="prev-btn" aria-label="Slide anterior">← Anterior</button>
+        <button class="btn" id="next-btn" aria-label="Próximo slide">Próximo →</button>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Preload SVG icons with proper colors
+            const preloadSVGStyles = document.createElement('style');
+            preloadSVGStyles.textContent = `
+                .tool-icon path, .tool-icon circle {
+                    transition: all 0.3s ease;
+                }
+                .tool:hover .tool-icon path, .tool:hover .tool-icon circle {
+                    opacity: 1 !important;
+                }
+            `;
+            document.head.appendChild(preloadSVGStyles);
+            
+            const slides = document.querySelectorAll('.slide');
+            const navContainer = document.getElementById('navigation');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            let currentSlide = 0;
+            let touchStartX = 0;
+            let touchEndX = 0;
+            let touchStartY = 0;
+            let touchEndY = 0;
+            let isScrolling;
+            
+            // Verificar se dispositivo suporta toques
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            
+            // Create navigation dots
+            slides.forEach((slide, index) => {
+                const dot = document.createElement('div');
+                dot.classList.add('nav-btn');
+                dot.setAttribute('role', 'button');
+                dot.setAttribute('tabindex', '0');
+                dot.setAttribute('aria-label', `Ir para o slide ${index + 1}`);
+                if (index === 0) {
+                    dot.classList.add('active');
+                    dot.setAttribute('aria-current', 'true');
+                }
+                dot.addEventListener('click', () => goToSlide(index));
+                dot.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        goToSlide(index);
+                    }
+                });
+                navContainer.appendChild(dot);
+            });
+            
+            // Navigation buttons
+            prevBtn.addEventListener('click', prevSlide);
+            nextBtn.addEventListener('click', nextSlide);
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight') nextSlide();
+                if (e.key === 'ArrowLeft') prevSlide();
+            });
+            
+            // Improved touch navigation
+            if (isTouchDevice) {
+                document.addEventListener('touchstart', handleTouchStart, { passive: true });
+                document.addEventListener('touchmove', handleTouchMove, { passive: true });
+                document.addEventListener('touchend', handleTouchEnd, { passive: true });
+            }
+            
+            function handleTouchStart(e) {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                isScrolling = undefined;
+            }
+            
+            function handleTouchMove(e) {
+                if (!touchStartX || !touchStartY) return;
+                
+                const touchX = e.touches[0].clientX;
+                const touchY = e.touches[0].clientY;
+                const diffX = touchStartX - touchX;
+                const diffY = touchStartY - touchY;
+                
+                // Determinar se o usuário está tentando rolar verticalmente
+                if (isScrolling === undefined) {
+                    isScrolling = Math.abs(diffY) > Math.abs(diffX);
+                }
+                
+                // Se estiver rolando verticalmente, não prevenir o comportamento padrão
+                if (isScrolling) return;
+                
+                // Se for um movimento horizontal, prevenir comportamento padrão para evitar conflitos
+                if (Math.abs(diffX) > 10) {
+                    e.preventDefault();
+                }
+            }
+            
+            function handleTouchEnd(e) {
+                if (isScrolling) return;
+                
+                const touchX = e.changedTouches[0].clientX;
+                const touchY = e.changedTouches[0].clientY;
+                
+                touchEndX = touchX;
+                touchEndY = touchY;
+                
+                const diffX = touchStartX - touchEndX;
+                const diffY = touchStartY - touchEndY;
+                
+                // Verificar se o movimento foi mais horizontal que vertical
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    handleSwipe(diffX);
+                }
+                
+                // Resetar posição para o próximo toque
+                touchStartX = 0;
+                touchStartY = 0;
+            }
+            
+            function handleSwipe(diffX) {
+                const threshold = 50; // Minimum swipe distance
+                
+                if (diffX > threshold) {
+                    // Swipe para a esquerda - próximo slide
+                    nextSlide();
+                } else if (diffX < -threshold) {
+                    // Swipe para a direita - slide anterior
+                    prevSlide();
+                }
+            }
+            
+            function goToSlide(index) {
+                if (index < 0) index = slides.length - 1;
+                if (index >= slides.length) index = 0;
+                
+                // Anunciar a mudança para leitores de tela
+                const liveRegion = document.createElement('div');
+                liveRegion.setAttribute('aria-live', 'polite');
+                liveRegion.setAttribute('class', 'visually-hidden');
+                document.body.appendChild(liveRegion);
+                liveRegion.textContent = `Slide ${index + 1} de ${slides.length}`;
+                
+                setTimeout(() => {
+                    document.body.removeChild(liveRegion);
+                }, 1000);
+                
+                slides[currentSlide].classList.remove('active');
+                slides[index].classList.add('active');
+                
+                // Reset animations
+                const animElements = slides[index].querySelectorAll('.fade-in');
+                animElements.forEach(el => {
+                    // Verificar se o usuário prefere movimento reduzido
+                    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                        el.style.animation = 'none';
+                        setTimeout(() => {
+                            el.style.animation = '';
+                        }, 10);
+                    } else {
+                        el.style.opacity = 1;
+                    }
+                });
+                
+                // Update navigation dots
+                const dots = document.querySelectorAll('.nav-btn');
+                dots[currentSlide].classList.remove('active');
+                dots[currentSlide].removeAttribute('aria-current');
+                dots[index].classList.add('active');
+                dots[index].setAttribute('aria-current', 'true');
+                
+                currentSlide = index;
+                
+                // Scroll to top of slide content when changing slides (for mobile)
+                const slideContent = slides[index].querySelector('.slide-content');
+                if (slideContent) {
+                    slideContent.scrollTop = 0;
+                }
+                
+                // Atualizar o atributo aria-current para o slide atual
+                slides.forEach((slide, i) => {
+                    if (i === index) {
+                        slide.setAttribute('aria-current', 'true');
+                    } else {
+                        slide.removeAttribute('aria-current');
+                    }
+                });
+                
+                // Focar no conteúdo do slide para leitores de tela
+                slides[index].focus();
+            }
+            
+            function nextSlide() {
+                goToSlide(currentSlide + 1);
+            }
+            
+            function prevSlide() {
+                goToSlide(currentSlide - 1);
+            }
+            
+            // Detectar preferências de movimento reduzido
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            
+            // Configurar particles.js com base nas capacidades do dispositivo e preferências
+            const isLowEnd = navigator.deviceMemory && navigator.deviceMemory < 4;
+            const isLowEndExperience = isLowEnd || window.innerWidth < 768 || prefersReducedMotion;
+            
+            // Configuração diferente baseada no tipo de dispositivo
+            const particlesConfig = {
+                particles: {
+                    number: {
+                        value: isLowEndExperience ? 20 : 50,
+                        density: {
+                            enable: true,
+                            value_area: 800
+                        }
+                    },
+                    color: {
+                        value: '#6C63FF'
+                    },
+                    shape: {
+                        type: 'circle',
+                        stroke: {
+                            width: 0,
+                            color: '#000000'
+                        }
+                    },
+                    opacity: {
+                        value: 0.2,
+                        random: true,
+                        anim: {
+                            enable: !isLowEndExperience,
+                            speed: 0.3,
+                            opacity_min: 0.1,
+                            sync: false
+                        }
+                    },
+                    size: {
+                        value: 3,
+                        random: true,
+                        anim: {
+                            enable: false
+                        }
+                    },
+                    line_linked: {
+                        enable: !isLowEndExperience,
+                        distance: 150,
+                        color: '#6C63FF',
+                        opacity: 0.2,
+                        width: 1
+                    },
+                    move: {
+                        enable: true,
+                        speed: isLowEndExperience ? 0.5 : 1,
+                        direction: 'none',
+                        random: false,
+                        straight: false,
+                        out_mode: 'out',
+                        bounce: false
+                    }
+                },
+                interactivity: {
+                    detect_on: 'canvas',
+                    events: {
+                        onhover: {
+                            enable: !isLowEndExperience && !isTouchDevice,
+                            mode: 'grab'
+                        },
+                        onclick: {
+                            enable: !isLowEndExperience && !isTouchDevice,
+                            mode: 'push'
+                        },
+                        resize: true
+                    },
+                    modes: {
+                        grab: {
+                            distance: 140,
+                            line_linked: {
+                                opacity: 0.5
+                            }
+                        },
+                        push: {
+                            particles_nb: 2
+                        }
+                    }
+                },
+                retina_detect: !isLowEndExperience
+            };
+            
+            // Inicializar particles.js com a configuração adaptada
+            if (!prefersReducedMotion) {
+                if (typeof particlesJS !== 'undefined') {
+                    particlesJS('particles-js', particlesConfig);
+                }
+            }
+            
+            // Adicionar atributos aria-hidden para elementos decorativos
+            document.querySelectorAll('.particles').forEach(el => {
+                el.setAttribute('aria-hidden', 'true');
+            });
+            
+            // Redimensionamento responsivo
+            const handleResize = debounce(function() {
+                // Redefinir a altura do slide container
+                const windowHeight = window.innerHeight;
+                document.documentElement.style.setProperty('--vh', `${windowHeight * 0.01}px`);
+                
+                // Reinicializar particles.js para telas muito pequenas ou com memória limitada
+                if (typeof particlesJS !== 'undefined' && !prefersReducedMotion) {
+                    particlesJS('particles-js', particlesConfig);
+                }
+            }, 250);
+            
+            window.addEventListener('resize', handleResize);
+            
+            // Iniciar a configuração inicial
+            handleResize();
+            
+            // Função para limitar a taxa de execução de uma função
+            function debounce(func, wait) {
+                let timeout;
+                return function() {
+                    const context = this;
+                    const args = arguments;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => {
+                        func.apply(context, args);
+                    }, wait);
+                };
+            }
+            
+            // Garantir que o slide atual esteja visível
+            setTimeout(() => {
+                goToSlide(currentSlide);
+            }, 100);
+        });
+    </script>
+</body>
+</html>
